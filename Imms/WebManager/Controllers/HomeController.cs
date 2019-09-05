@@ -27,7 +27,7 @@ namespace Imms.WebManager.Controllers
         [Route("/home/userMenu"),HttpGet]        
         public ActionResult<string> GetUserMenu()
         {            
-            string path = this.host.WebRootPath + @"\resources\data\Administrator.json";           
+            string path = this.host.WebRootPath + @"/resources/data/Administrator.json";           
             string menuData = System.IO.File.ReadAllText(path);
 
             return menuData;
