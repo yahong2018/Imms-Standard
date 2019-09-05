@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Imms.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Imms.Data.Domain
+namespace Imms.Security.Data.Domain
 {
     public partial class SystemUser : Entity<long>
     {
@@ -17,6 +18,7 @@ namespace Imms.Data.Domain
 
         public virtual List<RoleUser> Roles { get; set; } = new List<RoleUser>();
     }
+    
     public partial class SystemRole : Entity<long>
     {
         public string RoleCode { get; set; }
@@ -48,7 +50,7 @@ namespace Imms.Data.Domain
         public long UserId { get; set; }
 
         public virtual SystemRole Role { get; set; }
-        public virtual SystemUser User { get; set; }        
+        public virtual SystemUser User { get; set; }
     }
 
     public partial class RolePrivilege : Entity<long>
@@ -59,7 +61,7 @@ namespace Imms.Data.Domain
         public string PrivilegeCode { get; set; }
 
         public virtual ProgramPrivilege PorgramPrivielge { get; set; }
-        public virtual SystemRole Role { get; set; }        
+        public virtual SystemRole Role { get; set; }
     }
 
     public partial class ProgramPrivilege : Entity<long>

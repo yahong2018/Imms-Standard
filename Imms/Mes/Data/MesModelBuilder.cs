@@ -6,18 +6,9 @@ using System.Text;
 
 namespace Imms.Mes.Data
 {
-    public partial class MesDbContext : ImmsDbContext
+    public  class MesModelBuilder:ICustomModelBuilder
     {
-        public MesDbContext()
-        {
-        }
-
-        public MesDbContext(DbContextOptions<MesDbContext> options)
-            : base(options)
-        {
-        }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        public void BuildModel(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.3-servicing-35854");
 
@@ -38,21 +29,6 @@ namespace Imms.Mes.Data
 
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.OperatorConfigure());
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.OperatorCapabilityConfigure());
-
-            base.OnModelCreating(modelBuilder);
-        }
-    }
-
-    public class ImmsDbContextFactory : IDbContextFactory
-    {
-        public DbContext GetContext()
-        {
-            return new MesDbContext();
-        }
-
-        public DbContext GetContext(string connectionString)
-        {
-            throw new NotImplementedException();
         }
     }
 }

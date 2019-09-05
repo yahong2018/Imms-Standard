@@ -1,4 +1,5 @@
 ﻿using System;
+using Imms.Data;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -52,7 +53,7 @@ namespace Imms.Data.Domain
         }
     }
 
-    public class PlanCodeConfigure : TrackableEntityConfigure<SimpleCode>
+    public class SimpleCodeConfigure : TrackableEntityConfigure<SimpleCode>
     {
         protected override void InternalConfigure(EntityTypeBuilder<SimpleCode> builder)
         {

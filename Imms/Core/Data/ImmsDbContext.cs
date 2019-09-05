@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Imms.Data
 {
-    public abstract class ImmsDbContext : DbContext
+    public class ImmsDbContext : DbContext
     {
         public ImmsDbContext()
         {
@@ -16,17 +16,18 @@ namespace Imms.Data
 
         public ImmsDbContext(DbContextOptions options)
             : base(options)
-        {   
+        {
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                if (ConfigurationManager.ConnectionString.ProviderType ==  ProviderType.SqlServer)
+                if (ConfigurationManager.ConnectionString.ProviderType == ProviderType.SqlServer)
                 {
                     optionsBuilder.UseSqlServer(ConfigurationManager.ConnectionString.ConnectionUrl);
-                }else if (ConfigurationManager.ConnectionString.ProviderType == ProviderType.MySql )
+                }
+                else if (ConfigurationManager.ConnectionString.ProviderType == ProviderType.MySql)
                 {
                     optionsBuilder.UseMySQL(ConfigurationManager.ConnectionString.ConnectionUrl);
                 }
@@ -112,8 +113,6 @@ namespace Imms.Data
             return dmlType;
         }
 
-
-
         private void FillTracableData(EntityEntry entry)
         {
             if (!(entry.Entity is ITrackableEntity))
@@ -132,41 +131,35 @@ namespace Imms.Data
             }
         }
 
-      
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new ProgramPrivilegeConfigure());
-            modelBuilder.ApplyConfiguration(new RolePrivilegeConfigure());
-            modelBuilder.ApplyConfiguration(new RoleUserConfigure());
-            modelBuilder.ApplyConfiguration(new SystemProgramConfigure());
-            modelBuilder.ApplyConfiguration(new SystemRoleConfigure());
-            modelBuilder.ApplyConfiguration(new SystemUserConfigure());
+            modelBuilder.ApplyConfiguration(new TreeCodeConfigure());
+            modelBuilder.ApplyConfiguration(new SimpleCodeConfigure());
+            modelBuilder.ApplyConfiguration(new CodeSeedConfigure());
+
             modelBuilder.ApplyConfiguration(new SysetmAppConfigure());
             modelBuilder.ApplyConfiguration(new DataExchangeRuleConfigure());
             modelBuilder.ApplyConfiguration(new DataExcahngeConfigure());
+
             modelBuilder.ApplyConfiguration(new MediaConfigure());
-            modelBuilder.ApplyConfiguration(new Imms.Data.Domain.TreeCodeConfigure());
-            modelBuilder.ApplyConfiguration(new PlanCodeConfigure());
-            modelBuilder.ApplyConfiguration(new CodeSeedConfigure());
-            modelBuilder.ApplyConfiguration(new Imms.Data.Domain.WorkOrganizationUnitConfigure());
+            foreach (ICustomModelBuilder customModelBuilder in customModelBuilders)
+            {
+                customModelBuilder.BuildModel(modelBuilder);
+            }
 
             base.OnModelCreating(modelBuilder);
         }
 
-        // public virtual DbSet<CodeSeed> CodeSeeds { get; set; }
-        // public virtual DbSet<PlanCode> PlanCodes { get; set; }
-        // public virtual DbSet<ProgramPrivilege> ProgramPrivileges { get; set; }
-        // public virtual DbSet<RolePrivilege> RolePrivileges { get; set; }
-        // public virtual DbSet<RoleUser> RoleUsers { get; set; }
-        // public virtual DbSet<SystemProgram> SystemPrograms { get; set; }
-        // public virtual DbSet<SystemRole> SystemRoles { get; set; }
-        // public virtual DbSet<SystemUser> SystemUsers { get; set; }
-        // public virtual DbSet<TreeCode> TreeCodes { get; set; }
-        // public virtual DbSet<WorkOrganizationUnit> WorkOrganizationUnits { get; set; }
-        // public virtual DbSet<SystemApp> SystemApps { get; set; }
-        // public virtual DbSet<ThirdPartDataExcahngeRule> ThirdPartDataExcahngeRules { get; set; }
-        // public virtual DbSet<ThirdPartDataExchangeTask> ThirdPartDataExchanges { get; set; }
-        // public virtual DbSet<Media> Medias { get; set; }        
+        private static List<ICustomModelBuilder> customModelBuilders = new List<ICustomModelBuilder>();
+
+        public static void RegisterModelBuilders(ICustomModelBuilder builder)
+        {
+            customModelBuilders.Add(builder);
+        }
+    }
+
+    public interface ICustomModelBuilder
+    {
+        void BuildModel(ModelBuilder modelBuilder);
     }
 }

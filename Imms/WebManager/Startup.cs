@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Imms.WebManager.Filters;
+using Imms.Data;
 
 namespace Imms.WebManager
 {
@@ -39,11 +40,11 @@ namespace Imms.WebManager
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();     
 
-            //services.AddOptions();
 
-            //services.Configure<ConnectionString>(this.Configuration);            
+            ImmsDbContext.RegisterModelBuilders(new Imms.Security.Data.SecurityModelBuilder());
+            ImmsDbContext.RegisterModelBuilders(new Imms.Mes.Data.MesModelBuilder());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
