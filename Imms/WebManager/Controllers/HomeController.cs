@@ -36,7 +36,10 @@ namespace Imms.WebManager.Controllers
         [Route("/home/currentLogin"), HttpGet]
         public ActionResult<string> GetCurrentLogin()
         {
-            return "{\"company\":\"爱三(佛山)汽车配件有限公司\", \"userName\":\"陶红安\",\"userCode\":\"ZHXH001\"}";
+            string userCode = this.HttpContext.User.Claims.First(x=>x.Type == "UserCode").Value;
+            string userName = this.HttpContext.User.Claims.First(x => x.Type == "UserName").Value;
+
+            return "{\"company\":\"爱三(佛山)汽车配件有限公司\", \"userName\":\""+userName+"\",\"userCode\":\""+userCode+"\"}";
         }
     }
 }

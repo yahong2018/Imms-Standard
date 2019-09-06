@@ -13,7 +13,7 @@ using System.Transactions;
 
 namespace Imms.Data
 {
-    public class CommonDAO
+    public class CommonRepository
     {
         private static readonly SortedList<Guid, string> _TypeKeyPropertyNameList = new SortedList<Guid, string>();
         private static readonly SortedDictionary<Guid, string> _TableDisplayLabelList = new SortedDictionary<Guid, string>();

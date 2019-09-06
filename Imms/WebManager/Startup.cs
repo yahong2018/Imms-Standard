@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Imms.WebManager.Filters;
 using Imms.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Imms.WebManager
 {
@@ -40,8 +41,9 @@ namespace Imms.WebManager
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();     
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();   
 
+            GlobalConstants.DbContextFactory = new DbContextFactory();
 
             ImmsDbContext.RegisterModelBuilders(new Imms.Security.Data.SecurityModelBuilder());
             ImmsDbContext.RegisterModelBuilders(new Imms.Mes.Data.MesModelBuilder());
@@ -73,6 +75,19 @@ namespace Imms.WebManager
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+        }
+    }
+
+    public class DbContextFactory : IDbContextFactory
+    {
+        public DbContext GetContext()
+        {
+            return new ImmsDbContext();
+        }
+
+        public DbContext GetContext(string connectionString)
+        {
+            throw new NotImplementedException();
         }
     }
 }

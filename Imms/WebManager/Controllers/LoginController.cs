@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Imms.Security.Data;
+using Imms.Security.Data.Domain;
 
 namespace Imms.WebManager.Controllers
 {
@@ -13,40 +15,46 @@ namespace Imms.WebManager.Controllers
     public class LoginController : Controller
     {
         private const string ID_ERROR_MESSAGE = "ErrorMessage";
-       
+
         // GET: Login
         public ActionResult Index()
         {
-            ViewBag.ErrorMessage = this.TempData[ID_ERROR_MESSAGE];            
+            ViewBag.ErrorMessage = this.TempData[ID_ERROR_MESSAGE];
             return View();
         }
 
         [HttpPost]
-        public async Task<ActionResult> Login(string UserName, string Password)
+        public async Task<ActionResult> Login(string userCode, string password)
         {
-            //Login login = adminLogic.IsValidAccount(UserName, Password);
-            //if (login != null)
-            //{
-            //    MvcAuthenticationFilter.CurrentUser = login;
-            //    return RedirectToAction("Index", "Home");
-            //}             
-
-            if (string.IsNullOrEmpty(UserName) || string.IsNullOrEmpty(Password))
+            if (string.IsNullOrEmpty(userCode) || string.IsNullOrEmpty(password))
             {
-                this.TempData[LoginController.ID_ERROR_MESSAGE] = "用户名或密码错误！";
+                this.TempData[LoginController.ID_ERROR_MESSAGE] = "账号和密码都必须输入！";
                 return RedirectToAction("Index");
             }
-
-            var claims = new List<Claim>
+            try
+            {
+                SystemUser systemUser = SecurityLogic.VerifyLogin(userCode, password);
+                var claims = new List<Claim>
                 {
-                    new Claim("UserName", UserName),
-                    new Claim("Role", "Admin")
+                    new Claim("UserId",systemUser.RecordId.ToString()),
+                    new Claim("UserCode", systemUser.UserCode),
+                    new Claim("UserName",systemUser.UserName)
                 };
-            ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            ClaimsPrincipal user = new ClaimsPrincipal(claimsIdentity);
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, user);
+                foreach (RoleUser roleUser in systemUser.Roles)
+                {
+                    claims.Add(new Claim("RoleCode", roleUser.Role.RoleCode));
+                }
+                ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                ClaimsPrincipal user = new ClaimsPrincipal(claimsIdentity);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, user);
 
-            return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception ex)
+            {
+                this.ViewBag.ErrorMessage = ex.Message;
+                return View("Index");
+            }
         }
 
         public async Task<ActionResult> Logout()

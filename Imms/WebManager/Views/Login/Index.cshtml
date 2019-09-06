@@ -12,7 +12,7 @@
 
     <script type="text/javascript">
         function onLogin() {
-            var txtUserName = document.getElementById('txtUserName');
+            var txtUserName = document.getElementById('txtUserCode');
             var txtPassword = document.getElementById('txtPassword');
             var txtErrorMessage = document.getElementById('txtErrorMessage');
             if (txtUserName.value == "" || txtPassword.value == "") {
@@ -33,11 +33,11 @@
             <div style="font-size:16px;">
                 <div class="row">
                     <div class="label">用户名：</div>
-                    <input type="text" style="width:200px;" id="txtUserName" name="UserName" maxlength="6" />
+                    <input type="text" style="width:200px;" id="txtUserName" name="userCode" maxlength="6" />
                 </div>
                 <div class="row">
                     <div class="label">密码：</div>
-                    <input type="password" style="width:200px;" id="txtPassword" name="Password" />
+                    <input type="password" style="width:200px;" id="txtPassword" name="password" />
                 </div>
                 <div class="row">
                     <div class="label">&nbsp;</div>
@@ -46,7 +46,7 @@
                 <div class="row">
                     <div class="label">&nbsp;</div>
                     <div id="txtErrorMessage" style="color:red;">
-                        @ViewBag.ErrorMessage
+                        @this.ViewBag.ErrorMessage
                     </div>
                 </div>
             </div>
