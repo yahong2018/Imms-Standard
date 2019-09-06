@@ -11,7 +11,7 @@ Ext.define('app.Application', {
             initComponent:function(){
                 if(this.allowBlank!==undefined && !this.allowBlank){
                     if(this.fieldLabel){
-                        this.fieldLabel += '<font color=red>*</font>';
+                        this.fieldLabel += '<font color=red>*</font>';  
                     }
                 }
                 this.callParent(arguments);
