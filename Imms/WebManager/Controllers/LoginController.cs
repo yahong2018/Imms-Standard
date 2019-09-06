@@ -52,8 +52,8 @@ namespace Imms.WebManager.Controllers
             }
             catch (Exception ex)
             {
-                this.ViewBag.ErrorMessage = ex.Message;
-                return View("Index");
+                this.TempData[ID_ERROR_MESSAGE] = ex.Message;
+                return RedirectToAction("Index");
             }
         }
 
