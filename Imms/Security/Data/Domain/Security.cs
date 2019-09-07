@@ -17,6 +17,10 @@ namespace Imms.Security.Data.Domain
         public DateTime? LastLoginTime { get; set; }
 
         public virtual List<RoleUser> Roles { get; set; } = new List<RoleUser>();
+
+
+        public const byte USER_STATUS_DISABLED = 1;
+        public const byte USER_STATUS_ENABLED = 0;
     }
     
     public partial class SystemRole : Entity<long>

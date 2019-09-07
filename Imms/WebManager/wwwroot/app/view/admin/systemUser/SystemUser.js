@@ -36,12 +36,12 @@ Ext.define('app.view.admin.systemUser.SystemUser', {
     ],
     additionToolbarItems: [
         '-',
-        { text: '启用账户', handler: 'startUser',privilege:"START_USER" },
-        { text: '停用账户', handler: 'stopUser',privilege:"STOP_USER" },
+        { text: '启用账户', handler: 'startUser', privilege: "START_USER" },
+        { text: '停用账户', handler: 'stopUser', privilege: "STOP_USER" },
         { xtype: 'tbspacer' },
-        { text: '密码重设', handler: 'resetPassword',privilege:"RESET_PASSWORD" },
+        { text: '密码重设', handler: 'resetPassword', privilege: "RESET_PASSWORD" },
         '-',
-        { text: '授权', handler: 'updateRoles',privilege:"ASSIGN_ROLE" }
+        { text: '授权', handler: 'updateRoles', privilege: "ASSIGN_ROLE" }
     ],
 
     constructor: function (config) {
@@ -56,7 +56,7 @@ Ext.define('app.view.admin.systemUser.SystemUser', {
     },
     listeners: {
         afterrender: function () {
-          //  this.getController().loadAllRoles();
+            this.getController().loadAllRoles();
         },
         beforeselect: 'gridSelectionChanged',
     }

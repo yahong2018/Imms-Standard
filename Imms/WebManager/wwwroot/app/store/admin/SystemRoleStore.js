@@ -3,10 +3,10 @@ Ext.define('app.store.admin.SystemRoleStore', {
     model: 'app.model.admin.SystemRoleModel',
     alias: 'widget.app_store_admin_SystemRoleStore',
     dao: {
-        deleteUrl: 'admin/systemRoles/delete.handler',
-        insertUrl: 'admin/systemRoles/insert.handler',
-        updateUrl: 'admin/systemRoles/update.handler',
-        selectUrl: 'admin/systemRoles/getAll.handler',
+        deleteUrl: 'security/systemRole/delete',
+        insertUrl: 'security/systemRole/create',
+        updateUrl: 'security/systemRole/update',
+        selectUrl: 'security/systemRole/getAll',
     },
 
     loadRolePrivileges: function (role, callback) {

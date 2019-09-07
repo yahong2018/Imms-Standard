@@ -15,5 +15,9 @@
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.19"/>
     <PackageReference Include="System.Net.WebSockets" Version="4.3.0"/>
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.1"/>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0"/>
+    <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.2.0"/>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.2.0"/>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Abstractions" Version="2.2.0"/>
   </ItemGroup>
 </Project>

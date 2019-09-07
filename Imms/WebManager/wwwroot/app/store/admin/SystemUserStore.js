@@ -13,7 +13,7 @@ Ext.define('app.store.admin.SystemUserStore', {
     restePassword: function (user) {
         var me = this;
         app.ux.Utils.ajaxRequest({
-            url: 'admin/systemUsers/resetPassword.handler?userId=' + user.get('recordId'),
+            url: 'security/systemUser/resetPassword?userId=' + user.get('recordId'),
             successCallback: function (record, response, opts) {
                 Ext.Msg.alert('系统提示', '密码已重设为系统缺省密码!');
             }
@@ -22,24 +22,38 @@ Ext.define('app.store.admin.SystemUserStore', {
     startUser: function (user) {
         var me = this;
         app.ux.Utils.ajaxRequest({
-            url: 'admin/systemUsers/enableUser.handler?userId=' + user.get('recordId'),
+            url: 'security/systemUser/enable?userId=' + user.get('recordId'),
             successCallback: function (record, response, opts) {
                 user.beginEdit();
                 user.set('userStatus', 0);
                 user.endEdit();
                 me.commitChanges();
+
+                Ext.toast({
+                    html: '用户已启用',
+                    title: '系统提示',
+                    width: 200,
+                    align: 't'
+                });               
             }
         });
     },
     stopUser: function (user) {
         var me = this;
         app.ux.Utils.ajaxRequest({
-            url: 'admin/systemUsers/disableUser.handler?userId=' + user.get('recordId'),
+            url: 'security/systemUser/disable?userId=' + user.get('recordId'),
             successCallback: function (record, response, opts) {
                 user.beginEdit();
                 user.set('userStatus', 1);
                 user.endEdit();
                 me.commitChanges();
+
+                Ext.toast({
+                    html: '用户已停用',
+                    title: '系统提示',
+                    width: 200,
+                    align: 't'
+                });    
             }
         });
     },
@@ -52,11 +66,11 @@ Ext.define('app.store.admin.SystemUserStore', {
         }
         
         app.ux.Utils.ajaxRequest({
-            url: 'admin/systemUsers/getUserRoles.handler?userId=' + user.get('recordId'),
+            url: 'security/systemUser/userRoles?userId=' + user.get('recordId'),
             successCallback: function (result, response, opts) {
                 user.userRoles = [];
                 for (var i = 0; i < result.length; i++) {
-                    user.userRoles.push(Ext.create('app.model.admin.UserRoleModel', result[i]));
+                    user.userRoles.push(Ext.create('app.model.admin.SystemRoleModel', result[i]));
                 }
             }
         });
