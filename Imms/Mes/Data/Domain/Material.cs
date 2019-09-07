@@ -54,8 +54,9 @@ namespace Imms.Mes.Data.Domain
         protected override void InternalConfigure(EntityTypeBuilder<BomOrder> builder)
         {
             base.InternalConfigure(builder);
-
             builder.ToTable("bom_order");
+            ImmsDbContext.RegisterEntityTable<BomOrder>("bom_order");
+
             builder.Property(e => e.BomOrderType).HasColumnName("bom_order_type");
             builder.Property(e => e.MaterialId).HasColumnName("material_id");
 
@@ -69,8 +70,8 @@ namespace Imms.Mes.Data.Domain
         protected override void InternalConfigure(EntityTypeBuilder<Bom> builder)
         {
             base.InternalConfigure(builder);
-
             builder.ToTable("bom");
+            ImmsDbContext.RegisterEntityTable<Bom>("bom");
 
             builder.Property(e => e.BomOrderId).HasColumnName("bom_order_id");
             builder.Property(e => e.ComponentAbstractMaterialId).HasColumnName("component_abstract_material_id");

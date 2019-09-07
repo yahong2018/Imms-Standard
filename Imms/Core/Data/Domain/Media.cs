@@ -20,6 +20,7 @@ namespace Imms.Data.Domain
         {
             base.InternalConfigure(builder);
             builder.ToTable("media");
+            ImmsDbContext.RegisterEntityTable<Media>("media");
 
             builder.Property(e => e.Description).HasColumnName("description").HasMaxLength(250).IsUnicode(false);
             builder.Property(e => e.MediaName).IsRequired().HasColumnName("media_name").HasMaxLength(100).IsUnicode(false);

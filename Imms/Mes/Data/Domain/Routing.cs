@@ -70,7 +70,7 @@ namespace Imms.Mes.Data.Domain
         protected override void InternalConfigure(EntityTypeBuilder<E> builder)
         {
             base.InternalConfigure(builder);
-
+            
             builder.Property(e => e.OperationNo).IsRequired().HasColumnName("operation_no").HasMaxLength(20).IsUnicode(false);
             builder.Property(e => e.Description).IsRequired().HasColumnName("description").HasMaxLength(3000).IsUnicode(false);
             builder.Property(e => e.MachineTypeId).HasColumnName("machine_type_id").HasColumnType("bigint(20)");
@@ -92,8 +92,9 @@ namespace Imms.Mes.Data.Domain
         protected override void InternalConfigure(EntityTypeBuilder<Operation> builder)
         {
             base.InternalConfigure(builder);
-
             builder.ToTable("operation");
+            ImmsDbContext.RegisterEntityTable<Operation>("operation");
+
             builder.HasMany(e => e.Medias).WithOne(e => e.Operation).HasForeignKey(e => e.OperationId);
         }
     }
@@ -103,8 +104,8 @@ namespace Imms.Mes.Data.Domain
         protected override void InternalConfigure(EntityTypeBuilder<OperationMedia> builder)
         {
             base.InternalConfigure(builder);
-
             builder.ToTable("operation_media");
+            ImmsDbContext.RegisterEntityTable<OperationMedia>("operation_media");
 
             builder.Property(e => e.MediaId).HasColumnName("media_id");
             builder.Property(e => e.OperationId).HasColumnName("operation_id");
@@ -120,6 +121,7 @@ namespace Imms.Mes.Data.Domain
         {
             base.InternalConfigure(builder);
             builder.ToTable("operation_routing");
+            ImmsDbContext.RegisterEntityTable<OperationRouting>("operation_routing");
 
             builder.Property(e => e.OperationId).HasColumnName("operation_id").HasColumnType("bigint(20)");
             builder.Property(e => e.OperationRoutingOrderId).HasColumnName("operation_routing_order_id").HasColumnType("bigint(20)");
@@ -139,6 +141,7 @@ namespace Imms.Mes.Data.Domain
         {
             base.InternalConfigure(builder);
             builder.ToTable("operation_routing_order");
+            ImmsDbContext.RegisterEntityTable<OperationRoutingOrder>("operation_routing_order");
 
             builder.Property(e => e.MaterialId).HasColumnName("material_id").HasColumnType("bigint(20)");
             builder.Property(e => e.OrderType).HasColumnName("order_type").HasColumnType("int(11)");

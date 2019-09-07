@@ -183,6 +183,21 @@ namespace Imms.Data
         {
             customModelBuilders.Add(builder);
         }
+
+        private static SortedList<Guid, string> entityTables = new SortedList<Guid, string>();
+        public static void RegisterEntityTable<T>(string tableName)
+        {
+            Guid key = typeof(T).GUID;
+            if (entityTables.ContainsKey(key))
+            {
+                return;
+            }
+            entityTables.Add(key, tableName);
+        }
+        public static string GetEntityTableName<T>()
+        {
+            return entityTables[typeof(T).GUID];
+        }
     }
 
     public interface ICustomModelBuilder

@@ -79,6 +79,7 @@ namespace Imms.Security.Data.Domain
         {
             base.InternalConfigure(builder);
             builder.ToTable("program_privilege");
+            ImmsDbContext.RegisterEntityTable<ProgramPrivilege>("program_privilege");
 
             builder.Property(e => e.PrivilegeCode).IsRequired().HasColumnName("privilege_code").HasMaxLength(50).IsUnicode(false);
             builder.Property(e => e.PrivilegeName).IsRequired().HasColumnName("privilege_name").HasMaxLength(120).IsUnicode(false);
@@ -94,6 +95,7 @@ namespace Imms.Security.Data.Domain
         {
             base.InternalConfigure(builder);
             builder.ToTable("role_privilege");
+            ImmsDbContext.RegisterEntityTable<RolePrivilege>("role_privilege");
 
             builder.Property(e => e.PrivilegeCode).IsRequired().HasColumnName("privilege_code").HasMaxLength(50).IsUnicode(false);
             builder.Property(e => e.ProgramId).IsRequired().HasColumnName("program_id").HasMaxLength(50).IsUnicode(false);
@@ -110,6 +112,7 @@ namespace Imms.Security.Data.Domain
         {
             base.InternalConfigure(builder);
             builder.ToTable("role_user");
+            ImmsDbContext.RegisterEntityTable<RoleUser>("role_user");
 
             builder.Property(e => e.RoleId).HasColumnName("role_id").HasColumnType("bigint(20)");
             builder.Property(e => e.UserId).HasColumnName("user_id").HasColumnType("bigint(20)");
@@ -125,6 +128,7 @@ namespace Imms.Security.Data.Domain
         {
             base.InternalConfigure(builder);
             builder.ToTable("system_program");
+            ImmsDbContext.RegisterEntityTable<SystemProgram>("system_program");
 
             builder.Property(e => e.Glyph).HasColumnName("glyph").HasMaxLength(100).IsUnicode(false);
             builder.Property(e => e.Parameters).IsRequired().HasColumnName("parameters").HasMaxLength(255).IsUnicode(false);
@@ -144,6 +148,7 @@ namespace Imms.Security.Data.Domain
         {
             base.InternalConfigure(builder);
             builder.ToTable("system_role");
+            ImmsDbContext.RegisterEntityTable<SystemRole>("system_role");
 
             builder.Property(e => e.RoleCode).IsRequired().HasColumnName("role_code").HasMaxLength(20).IsUnicode(false);
             builder.Property(e => e.RoleName).IsRequired().HasColumnName("role_name").HasMaxLength(50).IsUnicode(false);
@@ -155,8 +160,8 @@ namespace Imms.Security.Data.Domain
         protected override void InternalConfigure(EntityTypeBuilder<SystemUser> builder)
         {
             base.InternalConfigure(builder);
-
             builder.ToTable("system_user");
+            ImmsDbContext.RegisterEntityTable<SystemUser>("system_user");
 
             builder.Property(e => e.Email).IsRequired().HasColumnName("email").HasMaxLength(255).IsUnicode(false);
             builder.Property(e => e.IsOnline).HasColumnName("is_online").HasColumnType("bit(1)").HasDefaultValueSql("b'0'");

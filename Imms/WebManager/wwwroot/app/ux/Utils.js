@@ -57,7 +57,6 @@ Ext.define('app.ux.Utils', {
         }
     },
     applyPrivileges: function (config) {
-        debugger;
         var privilegeList = app.ux.GlobalVars.currentLogin.privielges;
         var programId = config.programId;
         var model = config.model;

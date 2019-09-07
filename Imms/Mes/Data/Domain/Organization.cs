@@ -33,6 +33,7 @@ namespace Imms.Mes.Data.Domain
         {
             base.InternalConfigure(builder);
             builder.ToTable("operator_capability");
+            ImmsDbContext.RegisterEntityTable<OperatorCapability>("operator_capability");
 
             builder.Property(e => e.OperationId).HasColumnName("operation_id").HasColumnType("bigint(20)");
             builder.Property(e => e.OperatorId).HasColumnName("operator_id").HasColumnType("bigint(20)");
@@ -49,6 +50,7 @@ namespace Imms.Mes.Data.Domain
         {
             base.InternalConfigure(builder);
             builder.ToTable("operator");
+            ImmsDbContext.RegisterEntityTable<Operator>("operator");
 
             builder.Property(e => e.OrganizationId).HasColumnName("organization_id").HasColumnType("bigint(20)");
             builder.Property(e => e.SupervisorId).HasColumnName("supervisor_id").HasColumnType("bigint(20)");

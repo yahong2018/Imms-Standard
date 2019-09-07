@@ -15,8 +15,7 @@ namespace Imms.Security.Data{
             modelBuilder.ApplyConfiguration(new SystemProgramConfigure());
             modelBuilder.ApplyConfiguration(new SystemRoleConfigure());
             modelBuilder.ApplyConfiguration(new SystemUserConfigure());
-
-            
+           
             modelBuilder.ApplyConfiguration(new WorkOrganizationUnitConfigure());
         }    
     }

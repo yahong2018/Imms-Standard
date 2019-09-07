@@ -25,6 +25,7 @@ namespace Imms.Mes.Data.Domain
         {
             base.InternalConfigure(builder);
             builder.ToTable("equipment");
+            ImmsDbContext.RegisterEntityTable<Equipment>("equipment");
 
             builder.Property(e => e.EquipmentNo).HasColumnName("equipment_no");
             builder.Property(e => e.EquipmentName).HasColumnName("equipment_name");

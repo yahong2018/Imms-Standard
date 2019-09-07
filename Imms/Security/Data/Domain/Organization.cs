@@ -25,8 +25,9 @@ namespace Imms.Security.Data.Domain
         protected override void InternalConfigure(EntityTypeBuilder<WorkOrganizationUnit> builder)
         {
             base.InternalConfigure(builder);
-
             builder.ToTable("work_organization_unit");
+            ImmsDbContext.RegisterEntityTable<WorkOrganizationUnit>("work_organization_unit");
+
             builder.Property(e => e.OrganizationCode).IsRequired().HasColumnName("organization_code").HasMaxLength(10).IsUnicode(false);
             builder.Property(e => e.OrganizationName).IsRequired().HasColumnName("organization_name").HasMaxLength(50).IsUnicode(false);
             builder.Property(e => e.SequenceNo).HasColumnName("sequence_no");

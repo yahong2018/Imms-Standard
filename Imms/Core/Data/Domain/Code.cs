@@ -43,6 +43,7 @@ namespace Imms.Data.Domain
         {
             base.InternalConfigure(builder);
             builder.ToTable("tree_code");
+            ImmsDbContext.RegisterEntityTable<TreeCode>("tree_code");
 
             builder.Property(e => e.CodeNo).IsRequired().HasColumnName("code_no").HasMaxLength(10).IsUnicode(false);
             builder.Property(e => e.CodeName).IsRequired().HasColumnName("code_name").HasMaxLength(30).IsUnicode(false);
@@ -59,6 +60,7 @@ namespace Imms.Data.Domain
         {
             base.InternalConfigure(builder);
             builder.ToTable("simple_code");
+            ImmsDbContext.RegisterEntityTable<SimpleCode>("simple_code");
 
             builder.Property(e => e.CodeName).IsRequired().HasColumnName("code_name").HasMaxLength(30).IsUnicode(false);
             builder.Property(e => e.CodeNo).IsRequired().HasColumnName("code_no").HasMaxLength(10).IsUnicode(false);
@@ -71,8 +73,9 @@ namespace Imms.Data.Domain
         protected override void InternalConfigure(EntityTypeBuilder<CodeSeed> builder)
         {
             base.InternalConfigure(builder);
-
             builder.ToTable("code_seed");
+            ImmsDbContext.RegisterEntityTable<CodeSeed>("code_seed");
+
             builder.Property(e => e.InitialValue).HasColumnName("initial_value");
             builder.Property(e => e.Postfix).IsRequired().HasColumnName("postfix").HasMaxLength(10);
             builder.Property(e => e.Prefix).IsRequired().HasColumnName("prefix").HasMaxLength(10);

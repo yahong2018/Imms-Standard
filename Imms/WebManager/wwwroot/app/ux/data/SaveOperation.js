@@ -23,8 +23,12 @@ Ext.define("app.ux.data.SaveOperation", {
             form.submit({
                 url: theUrl,
                 success: function (form, action) {
+                    debugger;
+
                     store.load({
                         callback: function (records, operation, success) {
+                            debugger;
+                            
                             var theNewRecord = store.createModel({});
                             var idProperty = theNewRecord.getIdProperty();
                             var idField = me.down('[name="' + idProperty + '"]');
@@ -66,6 +70,8 @@ Ext.define("app.ux.data.SaveOperation", {
 
                 },
                 failure: function (form, action) {
+                    debugger;
+
                     var message = action.response.responseText.trim().replace("\n", "<br>");
                     Ext.MessageBox.show({
                         title: '系统提示',

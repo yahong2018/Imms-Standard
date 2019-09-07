@@ -121,6 +121,8 @@ Ext.define("app.ux.data.DataOperation", {
 
         var currentTopWindow = Ext.app.Application.instance.getMainView().down('maincenter').getActiveTab();
         var programId = currentTopWindow.menuData.get('programId');
+        debugger;
+        
         var canInsert = app.ux.Utils.hasPrivilege({ programId: programId, privilegeCode: "INSERT" });
         if (!canInsert) {
             detailWindow.down('[buttonName="save"]').setDisabled(true);
@@ -240,7 +242,7 @@ Ext.define("app.ux.data.DataOperation", {
             expr = fieldName + ' ' + operator.get('abbr');
             var fieldType = field.type;
             if (fieldType == 'string' || fieldType == 'date') {
-                expr = expr + '"'+ value + '"';
+                expr = expr + "'"+ value + "'";
             } else {
                 expr = expr + value;
             }            

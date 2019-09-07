@@ -13,11 +13,21 @@ namespace Imms.Data
 
         public void Notify(DataChangedNotifyEvent e)
         {
+            if (Dispatcher == null)
+            {
+                return;
+            }
+
             ThreadPool.QueueUserWorkItem(Dispatcher.OnDateChanged, e);
         }
 
         public void Notify(IEntity item, int dmlType)
         {
+            if (Dispatcher == null)
+            {
+                return;
+            }
+
             DataChangedNotifyEvent e = new DataChangedNotifyEvent()
             {
                 Entity = item,

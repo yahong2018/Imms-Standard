@@ -1,4 +1,5 @@
-﻿using Imms.Data.Domain;
+﻿using Imms.Data;
+using Imms.Data.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -23,15 +24,22 @@ namespace Imms.Mes.Data.Domain
     {
         public void Configure(EntityTypeBuilder<EquipmentType> builder)
         {
+            ImmsDbContext.RegisterEntityTable<EquipmentType>("simple_code");
+
             builder.Ignore(e => e.EquipmentTypeNo);
             builder.Ignore(e => e.EquipmentTypeName);
         }
     }
 
-    public class SimpleCodeConfigure : IEntityTypeConfiguration<SimpleCode>
+    public class MaterialTypeConfigure : IEntityTypeConfiguration<MaterialType>
     {
-        public void Configure(EntityTypeBuilder<SimpleCode> builder)
+        public void Configure(EntityTypeBuilder<MaterialType> builder)
         {
+            ImmsDbContext.RegisterEntityTable<MaterialType>("simple_code");
+
+            builder.Ignore(e => e.MaterialTypeCode);
+            builder.Ignore(e => e.MaterialTypeName);
+
             builder.HasDiscriminator("code_type", typeof(string))
                 .HasValue<EquipmentType>(GlobalConstants.TYPE_CODE_TYPE_EQUIPMENT_TYPE)
                 .HasValue<MaterialType>(GlobalConstants.TYPE_CODE_TYPE_MATERIAL_TYPE)
@@ -43,6 +51,8 @@ namespace Imms.Mes.Data.Domain
     {
         public void Configure(EntityTypeBuilder<MaterialType> builder)
         {
+            ImmsDbContext.RegisterEntityTable<MaterialType>("simple_code");
+
             builder.Ignore(e => e.MaterialTypeCode);
             builder.Ignore(e => e.MaterialTypeName);
         }

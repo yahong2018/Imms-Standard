@@ -4,6 +4,7 @@ Ext.define('app.model.admin.SystemProgramModel', {
     identifier:'empty',
     fields: [
           {name:"recordId",type:"string",unique:true},
+          {name:"programId",mapping:"recordId"},
           {name:"programCode",type:"string"},
           {name:"programName",type:"string"},
           {name:"url",type:"string"},

@@ -56,8 +56,7 @@ Ext.define('app.view.admin.systemUser.SystemUser', {
     },
     listeners: {
         afterrender: function () {
-            //   this.store.load();
-            this.getController().loadAllRoles();
+          //  this.getController().loadAllRoles();
         },
         beforeselect: 'gridSelectionChanged',
     }

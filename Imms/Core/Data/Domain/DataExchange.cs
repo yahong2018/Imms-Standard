@@ -40,8 +40,9 @@ namespace Imms.Data.Domain
         protected override void InternalConfigure(EntityTypeBuilder<SystemApp> builder)
         {
             base.InternalConfigure(builder);
-
             builder.ToTable("system_app");
+            ImmsDbContext.RegisterEntityTable<SystemApp>("system_app");
+
             builder.Property(e => e.SystemCode).HasColumnName("system_code");
             builder.Property(e => e.SystemName).HasColumnName("system_name");
             builder.Property(e => e.Ip).HasColumnName("ip");
@@ -54,8 +55,9 @@ namespace Imms.Data.Domain
         protected override void InternalConfigure(EntityTypeBuilder<DataExcahngeRule> builder)
         {
             base.InternalConfigure(builder);
-
             builder.ToTable("data_exchange_rule");
+            ImmsDbContext.RegisterEntityTable<DataExcahngeRule>("data_exchange_rule");
+
             builder.Property(e => e.ExchangeRuleCode).HasColumnName("exchange_rule_code");
             builder.Property(e => e.SrcSystemId).HasColumnName("src_system_id");
             builder.Property(e => e.DestSystemId).HasColumnName("dest_system_id");
@@ -69,8 +71,8 @@ namespace Imms.Data.Domain
         protected override void InternalConfigure(EntityTypeBuilder<DataExchangeTask> builder)
         {
             base.InternalConfigure(builder);
-
             builder.ToTable("data_exchange_task");
+            ImmsDbContext.RegisterEntityTable<DataExchangeTask>("data_exchange_task");
 
             builder.Property(e => e.ExchangeRuleCode).HasColumnName("exchange_rule_code");
             builder.Property(e => e.MessageId).HasColumnName("message_id");

@@ -81,9 +81,7 @@ Ext.define('app.view.main.MainController', {
 		app.ux.Utils.ajaxRequest({
 			url: 'home/currentLogin',
 			async: false,
-			successCallback: function (result) {
-				debugger;
-				
+			successCallback: function (result) {			
 				app.ux.GlobalVars.currentLogin = result;
 				app.ux.GlobalVars.systemTitle = "智能制造平台";
 

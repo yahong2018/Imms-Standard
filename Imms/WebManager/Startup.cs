@@ -40,6 +40,7 @@ namespace Imms.WebManager
             services.AddMvc(config=>
             {
                 config.Filters.Add(new AuthenticationFilter());
+                config.Filters.Add(new ExtJsResponseBodyFilter());
             })
             .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
             .AddJsonOptions(x=>{
@@ -53,6 +54,7 @@ namespace Imms.WebManager
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();   
+           
 
             GlobalConstants.DbContextFactory = new DbContextFactory();
 
@@ -80,6 +82,7 @@ namespace Imms.WebManager
             app.UseCookiePolicy();
             app.UseAuthentication();
 
+            
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

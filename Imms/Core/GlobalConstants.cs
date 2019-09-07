@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Imms.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Newtonsoft.Json;
@@ -62,10 +63,10 @@ namespace Imms
         public static Imms.Data.IDbContextFactory DbContextFactory = null;
         public static Logger DefaultLogger = new Logger();
 
-        public static void ModifyEntityStatus<T>(T item, DbContext dbContext) where T : class
+        public static void ModifyEntityStatus<T>(T item, DbContext dbContext) where T : class,IEntity
         {
-            EntityEntry<T> entry = dbContext.Entry<T>(item); // dbContext.Attach<T>(item);
-            entry.State = EntityState.Modified;
+            T old = dbContext.Set<T>().Find(item.RecordId);
+            dbContext.Entry<T>(old).CurrentValues.SetValues(item);
         }
 
         //系统编码
