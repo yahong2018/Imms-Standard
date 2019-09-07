@@ -13,6 +13,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Imms.WebManager.Filters;
 using Imms.Data;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Imms.WebManager
 {
@@ -38,7 +40,16 @@ namespace Imms.WebManager
             services.AddMvc(config=>
             {
                 config.Filters.Add(new AuthenticationFilter());
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            })
+            .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+            .AddJsonOptions(x=>{
+                x.SerializerSettings.ContractResolver=new DefaultContractResolver
+                {
+                    NamingStrategy = new CamelCaseNamingStrategy()
+                }; 
+                x.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                x.SerializerSettings.Formatting = Formatting.Indented;
+            });
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();   

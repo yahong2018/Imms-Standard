@@ -4,6 +4,7 @@ using System.Linq;
 using Imms.Data.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Logging;
 
 namespace Imms.Data
@@ -71,7 +72,7 @@ namespace Imms.Data
 
         private void FillOrderNo(EntityEntry entry)
         {
-            IOrderEntry order = entry.Entity as IOrderEntry;
+            IOrderEntity order = entry.Entity as IOrderEntity;
             if (order == null || entry.State != EntityState.Added || !string.IsNullOrEmpty(order.OrderNo))
             {
                 return;
@@ -148,6 +149,32 @@ namespace Imms.Data
             }
 
             base.OnModelCreating(modelBuilder);
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties())
+                {
+                    if (property.ClrType == typeof(bool))
+                    {
+                        property.SetValueConverter(new BoolToIntConverter());
+                    }
+                }
+            }
+        }
+
+
+        public class BoolToIntConverter : ValueConverter<bool, int>
+        {
+            public BoolToIntConverter(ConverterMappingHints mappingHints = null)
+                : base(
+                      v => Convert.ToInt32(v),
+                      v => Convert.ToBoolean(v),
+                      mappingHints)
+            {
+            }
+
+            public static ValueConverterInfo DefaultInfo { get; }
+                = new ValueConverterInfo(typeof(bool), typeof(int), i => new BoolToIntConverter(i.MappingHints));
         }
 
         private static List<ICustomModelBuilder> customModelBuilders = new List<ICustomModelBuilder>();

@@ -51,7 +51,7 @@ Ext.define('app.view.main.region.ChangePasswordWindow', {
                     return;
                 }
                 var record = form.getValues();                
-                var url = webRoot +'/admin/changeCurrentUserPassword';
+                var url = 'admin/changeCurrentUserPassword';
                 Ext.Ajax.request({
                     url: url,
                     jsonData: record,

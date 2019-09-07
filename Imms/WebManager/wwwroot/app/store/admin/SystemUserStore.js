@@ -4,16 +4,16 @@ Ext.define('app.store.admin.SystemUserStore', {
     alias: 'widget.app_store_admin_SystemUserStore',
     uses: ['app.model.admin.UserRoleModel', 'app.ux.Utils','Ext.window.Toast'],
     dao: {
-        deleteUrl: '/admin/systemUsers/delete.handler',
-        insertUrl: '/admin/systemUsers/openLoginAccount.handler',
-        updateUrl: '/admin/systemUsers/update.handler',
-        selectUrl: '/admin/systemUsers/getAllUsers.handler',
+        deleteUrl: 'security/systemUser/delete',
+        insertUrl: 'security/systemUser/create',
+        updateUrl: 'security/systemUser/update',
+        selectUrl: 'security/systemUser/getAll',
     },
 
     restePassword: function (user) {
         var me = this;
         app.ux.Utils.ajaxRequest({
-            url: webRoot + '/admin/systemUsers/resetPassword.handler?userId=' + user.get('recordId'),
+            url: 'admin/systemUsers/resetPassword.handler?userId=' + user.get('recordId'),
             successCallback: function (record, response, opts) {
                 Ext.Msg.alert('系统提示', '密码已重设为系统缺省密码!');
             }
@@ -22,7 +22,7 @@ Ext.define('app.store.admin.SystemUserStore', {
     startUser: function (user) {
         var me = this;
         app.ux.Utils.ajaxRequest({
-            url: webRoot + '/admin/systemUsers/enableUser.handler?userId=' + user.get('recordId'),
+            url: 'admin/systemUsers/enableUser.handler?userId=' + user.get('recordId'),
             successCallback: function (record, response, opts) {
                 user.beginEdit();
                 user.set('userStatus', 0);
@@ -34,7 +34,7 @@ Ext.define('app.store.admin.SystemUserStore', {
     stopUser: function (user) {
         var me = this;
         app.ux.Utils.ajaxRequest({
-            url: webRoot + '/admin/systemUsers/disableUser.handler?userId=' + user.get('recordId'),
+            url: 'admin/systemUsers/disableUser.handler?userId=' + user.get('recordId'),
             successCallback: function (record, response, opts) {
                 user.beginEdit();
                 user.set('userStatus', 1);
@@ -52,7 +52,7 @@ Ext.define('app.store.admin.SystemUserStore', {
         }
         
         app.ux.Utils.ajaxRequest({
-            url: webRoot + '/admin/systemUsers/getUserRoles.handler?userId=' + user.get('recordId'),
+            url: 'admin/systemUsers/getUserRoles.handler?userId=' + user.get('recordId'),
             successCallback: function (result, response, opts) {
                 user.userRoles = [];
                 for (var i = 0; i < result.length; i++) {
@@ -72,7 +72,7 @@ Ext.define('app.store.admin.SystemUserStore', {
         }
 
         app.ux.Utils.ajaxRequest({
-            url: webRoot + '/admin/systemUsers/updateUserRoles.handler?userId=' + userId,
+            url: 'admin/systemUsers/updateUserRoles.handler?userId=' + userId,
             method: 'POST',
             jsonData: userRoles,
             successCallback: function (result, response, opts) {

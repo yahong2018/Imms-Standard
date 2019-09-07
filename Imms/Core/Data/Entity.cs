@@ -148,12 +148,12 @@ namespace Imms.Data
         public int OptFlag { get; set; }
     }
 
-    public interface IOrderEntry
+    public interface IOrderEntity
     {
         string OrderNo { get; set; }
     }
 
-    public class OrderEntity<T> : TrackableEntity<T>, IOrderEntry where T : IComparable
+    public class OrderEntity<T> : TrackableEntity<T>, IOrderEntity where T : IComparable
     {
         public string OrderNo { get; set; }
         public int OrderStatus { get; set; }

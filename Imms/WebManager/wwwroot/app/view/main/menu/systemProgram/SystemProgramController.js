@@ -10,7 +10,7 @@ Ext.define('app.view.main.menu.systemProgram.SystemProgramController', {
     	}
     	var grid =this.getView().up('app_view_main_menu_systemProgram_SystemProgramHomepage').down('app_view_main_menu_programPrivilege_ProgramPrivilege');
 		var expr = "?programId=" + programId;
-		grid.getStore().getProxy().url = webRoot + "/admin/programPrivilege/getProgramPrivilegeByProgramId.handler" + expr;
+		grid.getStore().getProxy().url = "admin/programPrivilege/getProgramPrivilegeByProgramId.handler" + expr;
 		grid.getStore().load();
     }
 });

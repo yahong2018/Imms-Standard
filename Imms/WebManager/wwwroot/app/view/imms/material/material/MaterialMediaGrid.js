@@ -44,7 +44,7 @@ Ext.define("app.view.imms.material.material.MaterialMediaGrid", {
 
     beforeInsert: function () {
         var me = this;
-        var getMaterialCandidateMediaUrl = webRoot + "/imms/media/media/" + this.materialId + "/getCandidateMaterialMedia.handler";
+        var getMaterialCandidateMediaUrl = "imms/media/media/" + this.materialId + "/getCandidateMaterialMedia.handler";
         this.filterStore.setSelectUrl(getMaterialCandidateMediaUrl);
         this.filterStore.getProxy().url = getMaterialCandidateMediaUrl;
 

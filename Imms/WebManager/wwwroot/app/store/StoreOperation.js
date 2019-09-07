@@ -34,7 +34,7 @@ Ext.define("app.store.StoreOperation", {
     },
     setUrl: function (key, url, isAbsolute) {
         if (!isAbsolute) {
-            url = webRoot + url;
+            url = url;
         }
         this.urlMeta.put(key, url);
     },

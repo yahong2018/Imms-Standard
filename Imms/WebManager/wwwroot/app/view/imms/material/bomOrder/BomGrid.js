@@ -58,7 +58,7 @@ Ext.define("app.view.imms.material.bomOrder.BomGrid", {
 
     constructor: function (config) {
         var bomStore = Ext.create({ xtype: "app_store_imms_material_BomStore", autoLoad: false });
-        bomStore.getProxy().url = webRoot + "/imms/material/bom/getAll.handler";
+        bomStore.getProxy().url = "imms/material/bom/getAll.handler";
 
         var configBase = {
             store: bomStore,

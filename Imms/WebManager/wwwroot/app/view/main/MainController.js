@@ -30,7 +30,7 @@ Ext.define('app.view.main.MainController', {
 					menuData: menuData
 				}));
 
-			var programId = menuData.get("programId");
+			var programId = menuData.get("recordId");
 			app.ux.Utils.applyPrivileges({ programId: programId, model: 0,component:theTab});
 			
 			if (theTab.applyPrivileges) {
@@ -82,6 +82,8 @@ Ext.define('app.view.main.MainController', {
 			url: 'home/currentLogin',
 			async: false,
 			successCallback: function (result) {
+				debugger;
+				
 				app.ux.GlobalVars.currentLogin = result;
 				app.ux.GlobalVars.systemTitle = "智能制造平台";
 

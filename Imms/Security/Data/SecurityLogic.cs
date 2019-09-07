@@ -10,14 +10,6 @@ namespace Imms.Security.Data
 {
     public class SecurityLogic
     {
-        public List<SystemProgram> getUserMenu(long userId)
-        {
-            using (Imms.Data.ImmsDbContext dbContext = new Imms.Data.ImmsDbContext())
-            {
-                return (from item in dbContext.Set<SystemProgram>().Include(x => x.Children) select item).ToList();
-            }
-        }
-
         public static SystemUser VerifyLogin(string userCode, string password)
         {
             SystemUser result = null;
