@@ -5,7 +5,8 @@ Ext.define('app.view.main.region.Bottom', {
 	defaults: {
 		xtype: 'buttontransparent'
 	},
-	style: 'background-color : #f6f5ec;',
+	style: 'background-color : #f6f5ec;padding-top:0px;',
+	height:30,
 
 	initComponent:function(){		
 		this.up('app-main').getController().loadCurrentUser();

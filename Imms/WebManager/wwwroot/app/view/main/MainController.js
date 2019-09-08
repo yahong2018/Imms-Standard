@@ -83,7 +83,7 @@ Ext.define('app.view.main.MainController', {
 			async: false,
 			successCallback: function (result) {			
 				app.ux.GlobalVars.currentLogin = result;
-				app.ux.GlobalVars.systemTitle = "智能制造平台";
+				app.ux.GlobalVars.systemTitle = "爱三(佛山)汽车配件有限公司智能制造平台";
 
                 me.getView().getViewModel().set('user.company', result.company);
 				me.getView().getViewModel().set('user.name', result.userName + '(' + result.userCode + ')');

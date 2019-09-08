@@ -86,7 +86,7 @@ Ext.define('app.store.admin.SystemUserStore', {
         }
 
         app.ux.Utils.ajaxRequest({
-            url: 'admin/systemUsers/updateUserRoles.handler?userId=' + userId,
+            url: 'security/systemUser/updateUserRoles?userId=' + userId,
             method: 'POST',
             jsonData: userRoles,
             successCallback: function (result, response, opts) {

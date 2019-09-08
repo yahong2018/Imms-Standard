@@ -2,15 +2,17 @@ Ext.define('app.model.admin.SystemMenuTreeModel', {
     extend: 'Ext.data.TreeModel',
     fields: [
         { name: 'text', mapping: 'programName' },
-        {name:"programId",mapping:"recordId"},
-        { name:' leaf',calculate:function(item){             
-            if(item.id=='root'){
-                return false;
-            }            
-            item.leaf =(item.children == null || item.children.length==0);
-            
-            return true;
-        }},
+        { name: "programId", mapping: "recordId" },
+        {
+            name: ' leaf', calculate: function (item) {
+                if (item.id == 'root') {
+                    return false;
+                }
+                item.leaf = (item.children == null || item.children.length == 0);
+
+                return true;
+            }
+        },
         {
             name: 'glyph', convert: function (value) {
                 return parseInt(value);

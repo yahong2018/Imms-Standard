@@ -23,7 +23,7 @@ namespace Imms.WebManager.Controllers
         {
             this.host = host;
         }
-        
+
         public IActionResult Index()
         {
             return View();
@@ -33,22 +33,36 @@ namespace Imms.WebManager.Controllers
         public List<SystemProgram> GetUserMenu()
         {
             long userId = long.Parse(this.HttpContext.User.Claims.First(x => x.Type == "UserId").Value);
-            List<SystemProgram> programList = null;
+            List<SystemProgram> programList = new List<SystemProgram>();
             CommonRepository.UseDbContext(dbContext =>
             {
-                programList =
-                 (from rp in dbContext.Set<RolePrivilege>()
-                  from r in dbContext.Set<RoleUser>()
-                  from prg in dbContext.Set<SystemProgram>()
-                  where rp.RoleId == r.RoleId
-                     && prg.RecordId == rp.ProgramId
-                     && string.IsNullOrEmpty(prg.ParentId)
-                     && r.UserId == userId
-                  select prg)
-                  .Include(x => x.Children)
-                  .ToList();
+                var allPrograms = (from p in dbContext.Set<SystemProgram>()
+                                   from rp in dbContext.Set<RolePrivilege>()
+                                   from r in dbContext.Set<RoleUser>()
+                                   where p.RecordId == rp.ProgramId
+                                      && rp.RoleId == r.RoleId
+                                      && r.UserId == userId
+                                   select p
+                ).Include(x => x.Privielges)
+                .ToList();
+
+                programList.AddRange(allPrograms.Where(x => string.IsNullOrEmpty(x.ParentId)));
+                foreach (SystemProgram program in programList)
+                {
+                    this.fillMenu(allPrograms, program);
+                }
             });
             return programList;
+        }
+
+        private void fillMenu(List<SystemProgram> allPrograms, SystemProgram program)
+        {
+            string[] childIdList = program.Children.Select(x => x.RecordId).ToArray();
+            program.Children.AddRange(allPrograms.Where(x => x.ParentId == program.RecordId && !childIdList.Contains(x.RecordId)));
+            foreach (SystemProgram child in program.Children)
+            {
+                fillMenu(allPrograms, child);
+            }
         }
 
         [Route("currentLogin"), HttpGet]
@@ -70,7 +84,7 @@ namespace Imms.WebManager.Controllers
                        && ur.UserId == userId
                     select r
                 ).Distinct()
-                .SelectMany(x=>x.Privileges).ToList();
+                .SelectMany(x => x.Privileges).ToList();
 
                 string privilegeText = GlobalConstants.ToJson(privilegeList);
 

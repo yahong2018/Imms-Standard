@@ -22,7 +22,7 @@ namespace Imms.Security.Data.Domain
         public const byte USER_STATUS_DISABLED = 1;
         public const byte USER_STATUS_ENABLED = 0;
     }
-    
+
     public partial class SystemRole : Entity<long>
     {
         public string RoleCode { get; set; }
@@ -32,7 +32,7 @@ namespace Imms.Security.Data.Domain
         public virtual List<RolePrivilege> Privileges { get; set; } = new List<RolePrivilege>();
     }
 
-    public partial class SystemProgram : Entity<string>
+    public class BaseProgram : Entity<string>
     {
         public string ProgramCode { get; set; }
         public string ProgramName { get; set; }
@@ -42,6 +42,21 @@ namespace Imms.Security.Data.Domain
         public string Parameters { get; set; }
         public string ParentId { get; set; }
 
+        public virtual void Assign(BaseProgram other)
+        {
+            this.RecordId = other.RecordId;
+            this.ProgramCode = other.ProgramCode;
+            this.ProgramName = other.ProgramName;
+            this.Url = other.Url;
+            this.Glyph = other.Glyph;
+            this.ShowOrder = other.ShowOrder;
+            this.Parameters = other.Parameters;
+            this.ParentId = other.ParentId;
+        }
+    }
+
+    public partial class SystemProgram : BaseProgram
+    {
         public virtual List<ProgramPrivilege> Privielges { get; set; } = new List<ProgramPrivilege>();
 
         public virtual List<SystemProgram> Children { get; set; } = new List<SystemProgram>();
@@ -75,6 +90,11 @@ namespace Imms.Security.Data.Domain
         public string PrivilegeName { get; set; }
 
         public virtual SystemProgram Program { get; set; }
+
+        public const string PRIVILEGE_RUN = "RUN";
+        public const string PRIVILEGE_INSERT = "INSERT";
+        public const string PRIVILEGE_UPDATE = "UPDATE";
+        public const string PRIVILEGE_DELETE = "DELETE";
     }
 
     public class ProgramPrivilegeConfigure : EntityConfigure<ProgramPrivilege>

@@ -14,25 +14,25 @@ namespace Imms
         protected SimpleCRUDLogic<T> Logic { get; set; }
 
         [Route("create"), HttpPost]
-        public T create(T item)
+        public T Create(T item)
         {
-            return Logic.create(item);
+            return Logic.Create(item);
         }
 
         [Route("update"), HttpPost]
-        public T update(T item)
+        public T Update(T item)
         {
-            return Logic.update(item);
+            return Logic.Update(item);
         }
 
         [Route("delete"), HttpPost]
-        public int delete([FromBody]long[] ids)
+        public int Delete([FromBody]long[] ids)
         {
-            return Logic.delete(ids);
+            return Logic.Delete(ids);
         }
 
         [Route("getAll"), HttpGet]
-        public ExtJsResult getAll()
+        public ExtJsResult GetAll()
         {
             IQueryCollection query = this.HttpContext.Request.Query;
             string filterStr = "";
@@ -49,9 +49,9 @@ namespace Imms
                 int start = int.Parse(query["start"][0]);
                 int limit = int.Parse(query["limit"][0]);
 
-                return Logic.getAllByPage(page, start, limit, filterStr);
+                return Logic.GetAllByPage(page, start, limit, filterStr);
             }
-            return Logic.getAllWithWhole(filterStr);
+            return Logic.GetAllWithWhole(filterStr);
         }
     }
 }

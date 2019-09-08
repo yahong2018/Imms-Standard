@@ -23,7 +23,7 @@ namespace Imms
             if (Status == ServiceStatus.Running)
                 return true;
 
-            GlobalConstants.DefaultLogger.Debug("正在启动BaseService:({0})...", this.ServiceId);
+            GlobalConstants.DefaultLogger.Debug(string.Format("正在启动BaseService:({0})...", this.ServiceId));
 
             try
             {
@@ -35,16 +35,16 @@ namespace Imms
                     thread.Priority = ThreadPriority.Highest;
 
                     thread.Start();
-                    GlobalConstants.DefaultLogger.Debug("启动BaseService:({0})成功.", this.ServiceId);
+                    GlobalConstants.DefaultLogger.Debug(string.Format("启动BaseService:({0})成功.", this.ServiceId));
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                GlobalConstants.DefaultLogger.Error("启动BaseService:({0})失败:{1}", this.ServiceId, ex.Message);
+                GlobalConstants.DefaultLogger.Error(string.Format("启动BaseService:({0})失败:{1}", this.ServiceId, ex.Message));
             }
 
-            GlobalConstants.DefaultLogger.Error("启动BaseService:({0})失败.", this.ServiceId);
+            GlobalConstants.DefaultLogger.Error(string.Format("启动BaseService:({0})失败.", this.ServiceId));
             return false;
         }
 
@@ -60,7 +60,7 @@ namespace Imms
                 }
                 catch (Exception ex)
                 {
-                    GlobalConstants.DefaultLogger.Error("({0})BaseService.ThreadProc出现异常:{1}", this.ServiceId, ex.Message);
+                    GlobalConstants.DefaultLogger.Error(string.Format("({0})BaseService.ThreadProc出现异常:{1}", this.ServiceId, ex.Message));
                     break;
                 }
 
@@ -69,7 +69,7 @@ namespace Imms
             _TerminatedEvent.Set();
             Status = ServiceStatus.Stopped;
 
-            GlobalConstants.DefaultLogger.Debug("BaseService.ThreadProc已停止:({0}).", this.ServiceId);
+            GlobalConstants.DefaultLogger.Debug(string.Format("BaseService.ThreadProc已停止:({0}).", this.ServiceId));
         }
 
         protected virtual bool DoInternalShutdown() { return true; }
@@ -79,7 +79,7 @@ namespace Imms
             if (Status == ServiceStatus.Stopped)
                 return true;
 
-            GlobalConstants.DefaultLogger.Debug("正在关闭BaseService:({0})...", this.ServiceId);
+            GlobalConstants.DefaultLogger.Debug(string.Format("正在关闭BaseService:({0})...", this.ServiceId));
             Terminated = true;
             try
             {
@@ -87,15 +87,15 @@ namespace Imms
                 if (DoInternalShutdown())
                 {
                     Status = ServiceStatus.Stopped;
-                    GlobalConstants.DefaultLogger.Debug("关闭BaseService:({0})成功.", this.ServiceId);
+                    GlobalConstants.DefaultLogger.Debug(string.Format("关闭BaseService:({0})成功.", this.ServiceId));
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                GlobalConstants.DefaultLogger.Debug("关闭BaseService:({0})失败:{1}", this.ServiceId, ex.Message);
+                GlobalConstants.DefaultLogger.Debug(string.Format("关闭BaseService:({0})失败:{1}", this.ServiceId, ex.Message));
             }
-            GlobalConstants.DefaultLogger.Debug("关闭BaseService:({0})已完成.", this.ServiceId);
+            GlobalConstants.DefaultLogger.Debug(string.Format("关闭BaseService:({0})已完成.", this.ServiceId));
             return false;
         }
 

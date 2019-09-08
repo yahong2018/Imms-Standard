@@ -1,6 +1,7 @@
 using Imms.Data;
 using Imms.Security.Data;
 using Imms.Security.Data.Domain;
+using Imms.WebManager.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -11,13 +12,10 @@ namespace Imms.WebManager
     [Route("security/systemUser")]
     public class SystemUserController : SimpleCRUDController<SystemUser>
     {
-        public SystemUserController()
-        {
-            this.Logic = new SecurityLogic();
-        }
+        public SystemUserController() => this.Logic = new SystemUserLogic();
 
         [Route("userRoles"), HttpGet]
-        public List<SystemRole> getUserRoles(long userId)
+        public List<SystemRole> GetUserRoles(long userId)
         {
             List<SystemRole> result = null;
             CommonRepository.UseDbContext(dbContext =>
@@ -33,30 +31,64 @@ namespace Imms.WebManager
         }
 
         [Route("resetPassword"), HttpGet]
-        public int resetPassword(long userId)
+        public int ResetPassword(long userId)
         {
-            return (Logic as SecurityLogic).resetPassword(userId);
+            return (Logic as SystemUserLogic).ResetPassword(userId);
         }
 
         [Route("enable"), HttpGet]
-        public int enable(long userId)
+        public int Enable(long userId)
         {
-            return (Logic as SecurityLogic).changeUserStatus(userId, SystemUser.USER_STATUS_ENABLED);
+            return (Logic as SystemUserLogic).ChangeUserStatus(userId, SystemUser.USER_STATUS_ENABLED);
         }
 
         [Route("disable"), HttpGet]
-        public int disable(long userId)
+        public int Disable(long userId)
         {
-            return (Logic as SecurityLogic).changeUserStatus(userId, SystemUser.USER_STATUS_DISABLED);
+            return (Logic as SystemUserLogic).ChangeUserStatus(userId, SystemUser.USER_STATUS_DISABLED);
+        }
+
+        [Route("updateUserRoles"), HttpPost]
+        public int UpdateUserRoles(long userId, [FromBody] RoleUser[] roleUsers)
+        {
+            return (Logic as SystemUserLogic).UpdateUserRoles(userId, roleUsers);
         }
     }
 
     [Route("security/systemRole")]
     public class SystemRoleController : SimpleCRUDController<SystemRole>
     {
-        public SystemRoleController()
+        public SystemRoleController() => this.Logic = new SystemRoleLogic();
+
+        [Route("rolePrivileges"), HttpGet]
+        public List<RolePrivilege> GetRolePrivileges(long roleId)
         {
-            this.Logic = new SimpleCRUDLogic<SystemRole>();
+            return (this.Logic as SystemRoleLogic).GetRolePrivileges(roleId);
+        }
+
+        [Route("allMenuWithPrivilege"), HttpGet]
+        public List<ProgramWithPrivilgeViewModel> GetAllMenuWithPrivilege()
+        {
+            List<SystemProgram> allPrograms = (this.Logic as SystemRoleLogic).GetAllProgramWithPrivileges()
+                    .Where(x=>string.IsNullOrEmpty(x.ParentId))
+                    .OrderBy(x=>x.ShowOrder)
+                    .ToList();
+
+            List<ProgramWithPrivilgeViewModel> result = new List<ProgramWithPrivilgeViewModel>();
+            foreach (SystemProgram program in allPrograms)
+            {
+                ProgramWithPrivilgeViewModel menu = new ProgramWithPrivilgeViewModel(program);
+                result.Add(menu);
+            }
+
+            return result;
+        }
+
+        [Route("updatePrivileges"),HttpPost]
+        public int UpdatePrivileges(long roleId,[FromBody]ProgramPrivilege[] currentPrivileges){
+            return (this.Logic as SystemRoleLogic).UpdateRolePrivilege(roleId,currentPrivileges);            
         }
     }
+
+
 }

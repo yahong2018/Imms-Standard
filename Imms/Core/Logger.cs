@@ -2,99 +2,95 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using Microsoft.Extensions.Logging;
 
 namespace Imms
 {
-    public class Logger :TextWriter
+    public class Logger : TextWriter
     {
-        public LoggerLevel LoggerLevel { get; set; }        
+        public LogLevel LogLevel { get; set; }
 
         protected internal Logger()
         {
 #if DEBUG
-            this.LoggerLevel = LoggerLevel.TRACE;
+            this.LogLevel = LogLevel.Information;
 #else
             this.LoggerLevel= LoggerLevel.INFO;
 #endif
 
         }
 
-        public virtual void WriteMessage(string message, LoggerLevel level, params object[] parameterValues)
+        public virtual void WriteMessage(string message, LogLevel level)
         {
-            if (level >= this.LoggerLevel)
+            if (level >= this.LogLevel)
             {
-                string msg = string.Format(string.Format("[Imms.Core.Logger--{0:yyyy/MM/dd HH:mm:ss}-{1}]:{2}{3}", DateTime.Now, level, message, Environment.NewLine), parameterValues);
+                //string msg = string.Format(string.Format("[Imms.Core.Logger--{0:yyyy/MM/dd HH:mm:ss}-{1}]:{2}{3}", DateTime.Now, level, message.Trim(), Environment.NewLine), parameterValues);
                 lock (this)
                 {
-                    Console.Write(msg);                    
-                  //  File.AppendAllText(this.LoggerFileName, msg);
+                    Console.WriteLine();
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write(string.Format("[Imms.Core.Logger--{0:yyyy/MM/dd HH:mm:ss}-{1}]:", DateTime.Now, level));
+                    Console.WriteLine(message);
+                    Console.ResetColor();
+                    //  File.AppendAllText(this.LoggerFileName, msg);
                 }
             }
         }
 
         //private WriteTextHandler WriteTextFunc;
-        
+
         public override System.Text.Encoding Encoding
         {
             get
             {
                 return System.Text.Encoding.UTF8;
             }
-        }         
+        }
 
         public string LoggerFileName
         {
             get
             {
-                return DateTime.Now.ToString("yyyyMMdd")+"_log.txt";
+                return DateTime.Now.ToString("yyyyMMdd") + "_log.txt";
             }
         }
 
 
-        public void Debug(string message, params object[] parameterValues)
+        public void Debug(string message)
         {
-            this.WriteMessage(message, LoggerLevel.DEBUG, parameterValues);
+            this.WriteMessage(message, LogLevel.Debug);
         }
 
-        public void Trace(string message, params object[] parameterValues)
+        public void Trace(string message)
         {
-            this.WriteMessage(message, LoggerLevel.TRACE, parameterValues);
+            this.WriteMessage(message, LogLevel.Trace);
         }
 
-        public void Info(string message, params object[] parameterValues)
+        public void Info(string message)
         {
-            this.WriteMessage(message, LoggerLevel.INFO, parameterValues);
+            this.WriteMessage(message, LogLevel.Information);
         }
 
-        public void Warning(string message, params object[] parameterValues)
+        public void Warning(string message)
         {
             //lock (typeof(Logger))
             //{
             //    SystemEnvironment.WarnCount += 1;
             //}
 
-            this.WriteMessage(message, LoggerLevel.WARN, parameterValues);
+            this.WriteMessage(message, LogLevel.Warning);
         }
 
-        public void Error(string message, params object[] parameterValues)
+        public void Error(string message)
         {
             //lock (typeof(Logger))
             //{
             //    SystemEnvironment.ErrorCount += 1;
             //}
 
-            this.WriteMessage(message, LoggerLevel.ERROR, parameterValues);
+            this.WriteMessage(message, LogLevel.Error);
         }
     }
 
     //internal delegate void WriteTextHandler(string str);
-
-    public enum LoggerLevel
-    {
-        ERROR = 4,
-        WARN = 3,
-        INFO = 2,
-        DEBUG = 1,
-        TRACE = 0
-    }
 }

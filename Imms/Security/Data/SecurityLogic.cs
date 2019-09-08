@@ -12,7 +12,7 @@ using System;
 
 namespace Imms.Security.Data
 {
-    public class SecurityLogic : SimpleCRUDLogic<SystemUser>
+    public class SystemUserLogic : SimpleCRUDLogic<SystemUser>
     {
         public static async void Login(SystemUser systemUser, Microsoft.AspNetCore.Http.HttpContext httpContext)
         {
@@ -32,7 +32,7 @@ namespace Imms.Security.Data
 
             systemUser.LastLoginTime = DateTime.Now;
 
-            new SecurityLogic().update(systemUser);
+            new SystemUserLogic().Update(systemUser);
         }
 
 
@@ -50,6 +50,11 @@ namespace Imms.Security.Data
                 if (result == null || string.Compare(result.Pwd, GetMD5Hash(password), true) != 0)
                 {
                     throw new BusinessException(GlobalConstants.EXCEPTION_CODE_DATA_NOT_FOUND, "用户名或密码错误!");
+                }
+
+                if (result.UserStatus == SystemUser.USER_STATUS_DISABLED)
+                {
+                    throw new BusinessException(GlobalConstants.EXCEPTION_CODE_CUSTOM, "账号已过期!");
                 }
             });
             return result;
@@ -70,12 +75,12 @@ namespace Imms.Security.Data
             return sb.ToString();
         }
 
-        protected override void beforeInsert(SystemUser item, DbContext dbContext)
+        protected override void BeforeInsert(SystemUser item, DbContext dbContext)
         {
-            item.Pwd = SecurityLogic.DEAFULT_PASSWORD;
+            item.Pwd = SystemUserLogic.DEAFULT_PASSWORD;
         }
 
-        protected override void beforeUpdate(SystemUser item, DbContext dbContext)
+        protected override void BeforeUpdate(SystemUser item, DbContext dbContext)
         {
             if (string.IsNullOrEmpty(item.Pwd))
             {
@@ -84,23 +89,98 @@ namespace Imms.Security.Data
             }
         }
 
-        public int resetPassword(long userId)
+        public int ResetPassword(long userId)
         {
             SystemUser old = CommonRepository.AssureExistsByFilter<SystemUser>(x => x.RecordId == userId);
-            old.Pwd = SecurityLogic.DEAFULT_PASSWORD;
-            this.update(old);
+            old.Pwd = SystemUserLogic.DEAFULT_PASSWORD;
+            this.Update(old);
             return 1;
         }
 
-        public int changeUserStatus(long userId, byte userStatus)
+        public int ChangeUserStatus(long userId, byte userStatus)
         {
             SystemUser old = CommonRepository.AssureExistsByFilter<SystemUser>(x => x.RecordId == userId);
             old.UserStatus = userStatus;
-            this.update(old);
+            this.Update(old);
 
             return 1;
         }
 
+        public int UpdateUserRoles(long userId, RoleUser[] roleUsers)
+        {
+            CommonRepository.UseDbContextWithTransaction(dbContext =>
+            {
+                string sql = "delete from " + ImmsDbContext.GetEntityTableName<RoleUser>() + " where user_id = @p0";
+                dbContext.Database.ExecuteSqlCommand(sql, userId);
+
+                foreach (RoleUser roleUser in roleUsers)
+                {
+                    dbContext.Set<RoleUser>().Add(roleUser);
+                }
+                dbContext.SaveChanges();
+            });
+            return roleUsers.Length;
+        }
+
         public static readonly string DEAFULT_PASSWORD = GetMD5Hash("888888");
+    }
+
+    public class SystemRoleLogic : SimpleCRUDLogic<SystemRole>
+    {
+        public List<SystemProgram> GetAllProgramWithPrivileges()
+        {
+            return
+            GlobalConstants.DbContextFactory.GetContext().Set<SystemProgram>()
+            .Include(x => x.Children)
+            .Include(x => x.Privielges)
+            .ToList();
+        }
+
+        public List<RolePrivilege> GetRolePrivileges(long roleId)
+        {
+            List<RolePrivilege> result = GlobalConstants.DbContextFactory.GetContext().Set<RolePrivilege>()
+            .Where(x => x.RoleId == roleId)
+            .ToList();
+            return result;
+        }
+
+        public int UpdateRolePrivilege(long roleId, ProgramPrivilege[] currentPrivileges)
+        {
+            CommonRepository.UseDbContextWithTransaction(dbContext =>
+            {
+                List<RolePrivilege> oldPrivileges = dbContext.Set<RolePrivilege>().Where(x => x.RoleId == roleId).ToList();
+                this.Revoke(oldPrivileges, currentPrivileges, dbContext);
+                this.AssignNew(roleId,oldPrivileges,currentPrivileges,dbContext);
+
+                dbContext.SaveChanges();
+            });
+            return currentPrivileges.Length;
+        }
+
+        private void AssignNew(long roleId, List<RolePrivilege> oldPrivileges, ProgramPrivilege[] currentPrivileges, DbContext dbContext)
+        {
+            long[] privilegeIdList = oldPrivileges.Select(x => x.ProgramPrivilegeId).ToArray();
+            List<ProgramPrivilege> assignList = currentPrivileges.Where(x => !privilegeIdList.Contains(x.RecordId)).ToList();
+            foreach (ProgramPrivilege privilege in assignList)
+            {
+                RolePrivilege rolePrivilege = new RolePrivilege();
+                rolePrivilege.RoleId = roleId;
+                rolePrivilege.ProgramId = privilege.ProgramId;
+                rolePrivilege.PrivilegeCode = privilege.PrivilegeCode;
+                rolePrivilege.ProgramPrivilegeId = privilege.RecordId;
+
+                dbContext.Set<RolePrivilege>().Add(rolePrivilege);
+            }
+        }
+
+        private void Revoke(List<RolePrivilege> oldPrivileges, ProgramPrivilege[] currentPrivileges, DbContext dbContext)
+        {
+            long[] privielgeIdList = currentPrivileges.Select(x => x.RecordId).ToArray();
+            List<RolePrivilege> revokedList = oldPrivileges.Where(x => !privielgeIdList.Contains(x.ProgramPrivilegeId)).ToList();
+            foreach (RolePrivilege revokedPrivilege in revokedList)
+            {
+                dbContext.Set<RolePrivilege>().Remove(revokedPrivilege);
+            }
+        }
     }
 }

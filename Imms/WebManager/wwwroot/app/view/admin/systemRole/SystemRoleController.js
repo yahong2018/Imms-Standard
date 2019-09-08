@@ -13,6 +13,7 @@ Ext.define('app.view.admin.systemRole.SystemRoleController', {
             return;
         }
         var roleId = role.get('recordId');
+        debugger;
 
         var throughTree = function (node) {
             for (var i = 0; i < node.childNodes.length; i++) {
@@ -25,16 +26,22 @@ Ext.define('app.view.admin.systemRole.SystemRoleController', {
                 if (dataType == 'app.model.admin.ProgramPrivilegeModel') {
                     privilegeCode = child.get('privilegeCode');
                 }
-                privilegeList.push({
+                var item = {
                     privilegeCode: privilegeCode,
                     programId: child.get('programId'),
                     recordId: child.get("recordId")
-                });
+                };
+                if (dataType == 'app.model.admin.SystemMenuTreeModel') {
+                    item.recordId = child.get('programPrivilegeId');
+                }
+                privilegeList.push(item);
                 throughTree(child);
             }
         };
         var node = this.getView().down('RolePrivilegePanel').getRootNode();
         throughTree(node);
+
+        debugger;
 
         this.getView().down('SystemRoleGrid').getStore().updateRolePrivilege.apply(this, [role, privilegeList, function () {
             Ext.Msg.alert('系统提示', '权限更新成功');
