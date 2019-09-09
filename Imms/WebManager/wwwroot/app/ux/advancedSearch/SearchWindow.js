@@ -69,7 +69,7 @@ Ext.define("app.ux.advancedSearch.SearchWindow", {
                 grid.getStore().clearCustomerFilter();
                 grid.getStore().addCustomFilter(expr);
                 grid.getStore().buildFilterUrl();
-                grid.getStore().load();
+                grid.getStore().loadPage(1);
             }
         }, {
             text: "取消",

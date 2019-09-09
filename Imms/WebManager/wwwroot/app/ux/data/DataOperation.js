@@ -264,7 +264,7 @@ Ext.define("app.ux.data.DataOperation", {
         */
 
         grid.getStore().buildFilterUrl();
-        grid.getStore().load();
+        grid.getStore().loadPage(1);
     },
     advancedSearch: function () {
         var grid = this;
