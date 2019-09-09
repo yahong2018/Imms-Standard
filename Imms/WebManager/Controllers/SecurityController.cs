@@ -53,6 +53,20 @@ namespace Imms.WebManager
         {
             return (Logic as SystemUserLogic).UpdateUserRoles(userId, roleUsers);
         }
+
+        [Route("changeCurrentUserPassword"), HttpPost]
+        public int ChangeCurrentUserPassword([FromBody] PasswordChangeItem item)
+        {
+            long userId = long.Parse(this.HttpContext.User.Claims.First(x => x.Type == "UserId").Value);
+            return (Logic as SystemUserLogic).ChangeUserPassword(userId, item.Old, item.Pwd1, item.Pwd2);
+        }
+
+        public class PasswordChangeItem
+        {
+            public string Old { get; set; }
+            public string Pwd1 { get; set; }
+            public string Pwd2 { get; set; }
+        }
     }
 
     [Route("security/systemRole")]
@@ -70,8 +84,8 @@ namespace Imms.WebManager
         public List<ProgramWithPrivilgeViewModel> GetAllMenuWithPrivilege()
         {
             List<SystemProgram> allPrograms = (this.Logic as SystemRoleLogic).GetAllProgramWithPrivileges()
-                    .Where(x=>string.IsNullOrEmpty(x.ParentId))
-                    .OrderBy(x=>x.ShowOrder)
+                    .Where(x => string.IsNullOrEmpty(x.ParentId))
+                    .OrderBy(x => x.ShowOrder)
                     .ToList();
 
             List<ProgramWithPrivilgeViewModel> result = new List<ProgramWithPrivilgeViewModel>();
@@ -84,9 +98,10 @@ namespace Imms.WebManager
             return result;
         }
 
-        [Route("updatePrivileges"),HttpPost]
-        public int UpdatePrivileges(long roleId,[FromBody]ProgramPrivilege[] currentPrivileges){
-            return (this.Logic as SystemRoleLogic).UpdateRolePrivilege(roleId,currentPrivileges);            
+        [Route("updatePrivileges"), HttpPost]
+        public int UpdatePrivileges(long roleId, [FromBody]ProgramPrivilege[] currentPrivileges)
+        {
+            return (this.Logic as SystemRoleLogic).UpdateRolePrivilege(roleId, currentPrivileges);
         }
     }
 

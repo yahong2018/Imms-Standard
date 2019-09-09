@@ -30,9 +30,10 @@ namespace Imms.WebManager.Controllers
             }
             try
             {
-                SystemUser systemUser = SystemUserLogic.VerifyLogin(userCode, password);
-                SystemUserLogic.Login(systemUser,HttpContext);
+               // SystemUser systemUser = SystemUserLogic.VerifyLogin(userCode, password);
+               // SystemUserLogic.Login(systemUser,HttpContext);
 
+                SystemUserLogic.Login(userCode,password,this.HttpContext);
                 return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)

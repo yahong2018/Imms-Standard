@@ -11,33 +11,33 @@ Ext.define('app.view.main.region.ChangePasswordWindow', {
     items: [{
         xtype: 'form',
         defaults: {
-           // labelAlign: 'right',
+            // labelAlign: 'right',
             labelWidth: 90,
         },
         items: [{
-                xtype: 'textfield',
-                fieldLabel: '旧密码',
-                width: 270,
-                allowBlank: false,
-                name: 'old',
-                inputType: 'password',
-            },
-            {
-                xtype: 'textfield',
-                fieldLabel: '新密码',
-                width: 270,
-                allowBlank: false,
-                name: 'pwd1',
-                inputType: 'password',
-            },
-            {
-                xtype: 'textfield',
-                fieldLabel: '确认新密码',
-                width: 270,
-                allowBlank: false,
-                name: 'pwd2',
-                inputType: 'password',
-            }
+            xtype: 'textfield',
+            fieldLabel: '旧密码',
+            width: 270,
+            allowBlank: false,
+            name: 'old',
+            inputType: 'password',
+        },
+        {
+            xtype: 'textfield',
+            fieldLabel: '新密码',
+            width: 270,
+            allowBlank: false,
+            name: 'pwd1',
+            inputType: 'password',
+        },
+        {
+            xtype: 'textfield',
+            fieldLabel: '确认新密码',
+            width: 270,
+            allowBlank: false,
+            name: 'pwd2',
+            inputType: 'password',
+        }
         ]
     }],
     buttons: [
@@ -50,8 +50,8 @@ Ext.define('app.view.main.region.ChangePasswordWindow', {
                 if (!form.isValid()) {
                     return;
                 }
-                var record = form.getValues();                
-                var url = 'admin/changeCurrentUserPassword';
+                var record = form.getValues();
+                var url = 'security/systemUser/changeCurrentUserPassword';
                 Ext.Ajax.request({
                     url: url,
                     jsonData: record,
@@ -62,13 +62,13 @@ Ext.define('app.view.main.region.ChangePasswordWindow', {
                         if (typeof result == "string") {
                             result = Ext.decode(result);
                         }
-                        var msg="密码更改出现未知错误："+result;
-                        if(result == 0){
+                        var msg = "密码更改出现未知错误：" + result;
+                        if (result.data == 0) {
                             msg = '已成功更改密码！';
-                        }else if(result==-1){
+                        } else if (result.data == -1) {
                             msg = '二次输入的新密码不一致！';
-                        }else if(result==-2){
-                            msg='旧密码错误！';
+                        } else if (result.data == -2) {
+                            msg = '旧密码错误！';
                         }
 
                         Ext.MessageBox.show({
@@ -76,9 +76,9 @@ Ext.define('app.view.main.region.ChangePasswordWindow', {
                             msg: msg,
                             buttons: Ext.MessageBox.OK,
                             icon: Ext.MessageBox.INFO,
-                            fn:function(btn,text){   
-                                if(result==0){                             
-                                   me.close();
+                            fn: function (btn, text) {
+                                if (result == 0) {
+                                    me.close();
                                 }
                             }
                         });

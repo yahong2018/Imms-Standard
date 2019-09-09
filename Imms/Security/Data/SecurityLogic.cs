@@ -14,6 +14,11 @@ namespace Imms.Security.Data
 {
     public class SystemUserLogic : SimpleCRUDLogic<SystemUser>
     {
+        public static void Login(string userCode, string password,Microsoft.AspNetCore.Http.HttpContext httpContext){
+            SystemUser systemUser = SystemUserLogic.VerifyLoginAccount(userCode, password);
+            SystemUserLogic.Login(systemUser, httpContext);
+        }
+
         public static async void Login(SystemUser systemUser, Microsoft.AspNetCore.Http.HttpContext httpContext)
         {
             var claims = new List<Claim>
@@ -36,7 +41,7 @@ namespace Imms.Security.Data
         }
 
 
-        public static SystemUser VerifyLogin(string userCode, string password)
+        public static SystemUser VerifyLoginAccount(string userCode, string password)
         {
             SystemUser result = null;
             CommonRepository.UseDbContext(dbContext =>
@@ -120,6 +125,24 @@ namespace Imms.Security.Data
                 dbContext.SaveChanges();
             });
             return roleUsers.Length;
+        }
+
+        public int ChangeUserPassword(long userId, string old,string pwd1,string pwd2){
+            string oldMd5 = GetMD5Hash(old);
+            SystemUser user = CommonRepository.AssureExistsByFilter<SystemUser>(x=>x.RecordId == userId);
+            if(string.Compare(user.Pwd, oldMd5, true) != 0){
+                return -2;
+            }
+            string pwd1Md5 = GetMD5Hash(pwd1);
+            string pwd2Md5 = GetMD5Hash(pwd2);
+            if (string.Compare(pwd1Md5, pwd2Md5, true) != 0)
+            {
+                return -1;
+            }
+            user.Pwd = pwd2Md5;
+            this.Update(user);
+
+            return 0;
         }
 
         public static readonly string DEAFULT_PASSWORD = GetMD5Hash("888888");
