@@ -9,12 +9,11 @@ namespace Imms.Mes.Data.Domain
 {
     public partial class Operator : TrackableEntity<long>
     {
-        public long UserId { get; set; }
+        public long UserId { get; set; }        
         public long OrganizationId { get; set; }
         public long SupervisorId { get; set; }
 
-        public virtual List<OperatorCapability> OperatorCapabilities { get; set; } = new List<OperatorCapability>();
-        
+        public virtual List<OperatorCapability> OperatorCapabilities { get; set; } = new List<OperatorCapability>();        
     }
 
     public partial class OperatorCapability : TrackableEntity<long>
