@@ -80,7 +80,27 @@ create table rfid_card
   index IDX_RFID_CARD_2(card_status)       
 );
 
+--
+-- 生产计划: 就用work_order表
+--
 
-
-
+--
+-- 生产实绩: work_order_progress
+--
+create table work_order_progress
+(
+    record_id      bigint   auto_increment   not null default 0,
+    work_order_id  bigint                    not null,
+    operation_id   bigint                    not null,
+    rfid_terminator_id bigint                not null, -- 机器号
+    rfid_controller_id bigint                not null, -- 组号
+    production_id  bigint                    not null, -- 产品编号
+    report_time    datetime                  not null, -- 报告时间
+    report_qty     int                       not null, -- 数量
+    rfid_card_no   varchar(20)               not null default '', -- RFID卡号，如果是尾数，则为空
+    report_type    int                       not null, -- 数量类型：0. 整数刷卡申报  1.尾数
+    work_station_id bigint                   not null, -- 工位Id
+    work_center_id  bigint                   not null, -- 工作中心Id
+    
+)
 
