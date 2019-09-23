@@ -26,13 +26,27 @@ CREATE TABLE system_logs
   PRIMARY KEY(record_id),
   index IDX_SYSTEM_LOGS_0(user_id),
   index IDX_SYSTEM_LOGS_1(log_time),
-  index IDX_SYSTEM_LOGS(log_type)                   
+  index IDX_SYSTEM_LOGS_2(log_type)                   
 );
 
 --
--- 工位机
--- 
+-- 控制器:使用科启奥的控制器表
+--
+create view v_rfid_controller
+as
+select ConterID as record_id,
+       GID as group_id,   -- 组号
+       ConterName as controller_name,
+       Position as position,
+       IP as ip,     
+       Port as port,
+       IsUse as is_use
+from stationinfo
+;      
 
+--
+-- 工位机:直接从工位里面取数据，因为每个工位对应一个工位机
+-- 
 
 --
 -- 组织
@@ -53,7 +67,7 @@ alter table operator
 ;
 
 --
--- 工艺流程： 就是工艺路线
+-- 工艺流程： 就是工艺路线。
 --
 
 --
@@ -62,17 +76,24 @@ alter table operator
 
 --
 -- 发卡管理
+--    本表不可以修改，只可以新增，如果已经被使用，则不可以删除。
 --
 create table rfid_card
 (
   record_id      bigint  auto_increment  not null default 0,
   rfid_no        varchar(20)             not null,
-  card_type      int                     not null,
-  card_status    int                     not null,
+  card_type      int                     not null,        --  卡类别: 0. 工艺数量   1. 员工卡
+  card_status    int                     not null,        
   production_id  bigint                  not null,        -- （工艺数量卡）所代表的产品
   operation_id   bigint                  null,            -- （工艺数量卡）所代表的工艺
   qty            int                     null,            -- （工艺数量卡）数量
   operator_id    bigint                  null,            -- （员工卡）   操作员
+
+  create_by      bigint                  not null,
+  create_date    datetime                not null,
+  update_by      bigint                  not null,
+  update_date    datetime                not null,
+  opt_flag       int                     not null,
 
   PRIMARY KEY(record_id),
   index IDX_RFID_CARD_0(rfid_no),
@@ -101,6 +122,56 @@ create table work_order_progress
     report_type    int                       not null, -- 数量类型：0. 整数刷卡申报  1.尾数
     work_station_id bigint                   not null, -- 工位Id
     work_center_id  bigint                   not null, -- 工作中心Id
+
+
+    create_by      bigint                  not null,
+    create_date    datetime                not null,
+    update_by      bigint                  not null,
+    update_date    datetime                not null,
+    opt_flag       int                     not null,    
     
-)
+    PRIMARY KEY(record_id),
+    index idx_work_order_progress_0(work_order_id),
+    index idx_work_order_progress_1(operation_id),
+    index idx_work_order_progress_2(rfid_terminator_id),
+    index idx_work_order_progress_3(rfid_controller_id),
+    index idx_work_order_progress_4(production_id),
+    index idx_work_order_progress_5(rfid_card_no),
+    index idx_work_order_progress_6(work_station_id),
+    index idx_work_order_progress_7(work_center_id)
+);
+
+--
+-- 生产品质: quantity_list
+--
+
+create table quantity_list
+(
+  record_id      bigint     auto_increment   not null default 0,
+  work_order_id  bigint                      not null,  -- 工单编号
+  production_id  bigint                      not null,  -- 产品id  
+  discover_id    bigint                      not null,  -- 发现人
+  discover_time  datetime                    not null,  -- 发现时间
+  producer_id    bigint                      not null,  -- 产生人
+  produce_time   datetime                    not null,  -- 产生时间  
+  response_id    bigint                      not null,  -- 责任人
+  defect_type_id varchar(20)                 not null,  -- 缺陷代码
+  defect_description varchar(500)            not null,  -- 缺陷描述
+
+  create_by      bigint                      not null,
+  create_date    datetime                    not null,
+  update_by      bigint                      not null,
+  update_date    datetime                    not null,
+  opt_flag       int                         not null,  
+
+  PRIMARY KEY(record_id),
+  index idx_quantity_list_0(work_order_id),
+  index idx_quantity_list_1(production_id),
+  index idx_quantity_list_2(discover_id),
+  index idx_quantity_list_3(discover_time),
+  index idx_quantity_list_4(producer_id),
+  index idx_quantity_list_5(produce_time),
+  index idx_quantity_list_6(response_id),
+  index idx_quantity_list_7(defect_type_id)  
+);
 
