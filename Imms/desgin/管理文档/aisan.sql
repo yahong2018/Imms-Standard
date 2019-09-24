@@ -1,17 +1,30 @@
+create table system_parameter_class
+(
+  record_id            bigint    auto_increment   not null,
+  class_name           varchar(50)                not null,
+
+  PRIMARY KEY(record_id),
+  index idx_sytsem_parameter_class_0(class_name)
+);
+
 --
 -- 系统参数，包括与ERP的接口
 --
-create table system_parameters
+create table system_parameter
 (
     record_id          bigint  auto_increment   not null,
+    parameter_class_id bigint                   not null, -- 参数分类
     parameter_code     varchar(50)              not null,
     parameter_name     varchar(120)             not null,
     parameter_value    varchar(255)             not null,
 
     PRIMARY KEY (record_id),
     index IDX_SYSTEM_PARAMETER_0(parameter_code),
-    index IDX_SYSTEM_PARAMETER_1(parameter_name)
+    index IDX_SYSTEM_PARAMETER_1(parameter_name),
+    index IDX_SYSTEM_PARAMETER_2(parameter_class_id)
 );
+
+
 --
 -- 系统日志 
 --
