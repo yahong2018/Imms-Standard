@@ -143,7 +143,9 @@ namespace Imms.Data
             modelBuilder.ApplyConfiguration(new DataExcahngeConfigure());
 
             modelBuilder.ApplyConfiguration(new MediaConfigure());
-            modelBuilder.ApplyConfiguration(new WorkOrganizationUnitConfigure());            
+            modelBuilder.ApplyConfiguration(new WorkOrganizationUnitConfigure());   
+            modelBuilder.ApplyConfiguration(new SystemParameterClassConfigure()) ;
+            modelBuilder.ApplyConfiguration(new SystemParameterConfigure());
 
             foreach (ICustomModelBuilder customModelBuilder in customModelBuilders)
             {
