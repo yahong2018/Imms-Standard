@@ -28,18 +28,10 @@ namespace Imms.Mes.Data.Domain
 
     public partial class Operation : BaseOperation
     {
-        public virtual List<OperationMedia> Medias { get; set; } = new List<OperationMedia>();
+       
     }
 
-    public class OperationMedia : TrackableEntity<long>
-    {
-        public long MediaId { get; set; }
-        public long OperationId { get; set; }
-        public int MediaType { get; set; }
-
-        public virtual Media Media { get; set; }
-        public virtual Operation Operation { get; set; }
-    }
+    
 
     public partial class OperationRouting : BaseOperation
     {
@@ -94,27 +86,10 @@ namespace Imms.Mes.Data.Domain
             base.InternalConfigure(builder);
             builder.ToTable("operation");
             ImmsDbContext.RegisterEntityTable<Operation>("operation");
-
-            builder.HasMany(e => e.Medias).WithOne(e => e.Operation).HasForeignKey(e => e.OperationId);
         }
     }
 
-    public class OpetaionMediaConfigure : TrackableEntityConfigure<OperationMedia>
-    {
-        protected override void InternalConfigure(EntityTypeBuilder<OperationMedia> builder)
-        {
-            base.InternalConfigure(builder);
-            builder.ToTable("operation_media");
-            ImmsDbContext.RegisterEntityTable<OperationMedia>("operation_media");
-
-            builder.Property(e => e.MediaId).HasColumnName("media_id");
-            builder.Property(e => e.OperationId).HasColumnName("operation_id");
-            builder.Property(e => e.MediaType).HasColumnName("media_type");
-
-            builder.HasOne(e => e.Media).WithMany().HasForeignKey(e => e.MediaId);
-        }
-    }
-
+    
     public class OperationRoutingConfigure : BaseOperationConfigure<OperationRouting>
     {
         protected override void InternalConfigure(EntityTypeBuilder<OperationRouting> builder)

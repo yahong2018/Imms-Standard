@@ -19,9 +19,9 @@ namespace Imms.Mes.Data
             
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.MaterialTypeConfigure());
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.MaterialConfigure());
-            
+
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.OperationConfigure());
-            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.OpetaionMediaConfigure());
+            
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.OperationRoutingConfigure());
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.OperationRoutingOrderConfigure());
 
