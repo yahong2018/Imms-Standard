@@ -9,6 +9,7 @@ namespace Imms.WebManager.Models
         public string DataType { get; set; }
         public bool Checked { get; set; }
         public long ProgramPrivilegeId { get; set; }
+        public bool Expanded{get;set;}
 
         public ProgramWithPrivilgeViewModel() { }
         public ProgramWithPrivilgeViewModel(SystemProgram program)
@@ -51,6 +52,10 @@ namespace Imms.WebManager.Models
                                      Checked = false,
                                      DataType = "app.model.admin.ProgramPrivilegeModel"
                                  }).ToArray();
+            }
+
+            if(this.Children.Length>0){
+                this.Expanded=true;
             }
         }
     }

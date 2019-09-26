@@ -3,6 +3,7 @@ Ext.define('app.model.admin.SystemMenuTreeModel', {
     fields: [
         { name: 'text', mapping: 'programName' },
         { name: "programId", mapping: "recordId" },
+        { name:"expanded",calculate:function(item){return true;}},
         {
             name: ' leaf', calculate: function (item) {
                 if (item.id == 'root') {

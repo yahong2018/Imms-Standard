@@ -210,7 +210,7 @@ create table production_moving
     create_date    datetime                    not null,
     update_by      bigint                      not null,
     update_date    datetime                    not null,
-    opt_flag       int                         not null,  
+    opt_flag       int                         not null,    -- 0. 记录由工位机提交   1.记录由ERP同步
 
     PRIMARY KEY(record_id),
     index idx_production_moving_0(rfid_no),
