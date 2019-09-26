@@ -44,7 +44,6 @@ INSERT INTO system_program (record_id,program_code, program_name, url, show_orde
 INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS02_04', 'SYS02_04', '工位机登录记录', 'app.view.imms.org.workstationLogin.WorkstationLogin',3, '', 'SYS02', '0xf002');
 
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS02_01', 'RUN', '运行');
-INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS02_01', 'RUN', '运行');
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS02_01', 'INSERT', '新增');
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS02_01', 'UPDATE', '修改');
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS02_01', 'DELETE', '删除');
