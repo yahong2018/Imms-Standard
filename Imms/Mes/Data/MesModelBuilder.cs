@@ -1,5 +1,4 @@
 ﻿using Imms.Data;
-using Imms.Mes.Data.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -12,28 +11,30 @@ namespace Imms.Mes.Data
         public void BuildModel(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.3-servicing-35854");
-            
+
+            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.SimpleCodeConfigure());
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.EquipmentTypeCofigure());
+
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.EquipmentConfigure());
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.OperatorConfigure());
             
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.MaterialTypeConfigure());
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.MaterialConfigure());
 
-            modelBuilder.ApplyConfiguration(new RfidCardConfigure());
-            modelBuilder.ApplyConfiguration(new RfidControllerConfigure());
-            modelBuilder.ApplyConfiguration(new ProductionOrderConfigure());
-            modelBuilder.ApplyConfiguration(new ProductionOrderProgressConfigure());
-            modelBuilder.ApplyConfiguration(new QualityCheckConfigure());
-            modelBuilder.ApplyConfiguration(new WorkShopConfigure());
-            modelBuilder.ApplyConfiguration(new WorkStationConfigure());
+            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.RfidControllerConfigure());
 
-            modelBuilder.ApplyConfiguration(new WorkOrganizationUnitConfigure());
-            modelBuilder.ApplyConfiguration(new SimpleCodeConfigure());
+            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.WorkOrganizationUnitConfigure());
+            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.WorkshopConfigure());
+            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.WorkstationConfigure());        
 
-            modelBuilder.ApplyConfiguration(new WorkstationLoginConfigure());
-            modelBuilder.ApplyConfiguration(new ProductionMovingConfigure());
+            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.RfidCardConfigure());
+            
+            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.ProductionOrderConfigure());
+            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.ProductionOrderProgressConfigure());
+            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.QualityCheckConfigure());
+            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.ProductionMovingConfigure());
 
+            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.WorkstationLoginConfigure());
         }
     }
 }

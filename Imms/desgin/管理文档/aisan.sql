@@ -54,7 +54,7 @@ select ConterID as record_id,
        IP as ip,     
        Port as port,
        IsUse as is_use
-from stationinfo
+from conterinfo
 ;      
 
 --
@@ -77,7 +77,7 @@ alter table work_organization_unit
 alter table operator
    add employee_id         varchar(12)   not null,   -- 工号
    add employee_name       varchar(50)   not null,   -- 姓名 
-   add employee_card_no    varchar(20)   null        -- 工卡号
+   add employee_card_no    varchar(20)   not null default ''         -- 工卡号
 ;
 
 
@@ -86,13 +86,13 @@ alter table operator
 --
 create table Workstation_login
 (
-  record_id             bigint     auto_increment   not null default 0,
+  record_id             bigint     auto_increment   not null,
   rfid_terminator_id    int                         not null,
   rfid_controller_group_id   int                    not null,
   rfid_card_no          varchar(20)                 not null,
   login_time            datetime                    not null,  
 
-  rfid_controller_id    bigint                      not null, 
+  rfid_controller_id    int                      not null, 
   workstation_id        bigint                      not null,
   rfid_card_id          bigint                      not null,
   operator_id           bigint                      not null,
@@ -120,7 +120,7 @@ create table Workstation_login
 --
 create table rfid_card
 (
-  record_id      bigint  auto_increment  not null default 0,
+  record_id      bigint  auto_increment  not null,
   rfid_no        varchar(20)             not null,
   card_type      int                     not null,        --  卡类别: 0. 工艺数量   1. 员工卡
   card_status    int                     not null,        
@@ -150,11 +150,11 @@ create table rfid_card
 --
 create table production_order_progress
 (
-    record_id      bigint   auto_increment   not null default 0,
+    record_id      bigint   auto_increment   not null,
     production_order_id  bigint              not null,
     operation_id   bigint                    not null,
-    rfid_terminator_id bigint                not null, -- 机器号
-    rfid_controller_id bigint                not null, -- 组号
+    rfid_terminator_id int                   not null, -- 机器号
+    rfid_controller_id int                   not null, -- 组号
     production_id  bigint                    not null, -- 产品编号
     report_time    datetime                  not null, -- 报告时间
     report_qty     int                       not null, -- 数量
@@ -171,23 +171,22 @@ create table production_order_progress
     opt_flag       int                     not null,    
     
     PRIMARY KEY(record_id),
-    index idx_production_order_progress_0(work_order_id),
+    index idx_production_order_progress_0(production_order_id),
     index idx_production_order_progress_1(operation_id),
     index idx_production_order_progress_2(rfid_terminator_id),
     index idx_production_order_progress_3(rfid_controller_id),
     index idx_production_order_progress_4(production_id),
     index idx_production_order_progress_5(rfid_card_no),
-    index idx_production_order_progress_6(work_station_id),
-    index idx_production_order_progress_7(work_center_id)
+    index idx_production_order_progress_6(workstation_id),
+    index idx_production_order_progress_7(workshop_id)
 );
 
 --
 -- 交接记录: production_moving
 --
-
 create table production_moving
 (
-    record_id                  bigint             auto_increment    not null default 0,
+    record_id                  bigint        auto_increment    not null,
     rfid_no                    varchar(20)   not null,
     rfid_card_id               bigint        not null,
     rfid_terminator_id         int           not null,
@@ -237,7 +236,7 @@ create table production_moving
 
 create table quality_check
 (
-  record_id      bigint     auto_increment   not null default 0,
+  record_id      bigint     auto_increment   not null,
   production_order_id  bigint                not null,  -- 工单编号
   production_id  bigint                      not null,  -- 产品id  
   discover_id    bigint                      not null,  -- 发现人
@@ -255,7 +254,7 @@ create table quality_check
   opt_flag       int                         not null,  
 
   PRIMARY KEY(record_id),
-  index idx_quality_check_0(work_order_id),
+  index idx_quality_check_0(production_order_id),
   index idx_quality_check_1(production_id),
   index idx_quality_check_2(discover_id),
   index idx_quality_check_3(discover_time),

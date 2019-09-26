@@ -32,7 +32,6 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.MaterialNo).IsRequired().HasColumnName("material_no").HasMaxLength(20).IsUnicode(false);
             builder.Property(e => e.MaterialTypeId).HasColumnName("material_type_id").HasColumnType("bigint(20)");
             builder.Property(e => e.Unit).HasColumnName("unit").HasColumnType("varchar(20)");
-
         }
     }
 }

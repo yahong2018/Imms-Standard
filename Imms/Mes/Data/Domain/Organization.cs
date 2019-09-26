@@ -18,16 +18,16 @@ namespace Imms.Mes.Data.Domain
         public string EmployeeCardNo { get; set; }
     }
 
-    public class WorkShop : WorkOrganizationUnit
+    public class Workshop : WorkOrganizationUnit
     {
         public string WorkShopCode { get { return base.OrganizationCode; } set { base.OrganizationCode = value; } }
         public string WorkShopName { get { return base.OrganizationName; } set { base.OrganizationName = value; } }
-        public long NextWorkShopId { get; set; }
 
-        public virtual WorkShop NextWorkShop { get; set; }
+        public long NextWorkShopId { get; set; }
+        public virtual Workshop NextWorkShop { get; set; }
     }
 
-    public class WorkStation : WorkOrganizationUnit
+    public class Workstation : WorkOrganizationUnit
     {
         public string WorkStaitonCode { get { return base.OrganizationCode; } set { base.OrganizationCode = value; } }
         public string WorkStationName { get { return base.OrganizationName; } set { base.OrganizationName = value; } }
@@ -40,18 +40,18 @@ namespace Imms.Mes.Data.Domain
 
     public class WorkstationLogin:Entity<long>
     {
-        public int RfidTerminatorId;
-        public int RfidControllerGroupId;
-        public string RfidCardNo;
-        public DateTime LoginTime;
-        public long RfidControllerId;
-        public long WorkstationId;
-        public long RfidCardId;
-        public long OperatorId;
+        public int RfidTerminatorId{get;set;}
+        public int RfidControllerGroupId{ get; set; }
+        public string RfidCardNo{ get; set; }
+        public DateTime LoginTime{ get; set; }
+        public int RfidControllerId{ get; set; }
+        public long WorkstationId{ get; set; }
+        public long RfidCardId{ get; set; }
+        public long OperatorId{ get; set; }
 
         public virtual RfidCard RfidCard{get;set;}
         public virtual Operator Operator{get;set;}
-        public virtual WorkStation WorkStation{get;set;}
+        public virtual Workstation WorkStation{get;set;}
         public virtual RfidController RfidController{get;set;}
     }
 
@@ -97,24 +97,24 @@ namespace Imms.Mes.Data.Domain
         }
     }
 
-    public class WorkShopConfigure : IEntityTypeConfiguration<WorkShop>
+    public class WorkshopConfigure : IEntityTypeConfiguration<Workshop>
     {
-        public void Configure(EntityTypeBuilder<WorkShop> builder)
+        public void Configure(EntityTypeBuilder<Workshop> builder)
         {
-            ImmsDbContext.RegisterEntityTable<WorkShop>("work_organization_unit");
+            ImmsDbContext.RegisterEntityTable<Workshop>("work_organization_unit");
             builder.Ignore(e => e.WorkShopCode);
             builder.Ignore(e => e.WorkShopName);
 
-            builder.Property(e => e.NextWorkShopId).HasColumnName("next_work_shop_id");
-            builder.HasOne(e => e.NextWorkShop).WithMany().HasForeignKey(e => e.NextWorkShopId).HasConstraintName("next_work_shop_id");
+            builder.Property(e => e.NextWorkShopId).HasColumnName("next_workshop_id");
+            builder.HasOne(e=>e.NextWorkShop).WithMany().HasForeignKey(e => e.NextWorkShopId).HasConstraintName("next_workshop_id");
         }
     }
 
-    public class WorkStationConfigure : IEntityTypeConfiguration<WorkStation>
+    public class WorkstationConfigure : IEntityTypeConfiguration<Workstation>
     {
-        public void Configure(EntityTypeBuilder<WorkStation> builder)
+        public void Configure(EntityTypeBuilder<Workstation> builder)
         {
-            ImmsDbContext.RegisterEntityTable<WorkShop>("work_organization_unit");
+            ImmsDbContext.RegisterEntityTable<Workshop>("work_organization_unit");
             builder.Ignore(e => e.WorkStaitonCode);
             builder.Ignore(e => e.WorkStationName);
 
@@ -129,8 +129,8 @@ namespace Imms.Mes.Data.Domain
         public void Configure(EntityTypeBuilder<WorkOrganizationUnit> builder)
         {
             builder.HasDiscriminator("organization_type", typeof(string))
-               .HasValue<WorkStation>(GlobalConstants.TYPE_ORG_WORK_STATETION)
-               .HasValue<WorkShop>(GlobalConstants.TYPE_ORG_WORK_SHOP)
+               .HasValue<Workstation>(GlobalConstants.TYPE_ORG_WORK_STATETION)
+               .HasValue<Workshop>(GlobalConstants.TYPE_ORG_WORK_SHOP)
                ;
         }
     }

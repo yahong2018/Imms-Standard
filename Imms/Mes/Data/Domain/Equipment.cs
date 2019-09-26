@@ -19,7 +19,7 @@ namespace Imms.Mes.Data.Domain
         public virtual EquipmentType EquipmentType { get; set; }
     }
 
-    public class RfidController : Entity<long>
+    public class RfidController : Entity<int>
     {
         public int GroupId { get; set; }
         public string ControllerName { get; set; }
@@ -35,13 +35,13 @@ namespace Imms.Mes.Data.Domain
         public int CardType{get;set;}
         public int CardStatus{get;set;}
         public long WorkShopId{get;set;}
-        public int ProductionId {get;set;}
+        public long ProductionId {get;set;}
         public int Qty{get;set;}
-        public int OperatorId{get;set;}        
+        public long OperatorId{get;set;}        
 
         public virtual Material Production{get;set;}
         public virtual Operator Operator{get;set;}
-        public virtual WorkShop WorkShop {get;set;}
+        public virtual Workshop WorkShop {get;set;}
     }
 
 
@@ -61,9 +61,9 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.Qty).HasColumnName("qty");
             builder.Property(e => e.OperatorId).HasColumnName("operator_id");
 
-            builder.OwnsOne(e=>e.Production).HasConstraintName("production_id");
-            builder.OwnsOne(e=>e.Operator).HasConstraintName("operator_id");
-            builder.OwnsOne(e=>e.WorkShop).HasConstraintName("work_shop_id");
+            builder.HasOne(e=>e.Production).WithMany().HasForeignKey(e=>e.ProductionId).HasConstraintName("production_id");
+            builder.HasOne(e=>e.Operator).WithMany().HasForeignKey(e=>e.OperatorId).HasConstraintName("operator_id");
+            builder.HasOne(e=>e.WorkShop).WithMany().HasForeignKey(e=>e.WorkShopId).HasConstraintName("work_shop_id");
         }
     }
 
