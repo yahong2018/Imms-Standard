@@ -38,10 +38,11 @@ namespace Imms
         public const int SYSTEM_ID_KANBAN = 4;
 
         //组织机构类型
-        public const string TYPE_ORG_PLANT = "ORG_LANT";
-        public const string TYPE_ORG_WORK_CENTER = "ORG_WORK_CENTER";
-        public const string TYPE_ORG_WORK_LINE = "ORG_WORK_LINE";
-        public const string TYPE_ORG_WORK_STATETION = "ORG_WORK_STATION";
+        public const string TYPE_ORG_PLANT = "ORG_PLANT";   // 工厂
+        public const string TYPE_ORG_WORK_SHOP="ORG_WORK_SHOP"; //车间
+        public const string TYPE_ORG_WORK_CENTER = "ORG_WORK_CENTER";  //工作中心
+        public const string TYPE_ORG_WORK_LINE = "ORG_WORK_LINE";      // 生产线
+        public const string TYPE_ORG_WORK_STATETION = "ORG_WORK_STATION";  //工作站
 
         //组织架构参数
         //public const string TYPE_ORG_PARAMETER_TYPE_WORK_STATION_TYPE = "WORK_STATION_TYPE";  //工位类型

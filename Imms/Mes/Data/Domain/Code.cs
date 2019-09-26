@@ -47,14 +47,14 @@ namespace Imms.Mes.Data.Domain
         }
     }
 
-    public class MaterialTypeCofigure : IEntityTypeConfiguration<MaterialType>
-    {
-        public void Configure(EntityTypeBuilder<MaterialType> builder)
-        {
-            ImmsDbContext.RegisterEntityTable<MaterialType>("simple_code");
+    // public class MaterialTypeCofigure : IEntityTypeConfiguration<MaterialType>
+    // {
+    //     public void Configure(EntityTypeBuilder<MaterialType> builder)
+    //     {
+    //         ImmsDbContext.RegisterEntityTable<MaterialType>("simple_code");
 
-            builder.Ignore(e => e.MaterialTypeCode);
-            builder.Ignore(e => e.MaterialTypeName);
-        }
-    }
+    //         builder.Ignore(e => e.MaterialTypeCode);
+    //         builder.Ignore(e => e.MaterialTypeName);
+    //     }
+    // }
 }

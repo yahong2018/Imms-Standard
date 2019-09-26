@@ -1,4 +1,5 @@
 ﻿using Imms.Data;
+using Imms.Mes.Data.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -17,15 +18,21 @@ namespace Imms.Mes.Data
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.OperatorConfigure());
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.OperatorCapabilityConfigure());
             
-            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.MaterialTypeCofigure());
+            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.MaterialTypeConfigure());
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.MaterialConfigure());
-            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.BomConfigure());
-            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.BomOrderConfigure());
 
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.OperationConfigure());
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.OpetaionMediaConfigure());
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.OperationRoutingConfigure());
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.OperationRoutingOrderConfigure());
+
+            modelBuilder.ApplyConfiguration(new RfidCardConfigure());
+            modelBuilder.ApplyConfiguration(new RfidControllerConfigure());
+            modelBuilder.ApplyConfiguration(new ProductionOrderConfigure());
+            modelBuilder.ApplyConfiguration(new ProductionOrderProgressConfigure());
+            modelBuilder.ApplyConfiguration(new QualityCheckConfigure());
+            modelBuilder.ApplyConfiguration(new WorkShopConfigure());
+            modelBuilder.ApplyConfiguration(new WorkStationConfigure());
         }
     }
 }

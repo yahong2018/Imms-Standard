@@ -22,71 +22,7 @@ namespace Imms.Mes.Data.Domain
 
         public virtual MaterialType MaterialType { get; set; }
     }
-
-    public partial class BomOrder : OrderEntity<long>
-    {
-        public int BomOrderType { get; set; }
-        public long MaterialId { get; set; }
-
-        public virtual Material Material { get; set; }
-        public virtual List<Bom> Boms { get; set; } = new List<Bom>();
-    }
-
-    public partial class Bom : TrackableEntity<long>
-    {
-        public long BomOrderId { get; set; }
-        public long ComponentMaterialId { get; set; }
-        public long? ComponentAbstractMaterialId { get; set; }
-        public double QtyComponent { get; set; }
-        public string ComponentUnit { get; set; }
-        public bool IsMainFabric { get; set; }
-        public long? ParentBomId { get; set; }
-
-        public virtual BomOrder BomOrder { get; set; }
-        public virtual Material ComponentMaterial { get; set; }
-        public virtual Material AbstractComponentMaterial { get; set; }
-        public virtual Bom ParentBom { get; set; }
-        public virtual List<Bom> Children { get; set; } = new List<Bom>();
-    }
-
-    public class BomOrderConfigure : OrderEntityConfigure<BomOrder>
-    {
-        protected override void InternalConfigure(EntityTypeBuilder<BomOrder> builder)
-        {
-            base.InternalConfigure(builder);
-            builder.ToTable("bom_order");
-            ImmsDbContext.RegisterEntityTable<BomOrder>("bom_order");
-
-            builder.Property(e => e.BomOrderType).HasColumnName("bom_order_type");
-            builder.Property(e => e.MaterialId).HasColumnName("material_id");
-
-            builder.HasOne(e => e.Material).WithMany().HasForeignKey(e => e.MaterialId);
-            builder.HasMany(e => e.Boms).WithOne(e => e.BomOrder).HasForeignKey(e => e.BomOrderId);
-        }
-    }
-
-    public class BomConfigure : TrackableEntityConfigure<Bom>
-    {
-        protected override void InternalConfigure(EntityTypeBuilder<Bom> builder)
-        {
-            base.InternalConfigure(builder);
-            builder.ToTable("bom");
-            ImmsDbContext.RegisterEntityTable<Bom>("bom");
-
-            builder.Property(e => e.BomOrderId).HasColumnName("bom_order_id");
-            builder.Property(e => e.ComponentAbstractMaterialId).HasColumnName("component_abstract_material_id");
-            builder.Property(e => e.ComponentMaterialId).IsRequired().HasColumnName("component_material_id");
-            builder.Property(e => e.QtyComponent).HasColumnName("qty_component");
-            builder.Property(e => e.ComponentUnit).HasColumnName("component_unit");
-            builder.Property(e => e.IsMainFabric).HasColumnName("is_main_fabric").HasColumnType("bit");
-            builder.Property(e => e.ParentBomId).HasColumnName("parent_bom_id");
-
-            builder.HasOne(e => e.BomOrder).WithMany(e => e.Boms).HasForeignKey(e => e.BomOrderId);
-            builder.HasOne(e => e.ComponentMaterial).WithMany().HasForeignKey(e => e.ComponentMaterialId);
-            builder.HasOne(e => e.AbstractComponentMaterial).WithMany().HasForeignKey(e => e.ComponentAbstractMaterialId);
-            builder.HasOne(e => e.ParentBom).WithMany(e => e.Children).HasForeignKey(e => e.ParentBomId).HasConstraintName("parent_bom_id");
-        }
-    }
+  
 
     public class MaterialConfigure : TrackableEntityConfigure<Material>
     {

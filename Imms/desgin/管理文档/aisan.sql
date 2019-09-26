@@ -65,8 +65,8 @@ from stationinfo
 -- 组织
 --
 alter table work_organization_unit
-   add rfid_controller_id  bigint not null default 0,  -- 工位：控制器
-   add rfid_terminator_id  bigint not null default 0,  -- 工位：工位机
+   add rfid_controller_id  int not null default 0,  -- 工位：控制器的序号
+   add rfid_terminator_id  int not null default 0,  -- 工位：工位机的序号
    add operation_id        bigint not null default 0,  -- 车间：工艺
 ;
 
@@ -119,12 +119,12 @@ create table rfid_card
 --
 
 --
--- 生产实绩: work_order_progress
+-- 生产实绩: production_order_progress
 --
-create table work_order_progress
+create table production_order_progress
 (
     record_id      bigint   auto_increment   not null default 0,
-    work_order_id  bigint                    not null,
+    production_order_id  bigint              not null,
     operation_id   bigint                    not null,
     rfid_terminator_id bigint                not null, -- 机器号
     rfid_controller_id bigint                not null, -- 组号
@@ -134,7 +134,7 @@ create table work_order_progress
     rfid_card_no   varchar(20)               not null default '', -- RFID卡号，如果是尾数，则为空
     report_type    int                       not null, -- 数量类型：0. 整数刷卡申报  1.尾数
     work_station_id bigint                   not null, -- 工位Id
-    work_center_id  bigint                   not null, -- 工作中心Id
+    work_shop_id  bigint                     not null, -- 车间Id
 
 
     create_by      bigint                  not null,
@@ -144,24 +144,24 @@ create table work_order_progress
     opt_flag       int                     not null,    
     
     PRIMARY KEY(record_id),
-    index idx_work_order_progress_0(work_order_id),
-    index idx_work_order_progress_1(operation_id),
-    index idx_work_order_progress_2(rfid_terminator_id),
-    index idx_work_order_progress_3(rfid_controller_id),
-    index idx_work_order_progress_4(production_id),
-    index idx_work_order_progress_5(rfid_card_no),
-    index idx_work_order_progress_6(work_station_id),
-    index idx_work_order_progress_7(work_center_id)
+    index idx_production_order_progress_0(work_order_id),
+    index idx_production_order_progress_1(operation_id),
+    index idx_production_order_progress_2(rfid_terminator_id),
+    index idx_production_order_progress_3(rfid_controller_id),
+    index idx_production_order_progress_4(production_id),
+    index idx_production_order_progress_5(rfid_card_no),
+    index idx_production_order_progress_6(work_station_id),
+    index idx_production_order_progress_7(work_center_id)
 );
 
 --
--- 生产品质: quantity_list
+-- 生产品质: quality_check
 --
 
-create table quantity_list
+create table quality_check
 (
   record_id      bigint     auto_increment   not null default 0,
-  work_order_id  bigint                      not null,  -- 工单编号
+  production_order_id  bigint                not null,  -- 工单编号
   production_id  bigint                      not null,  -- 产品id  
   discover_id    bigint                      not null,  -- 发现人
   discover_time  datetime                    not null,  -- 发现时间
@@ -178,13 +178,13 @@ create table quantity_list
   opt_flag       int                         not null,  
 
   PRIMARY KEY(record_id),
-  index idx_quantity_list_0(work_order_id),
-  index idx_quantity_list_1(production_id),
-  index idx_quantity_list_2(discover_id),
-  index idx_quantity_list_3(discover_time),
-  index idx_quantity_list_4(producer_id),
-  index idx_quantity_list_5(produce_time),
-  index idx_quantity_list_6(response_id),
-  index idx_quantity_list_7(defect_type_id)  
+  index idx_quality_check_0(work_order_id),
+  index idx_quality_check_1(production_id),
+  index idx_quality_check_2(discover_id),
+  index idx_quality_check_3(discover_time),
+  index idx_quality_check_4(producer_id),
+  index idx_quality_check_5(produce_time),
+  index idx_quality_check_6(response_id),
+  index idx_quality_check_7(defect_type_id)  
 );
 
