@@ -138,11 +138,6 @@ namespace Imms.Data
             modelBuilder.ApplyConfiguration(new SimpleCodeConfigure());
             modelBuilder.ApplyConfiguration(new CodeSeedConfigure());
 
-            modelBuilder.ApplyConfiguration(new SysetmAppConfigure());
-            modelBuilder.ApplyConfiguration(new DataExchangeRuleConfigure());
-            modelBuilder.ApplyConfiguration(new DataExcahngeConfigure());
-
-            modelBuilder.ApplyConfiguration(new MediaConfigure());
             modelBuilder.ApplyConfiguration(new WorkOrganizationUnitConfigure());   
             modelBuilder.ApplyConfiguration(new SystemParameterClassConfigure()) ;
             modelBuilder.ApplyConfiguration(new SystemParameterConfigure());
