@@ -34,14 +34,14 @@ namespace Imms.Mes.Data.Domain
         public string RfidNo{get;set;}
         public int CardType{get;set;}
         public int CardStatus{get;set;}
-        public int ProductionId{get;set;}
-        public int OperationId{get;set;}
+        public long WorkShopId{get;set;}
+        public int ProductionId {get;set;}
         public int Qty{get;set;}
         public int OperatorId{get;set;}        
 
         public virtual Material Production{get;set;}
         public virtual Operator Operator{get;set;}
-        public virtual Operation Operation {get;set;}
+        public virtual WorkShop WorkShop {get;set;}
     }
 
 
@@ -57,13 +57,13 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.CardType).HasColumnName("card_type");
             builder.Property(e => e.CardStatus).HasColumnName("card_status");
             builder.Property(e => e.ProductionId).HasColumnName("production_id");
-            builder.Property(e => e.OperationId).HasColumnName("operation_id");
+            builder.Property(e => e.WorkShopId).HasColumnName("work_shop_id");
             builder.Property(e => e.Qty).HasColumnName("qty");
             builder.Property(e => e.OperatorId).HasColumnName("operator_id");
 
             builder.OwnsOne(e=>e.Production).HasConstraintName("production_id");
             builder.OwnsOne(e=>e.Operator).HasConstraintName("operator_id");
-            builder.OwnsOne(e=>e.Operation).HasConstraintName("operation_id");
+            builder.OwnsOne(e=>e.WorkShop).HasConstraintName("work_shop_id");
         }
     }
 

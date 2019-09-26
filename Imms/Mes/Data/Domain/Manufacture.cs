@@ -23,30 +23,6 @@ namespace Imms.Mes.Data.Domain
         public virtual List<ProductionOrderProgress> Progresses { get; set; } = new List<ProductionOrderProgress>();
     }
 
-    public class ProductionOrderConfigure : OrderEntityConfigure<ProductionOrder>
-    {
-        protected override void InternalConfigure(EntityTypeBuilder<ProductionOrder> builder)
-        {
-            base.InternalConfigure(builder);
-            builder.ToTable("production_order");
-            ImmsDbContext.RegisterEntityTable<ProductionOrder>("production_order");
-
-            builder.Property(e => e.ProductionId).HasColumnName("production_id");
-            builder.Property(e => e.WorkShopId).HasColumnName("work_shop_id").HasColumnType("bigint(20)");
-            builder.Property(e => e.QtyPlanned).HasColumnName("qty_planned").HasColumnType("int(11)");
-            builder.Property(e => e.QtyActual).HasColumnName("qty_actual").HasColumnType("int(11)");
-            builder.Property(e => e.QtyFinished).HasColumnName("qty_finished").HasColumnType("int(11)");
-            builder.Property(e => e.QtySecondQuality).HasColumnName("qty_second_quality").HasColumnType("int(11)");
-            builder.Property(e => e.QtyDefect).HasColumnName("qty_defect").HasColumnType("int(11)");
-
-            builder.HasOne(e => e.Production).WithMany().HasForeignKey(e => e.ProductionId).HasConstraintName("production_id");
-            builder.HasOne(e => e.WorkShop).WithMany().HasForeignKey(e => e.WorkShopId).HasConstraintName("work_shop_id");
-            builder.HasMany(e => e.QualityChecks).WithOne(e => e.ProductionOrder).HasForeignKey(e => e.ProductionOrderId).HasConstraintName("production_order_id");
-            builder.HasMany(e => e.Progresses).WithOne(e => e.ProductionOrder).HasForeignKey(e => e.ProductionOrderId).HasConstraintName("production_order_id");
-        }
-    }
-
-
     public class ProductionOrderProgress : TrackableEntity<long>
     {
         public long ProductionOrderId { get; set; }
@@ -61,38 +37,10 @@ namespace Imms.Mes.Data.Domain
         public long WorkStationId { get; set; }
         public long WorkShopId { get; set; }
 
-        public virtual Operation Operation { get; set; }
         public virtual Material Production { get; set; }
         public virtual WorkStation WorkStation { get; set; }
         public virtual WorkShop WorkShop { get; set; }
         public virtual ProductionOrder ProductionOrder { get; set; }
-    }
-
-    public class ProductionOrderProgressConfigure : OrderEntityConfigure<ProductionOrderProgress>
-    {
-        protected override void InternalConfigure(EntityTypeBuilder<ProductionOrderProgress> builder)
-        {
-            base.InternalConfigure(builder);
-            builder.ToTable("production_order_progress");
-            ImmsDbContext.RegisterEntityTable<ProductionOrder>("production_order_progress");
-
-            builder.Property(e => e.ProductionOrderId).HasColumnName("production_order_id");
-            builder.Property(e => e.OperationId).HasColumnName("operation_id");
-            builder.Property(e => e.RfidTerminatorId).HasColumnName("rfid_terminator_id");
-            builder.Property(e => e.RfidControllerId).HasColumnName("rfid_controller_id");
-            builder.Property(e => e.ProductionId).HasColumnName("production_id");
-            builder.Property(e => e.ReportTime).HasColumnName("report_time");
-            builder.Property(e => e.ReportQty).HasColumnName("report_qty");
-            builder.Property(e => e.RfidCardNo).HasColumnName("rfid_card_no");
-            builder.Property(e => e.ReportType).HasColumnName("report_type");
-            builder.Property(e => e.WorkStationId).HasColumnName("work_station_id");
-            builder.Property(e => e.WorkShopId).HasColumnName("work_shop_id");
-
-            builder.HasOne(e => e.Operation).WithMany().HasForeignKey(e => e.OperationId).HasConstraintName("operation_id");
-            builder.HasOne(e => e.Production).WithMany().HasForeignKey(e => e.ProductionId).HasConstraintName("production_id");
-            builder.HasOne(e => e.WorkStation).WithMany().HasForeignKey(e => e.WorkStationId).HasConstraintName("work_station_id");
-            builder.HasOne(e => e.WorkShop).WithMany().HasForeignKey(e => e.WorkShopId).HasConstraintName("work_shop_id");
-        }
     }
 
     public class QualityCheck : TrackableEntity<long>
@@ -119,6 +67,120 @@ namespace Imms.Mes.Data.Domain
         public virtual Operator Responser { get; set; }
     }
 
+    public class ProductionMoving : TrackableEntity<long>
+    {
+        public string RfidNo { get; set; }
+        public long RfidCardId { get; set; }
+        public int RfidTerminatorId { get; set; }
+        public int RfidControllerGroupId { get; set; }
+
+        public long ProductionOrderId { get; set; }
+        public long ProductionId { get; set; }
+        public int Qty { get; set; }
+
+        public long OperatorId { get; set; }
+        public DateTime MovingTime { get; set; }
+
+        public long WorkstationId { get; set; }
+        public long WorkshopId { get; set; }
+        public long PrevWorkshopId { get; set; }
+        public long PrevWorkstationId { get; set; }
+
+        public long PrevProgressRecordId { get; set; }
+
+        public virtual RfidCard RfidCard { get; set; }
+        public virtual ProductionOrder ProductionOrder { get; set; }
+        public virtual Material Production { get; set; }
+        public virtual WorkShop WorkShop { get; set; }
+        public virtual WorkStation Workstation { get; set; }
+        public virtual Operator Operator { get; set; }
+    }
+
+    public class ProductionMovingConfigure : TrackableEntityConfigure<ProductionMoving>
+    {
+        protected override void InternalConfigure(EntityTypeBuilder<ProductionMoving> builder)
+        {
+            base.InternalConfigure(builder);
+            builder.ToTable("production_moving");
+            ImmsDbContext.RegisterEntityTable<ProductionOrder>("production_moving");
+
+            builder.Property(e => e.RfidNo).HasColumnName("rfid_no");
+            builder.Property(e => e.RfidCardId).HasColumnName("rfid_card_id");
+            builder.Property(e => e.RfidTerminatorId).HasColumnName("rfid_terminator_id");
+            builder.Property(e => e.RfidControllerGroupId).HasColumnName("rfid_controller_group_id");
+
+            builder.Property(e => e.ProductionOrderId).HasColumnName("production_order_id");
+            builder.Property(e => e.ProductionId).HasColumnName("production_id");
+            builder.Property(e => e.Qty).HasColumnName("qty");
+
+            builder.Property(e => e.OperatorId).HasColumnName("operator_id");
+            builder.Property(e => e.MovingTime).HasColumnName("moving_time");
+
+            builder.Property(e => e.WorkstationId).HasColumnName("workstation_id");
+            builder.Property(e => e.WorkshopId).HasColumnName("workshop_id");
+            builder.Property(e => e.PrevWorkshopId).HasColumnName("prev_workshop_id");
+            builder.Property(e => e.PrevWorkstationId).HasColumnName("prev_workstation_id");
+
+            builder.Property(e => e.PrevProgressRecordId).HasColumnName("prev_progress_record_id");
+
+            builder.HasOne(e=>e.RfidCard).WithMany().HasForeignKey(e=>e.RfidCardId).HasConstraintName("rfid_card_id");
+            builder.HasOne(e=>e.ProductionOrder).WithMany().HasForeignKey(e=>e.ProductionOrderId).HasConstraintName("production_order_id");
+            builder.HasOne(e=>e.Production).WithMany().HasForeignKey(e=>e.ProductionId).HasConstraintName("production_id");
+            builder.HasOne(e=>e.WorkShop).WithMany().HasForeignKey(e=>e.WorkshopId).HasConstraintName("workshop_id");
+            builder.HasOne(e=>e.Workstation).WithMany().HasForeignKey(e=>e.WorkstationId).HasConstraintName("workstation_id");
+            builder.HasOne(e=>e.Operator).WithMany().HasForeignKey(e=>e.OperatorId).HasConstraintName("operator_id");
+        }
+    }
+
+    public class ProductionOrderProgressConfigure : OrderEntityConfigure<ProductionOrderProgress>
+    {
+        protected override void InternalConfigure(EntityTypeBuilder<ProductionOrderProgress> builder)
+        {
+            base.InternalConfigure(builder);
+            builder.ToTable("production_order_progress");
+            ImmsDbContext.RegisterEntityTable<ProductionOrder>("production_order_progress");
+
+            builder.Property(e => e.ProductionOrderId).HasColumnName("production_order_id");
+            builder.Property(e => e.OperationId).HasColumnName("operation_id");
+            builder.Property(e => e.RfidTerminatorId).HasColumnName("rfid_terminator_id");
+            builder.Property(e => e.RfidControllerId).HasColumnName("rfid_controller_id");
+            builder.Property(e => e.ProductionId).HasColumnName("production_id");
+            builder.Property(e => e.ReportTime).HasColumnName("report_time");
+            builder.Property(e => e.ReportQty).HasColumnName("report_qty");
+            builder.Property(e => e.RfidCardNo).HasColumnName("rfid_card_no");
+            builder.Property(e => e.ReportType).HasColumnName("report_type");
+            builder.Property(e => e.WorkStationId).HasColumnName("work_station_id");
+            builder.Property(e => e.WorkShopId).HasColumnName("work_shop_id");
+
+            builder.HasOne(e => e.Production).WithMany().HasForeignKey(e => e.ProductionId).HasConstraintName("production_id");
+            builder.HasOne(e => e.WorkStation).WithMany().HasForeignKey(e => e.WorkStationId).HasConstraintName("workstation_id");
+            builder.HasOne(e => e.WorkShop).WithMany().HasForeignKey(e => e.WorkShopId).HasConstraintName("workshop_id");
+        }
+    }
+
+    public class ProductionOrderConfigure : OrderEntityConfigure<ProductionOrder>
+    {
+        protected override void InternalConfigure(EntityTypeBuilder<ProductionOrder> builder)
+        {
+            base.InternalConfigure(builder);
+            builder.ToTable("production_order");
+            ImmsDbContext.RegisterEntityTable<ProductionOrder>("production_order");
+
+            builder.Property(e => e.ProductionId).HasColumnName("production_id");
+            builder.Property(e => e.WorkShopId).HasColumnName("workshop_id").HasColumnType("bigint(20)");
+            builder.Property(e => e.QtyPlanned).HasColumnName("qty_planned").HasColumnType("int(11)");
+            builder.Property(e => e.QtyActual).HasColumnName("qty_actual").HasColumnType("int(11)");
+            builder.Property(e => e.QtyFinished).HasColumnName("qty_finished").HasColumnType("int(11)");
+            builder.Property(e => e.QtySecondQuality).HasColumnName("qty_second_quality").HasColumnType("int(11)");
+            builder.Property(e => e.QtyDefect).HasColumnName("qty_defect").HasColumnType("int(11)");
+
+            builder.HasOne(e => e.Production).WithMany().HasForeignKey(e => e.ProductionId).HasConstraintName("production_id");
+            builder.HasOne(e => e.WorkShop).WithMany().HasForeignKey(e => e.WorkShopId).HasConstraintName("workshop_id");
+            builder.HasMany(e => e.QualityChecks).WithOne(e => e.ProductionOrder).HasForeignKey(e => e.ProductionOrderId).HasConstraintName("production_order_id");
+            builder.HasMany(e => e.Progresses).WithOne(e => e.ProductionOrder).HasForeignKey(e => e.ProductionOrderId).HasConstraintName("production_order_id");
+        }
+    }
+
     public class QualityCheckConfigure : OrderEntityConfigure<QualityCheck>
     {
         protected override void InternalConfigure(EntityTypeBuilder<QualityCheck> builder)
@@ -138,10 +200,10 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.DefectDescription).HasColumnName("defect_description");
 
             builder.HasOne(e => e.ProductionOrder).WithMany().HasForeignKey(e => e.ProductionOrderId).HasConstraintName("production_order_id");
-            builder.HasOne(e=>e.Production).WithMany().HasForeignKey(e=>e.ProductionId).HasConstraintName("production_id");
-            builder.HasOne(e=>e.Discover).WithMany().HasForeignKey(e=>e.DiscoverId).HasConstraintName("discover_id");
-            builder.HasOne(e=>e.Producer).WithMany().HasForeignKey(e=>e.ProducerId).HasConstraintName("producer_id");
-            builder.HasOne(e=>e.Responser).WithMany().HasForeignKey(e=>e.ResponseId).HasConstraintName("response_id");
+            builder.HasOne(e => e.Production).WithMany().HasForeignKey(e => e.ProductionId).HasConstraintName("production_id");
+            builder.HasOne(e => e.Discover).WithMany().HasForeignKey(e => e.DiscoverId).HasConstraintName("discover_id");
+            builder.HasOne(e => e.Producer).WithMany().HasForeignKey(e => e.ProducerId).HasConstraintName("producer_id");
+            builder.HasOne(e => e.Responser).WithMany().HasForeignKey(e => e.ResponseId).HasConstraintName("response_id");
         }
     }
 

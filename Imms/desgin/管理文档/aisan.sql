@@ -65,10 +65,11 @@ from stationinfo
 -- 组织
 --
 alter table work_organization_unit
-   add rfid_controller_id  int not null default 0,  -- 工位：控制器的序号
-   add rfid_terminator_id  int not null default 0,  -- 工位：工位机的序号
-   add operation_id        bigint not null default 0,  -- 车间：工艺
+   add rfid_controller_id  int not null default 0,  -- 工位：控制器
+   add rfid_terminator_id  int not null default 0,  -- 工位：工位机的序号   
+   add next_workshop_id    bigint  not null default 0 -- 车间: 下一个车间
 ;
+
 
 --
 -- 员工：就是操作员 operator
@@ -79,9 +80,35 @@ alter table operator
    add employee_card_no    varchar(20)   null        -- 工卡号
 ;
 
+
 --
--- 工艺流程： 就是工艺路线。
+-- 员工在工位机上的登录表
 --
+create table Workstation_login
+(
+  record_id             bigint     auto_increment   not null default 0,
+  rfid_terminator_id    int                         not null,
+  rfid_controller_group_id   int                    not null,
+  rfid_card_no          varchar(20)                 not null,
+  login_time            datetime                    not null,  
+
+  rfid_controller_id    bigint                      not null, 
+  workstation_id        bigint                      not null,
+  rfid_card_id          bigint                      not null,
+  operator_id           bigint                      not null,
+
+  PRIMARY KEY(record_id),
+  index idx_Workstation_login_0(rfid_card_no),
+  index idx_Workstation_login_1(login_time),
+  index idx_Workstation_login_2(rfid_terminator_id),
+  index idx_Workstation_login_3(rfid_controller_group_id),
+  index idx_Workstation_login_4(workstation_id),
+  index idx_Workstation_login_5(rfid_card_id),
+  index idx_Workstation_login_6(operator_id),
+  index idx_Workstation_login_7(rfid_controller_id)
+);
+
+
 
 --
 -- 产品 ： 就是物料
@@ -115,7 +142,7 @@ create table rfid_card
 );
 
 --
--- 生产计划: 就用work_order表
+-- 生产计划: 就用produciton_order表
 --
 
 --
@@ -133,8 +160,8 @@ create table production_order_progress
     report_qty     int                       not null, -- 数量
     rfid_card_no   varchar(20)               not null default '', -- RFID卡号，如果是尾数，则为空
     report_type    int                       not null, -- 数量类型：0. 整数刷卡申报  1.尾数
-    work_station_id bigint                   not null, -- 工位Id
-    work_shop_id  bigint                     not null, -- 车间Id
+    workstation_id bigint                   not null, -- 工位Id
+    workshop_id  bigint                     not null, -- 车间Id
 
 
     create_by      bigint                  not null,
@@ -153,6 +180,56 @@ create table production_order_progress
     index idx_production_order_progress_6(work_station_id),
     index idx_production_order_progress_7(work_center_id)
 );
+
+--
+-- 交接记录: production_moving
+--
+
+create table production_moving
+(
+    record_id                  bigint             auto_increment    not null default 0,
+    rfid_no                    varchar(20)   not null,
+    rfid_card_id               bigint        not null,
+    rfid_terminator_id         int           not null,
+    rfid_controller_group_id   int           not null,
+
+    production_order_id        bigint        not null,
+    production_id              bigint        not null,
+    qty                        int           not null,
+
+    operator_id                bigint        not null,
+    moving_time                datetime      not null,
+
+    workstation_id       int           not null,
+    workshop_id          bigint        not null,
+    prev_workshop_id     bigint        not null,
+    prev_workstation_id  bigint        not null,
+
+    prev_progress_record_id  bigint    not null,
+
+    create_by      bigint                      not null,
+    create_date    datetime                    not null,
+    update_by      bigint                      not null,
+    update_date    datetime                    not null,
+    opt_flag       int                         not null,  
+
+    PRIMARY KEY(record_id),
+    index idx_production_moving_0(rfid_no),
+    index idx_production_moving_1(rfid_controller_group_id),
+    index idx_production_moving_2(rfid_terminator_id),
+
+    index idx_production_moving_3(rfid_card_id),
+    index idx_production_moving_4(production_order_id),
+    index idx_production_moving_5(production_id),
+    index idx_production_moving_6(workstation_id),
+    index idx_production_moving_7(workshop_id),
+    index idx_production_moving_8(prev_workshop_id),
+    index idx_production_moving_9(prev_workstation_id),
+    index idx_production_moving_10(prev_progress_record_id),
+    index idx_production_moving_11(operator_id),
+    index idx_production_moving_12(moving_time)
+);
+
 
 --
 -- 生产品质: quality_check

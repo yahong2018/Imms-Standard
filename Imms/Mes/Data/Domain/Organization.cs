@@ -15,17 +15,16 @@ namespace Imms.Mes.Data.Domain
         public long SupervisorId { get; set; }
         public string EmployeeId { get; set; }
         public string EmployeeName { get; set; }
-        public string EmployeeCardNo { get; set; }       
+        public string EmployeeCardNo { get; set; }
     }
-
 
     public class WorkShop : WorkOrganizationUnit
     {
         public string WorkShopCode { get { return base.OrganizationCode; } set { base.OrganizationCode = value; } }
         public string WorkShopName { get { return base.OrganizationName; } set { base.OrganizationName = value; } }
-        public long OperationId { get; set; }
+        public long NextWorkShopId { get; set; }
 
-        public virtual Operation Operation { get; set; }
+        public virtual WorkShop NextWorkShop { get; set; }
     }
 
     public class WorkStation : WorkOrganizationUnit
@@ -37,7 +36,49 @@ namespace Imms.Mes.Data.Domain
         public int RfidTerminatorId { get; set; }
 
         public virtual RfidController RfidController { get; set; }
-    }   
+    }
+
+    public class WorkstationLogin:Entity<long>
+    {
+        public int RfidTerminatorId;
+        public int RfidControllerGroupId;
+        public string RfidCardNo;
+        public DateTime LoginTime;
+        public long RfidControllerId;
+        public long WorkstationId;
+        public long RfidCardId;
+        public long OperatorId;
+
+        public virtual RfidCard RfidCard{get;set;}
+        public virtual Operator Operator{get;set;}
+        public virtual WorkStation WorkStation{get;set;}
+        public virtual RfidController RfidController{get;set;}
+    }
+
+    public class WorkstationLoginConfigure : TrackableEntityConfigure<WorkstationLogin>
+    {
+        protected override void InternalConfigure(EntityTypeBuilder<WorkstationLogin> builder)
+        {
+            base.InternalConfigure(builder);
+            builder.ToTable("Workstation_login");
+            ImmsDbContext.RegisterEntityTable<Operator>("Workstation_login");
+
+            builder.Property(e => e.RfidTerminatorId).HasColumnName("rfid_terminator_id");
+            builder.Property(e => e.RfidControllerGroupId).HasColumnName("rfid_controller_group_id");
+            builder.Property(e => e.RfidCardNo).HasColumnName("rfid_card_no");
+            builder.Property(e => e.LoginTime).HasColumnName("login_time");
+            builder.Property(e => e.RfidControllerId).HasColumnName("rfid_controller_id");
+            builder.Property(e => e.WorkstationId).HasColumnName("workstation_id");
+            builder.Property(e => e.RfidCardId).HasColumnName("rfid_card_id");
+            builder.Property(e => e.OperatorId).HasColumnName("operator_id");
+
+            builder.HasOne(e=>e.RfidCard).WithMany().HasForeignKey(e=>e.RfidCardId).HasConstraintName("rfid_card_id");
+            builder.HasOne(e=>e.Operator).WithMany().HasForeignKey(e=>e.OperatorId).HasConstraintName("operator_id");
+            builder.HasOne(e=>e.WorkStation).WithMany().HasForeignKey(e=>e.WorkstationId).HasConstraintName("workstation_id");
+            builder.HasOne(e=>e.RfidController).WithMany().HasForeignKey(e=>e.RfidControllerId).HasConstraintName("rfid_controller_id");
+        }
+    }
+
 
     public class OperatorConfigure : TrackableEntityConfigure<Operator>
     {
@@ -56,39 +97,40 @@ namespace Imms.Mes.Data.Domain
         }
     }
 
-    public class WorkShopConfigure : TrackableEntityConfigure<WorkShop>
+    public class WorkShopConfigure : IEntityTypeConfiguration<WorkShop>
     {
-        protected override void InternalConfigure(EntityTypeBuilder<WorkShop> builder)
+        public void Configure(EntityTypeBuilder<WorkShop> builder)
         {
-            base.InternalConfigure(builder);
-
             ImmsDbContext.RegisterEntityTable<WorkShop>("work_organization_unit");
             builder.Ignore(e => e.WorkShopCode);
             builder.Ignore(e => e.WorkShopName);
-            builder.Property(e => e.OperationId).HasColumnName("operation_id");
-            builder.OwnsOne(e => e.Operation).HasForeignKey(e => e.RecordId).HasConstraintName("operation_id");
 
-            builder.HasDiscriminator("organization_type", typeof(string))
-               .HasValue<WorkShop>(GlobalConstants.TYPE_ORG_WORK_SHOP)
-               ;
+            builder.Property(e => e.NextWorkShopId).HasColumnName("next_work_shop_id");
+            builder.HasOne(e => e.NextWorkShop).WithMany().HasForeignKey(e => e.NextWorkShopId).HasConstraintName("next_work_shop_id");
         }
     }
 
-    public class WorkStationConfigure : TrackableEntityConfigure<WorkStation>
+    public class WorkStationConfigure : IEntityTypeConfiguration<WorkStation>
     {
-        protected override void InternalConfigure(EntityTypeBuilder<WorkStation> builder)
+        public void Configure(EntityTypeBuilder<WorkStation> builder)
         {
-            base.InternalConfigure(builder);
-
             ImmsDbContext.RegisterEntityTable<WorkShop>("work_organization_unit");
             builder.Ignore(e => e.WorkStaitonCode);
             builder.Ignore(e => e.WorkStationName);
-            builder.Property(e => e.RfidControllerId).HasColumnName("rfid_controller_id");
-            builder.Property(e => e.RfidTerminatorId).HasColumnName("rfid_terminator_id");
-            builder.OwnsOne(e => e.RfidController).HasForeignKey(e => e.RecordId).HasConstraintName("rfid_controller_id");
 
+            builder.Property(e => e.RfidControllerId).HasColumnName("rfid_controller_id");
+            builder.Property(e => e.RfidTerminatorId).HasColumnName("Rfid_terminator_id");
+            builder.HasOne(e => e.RfidController).WithMany().HasForeignKey(e => e.RfidControllerId).HasConstraintName("rfid_controller_id");
+        }
+    }
+
+    public class WorkOrganizationUnitConfigure : IEntityTypeConfiguration<WorkOrganizationUnit>
+    {
+        public void Configure(EntityTypeBuilder<WorkOrganizationUnit> builder)
+        {
             builder.HasDiscriminator("organization_type", typeof(string))
                .HasValue<WorkStation>(GlobalConstants.TYPE_ORG_WORK_STATETION)
+               .HasValue<WorkShop>(GlobalConstants.TYPE_ORG_WORK_SHOP)
                ;
         }
     }

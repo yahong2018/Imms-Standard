@@ -20,6 +20,17 @@ namespace Imms.Mes.Data.Domain
         public string MaterialTypeName { get { return base.CodeName; } set { base.CodeName = value; } }
     }
 
+    public class SimpleCodeConfigure : IEntityTypeConfiguration<SimpleCode>
+    {
+        public void Configure(EntityTypeBuilder<SimpleCode> builder)
+        {
+            builder.HasDiscriminator("code_type", typeof(string))
+               .HasValue<EquipmentType>(GlobalConstants.TYPE_CODE_TYPE_EQUIPMENT_TYPE)
+               .HasValue<MaterialType>(GlobalConstants.TYPE_CODE_TYPE_MATERIAL_TYPE)
+               ;
+        }
+    }
+
     public class EquipmentTypeCofigure : IEntityTypeConfiguration<EquipmentType>
     {
         public void Configure(EntityTypeBuilder<EquipmentType> builder)
@@ -29,7 +40,7 @@ namespace Imms.Mes.Data.Domain
             builder.Ignore(e => e.EquipmentTypeNo);
             builder.Ignore(e => e.EquipmentTypeName);
         }
-    }
+    }    
 
     public class MaterialTypeConfigure : IEntityTypeConfiguration<MaterialType>
     {
@@ -38,23 +49,7 @@ namespace Imms.Mes.Data.Domain
             ImmsDbContext.RegisterEntityTable<MaterialType>("simple_code");
 
             builder.Ignore(e => e.MaterialTypeCode);
-            builder.Ignore(e => e.MaterialTypeName);
-
-            builder.HasDiscriminator("code_type", typeof(string))
-                .HasValue<EquipmentType>(GlobalConstants.TYPE_CODE_TYPE_EQUIPMENT_TYPE)
-                .HasValue<MaterialType>(GlobalConstants.TYPE_CODE_TYPE_MATERIAL_TYPE)
-                ;
+            builder.Ignore(e => e.MaterialTypeName);           
         }
-    }
-
-    // public class MaterialTypeCofigure : IEntityTypeConfiguration<MaterialType>
-    // {
-    //     public void Configure(EntityTypeBuilder<MaterialType> builder)
-    //     {
-    //         ImmsDbContext.RegisterEntityTable<MaterialType>("simple_code");
-
-    //         builder.Ignore(e => e.MaterialTypeCode);
-    //         builder.Ignore(e => e.MaterialTypeName);
-    //     }
-    // }
+    }    
 }

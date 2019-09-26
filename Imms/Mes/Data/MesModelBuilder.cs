@@ -20,11 +20,6 @@ namespace Imms.Mes.Data
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.MaterialTypeConfigure());
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.MaterialConfigure());
 
-            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.OperationConfigure());
-            
-            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.OperationRoutingConfigure());
-            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.OperationRoutingOrderConfigure());
-
             modelBuilder.ApplyConfiguration(new RfidCardConfigure());
             modelBuilder.ApplyConfiguration(new RfidControllerConfigure());
             modelBuilder.ApplyConfiguration(new ProductionOrderConfigure());
@@ -32,6 +27,13 @@ namespace Imms.Mes.Data
             modelBuilder.ApplyConfiguration(new QualityCheckConfigure());
             modelBuilder.ApplyConfiguration(new WorkShopConfigure());
             modelBuilder.ApplyConfiguration(new WorkStationConfigure());
+
+            modelBuilder.ApplyConfiguration(new WorkOrganizationUnitConfigure());
+            modelBuilder.ApplyConfiguration(new SimpleCodeConfigure());
+
+            modelBuilder.ApplyConfiguration(new WorkstationLoginConfigure());
+            modelBuilder.ApplyConfiguration(new ProductionMovingConfigure());
+
         }
     }
 }
