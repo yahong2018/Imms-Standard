@@ -11,8 +11,7 @@ namespace Imms.Data.Domain
     {
         public string OrganizationType { get; set; }        
         public string OrganizationCode { get; set; }
-        public string OrganizationName { get; set; }
-        public int SequenceNo { get; set; }
+        public string OrganizationName { get; set; }        
         public string Description { get; set; }
         public long ParentOrganizationId { get; set; }
 
@@ -30,7 +29,6 @@ namespace Imms.Data.Domain
 
             builder.Property(e => e.OrganizationCode).IsRequired().HasColumnName("organization_code").HasMaxLength(10).IsUnicode(false);
             builder.Property(e => e.OrganizationName).IsRequired().HasColumnName("organization_name").HasMaxLength(50).IsUnicode(false);
-            builder.Property(e => e.SequenceNo).HasColumnName("sequence_no");
             builder.Property(e => e.Description).HasColumnName("description").HasMaxLength(250).IsUnicode(false);
             builder.Property(e => e.ParentOrganizationId).HasColumnName("parent_organization_id").HasColumnType("bigint(20)");
             builder.Property(e=>e.OrganizationType).HasColumnName("organization_type");

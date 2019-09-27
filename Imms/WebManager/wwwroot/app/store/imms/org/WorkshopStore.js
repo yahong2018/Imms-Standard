@@ -8,6 +8,5 @@ Ext.define("app.store.imms.org.WorkshopStore",{
         insertUrl: 'imms/org/workshop/create',
         updateUrl: 'imms/org/workshop/update',
         selectUrl: 'imms/org/workshop/getAll',
-    },
-    //this.setSelectUrl("imms/org/workshop/getAllOtherShop?workshopId");
+    }
 });
