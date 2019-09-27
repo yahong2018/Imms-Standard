@@ -35,13 +35,13 @@ INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUE
 
 -- ----------------------------------------------------------------------------------------------------------------------
 
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph)VALUES ('SYS02','SYS02', '组织架构', '', 1, '', '', '0xf1ad');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph)VALUES ('SYS02','SYS02', '组织架构', '', 1, '', '', '0xf0e8');
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS02', 'RUN', '运行');
 
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS02_01', 'SYS02_01', '车间管理', 'app.view.imms.org.workshop.Workshop', 0, '',  'SYS02', '0xf029');
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS02_02', 'SYS02_02', '工位管理', 'app.view.imms.org.workstation.Workstation', 1, '', 'SYS02', '0xf0c9');
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS02_03', 'SYS02_03', '操作员管理', 'app.view.imms.org.operator.Operator',2, '', 'SYS02', '0xf002');
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS02_04', 'SYS02_04', '工位机登录记录', 'app.view.imms.org.workstationLogin.WorkstationLogin',3, '', 'SYS02', '0xf002');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS02_01', 'SYS02_01', '车间管理', 'app.view.imms.org.workshop.Workshop', 0, '',  'SYS02', '0xf1ad');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS02_02', 'SYS02_02', '工位管理', 'app.view.imms.org.workstation.Workstation', 1, '', 'SYS02', '0xf239');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS02_03', 'SYS02_03', '操作员管理', 'app.view.imms.org.operator.Operator',2, '', 'SYS02', '0xf2be');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS02_04', 'SYS02_04', '工位机登录记录', 'app.view.imms.org.workstationLogin.WorkstationLogin',3, '', 'SYS02', '0xf090');
 
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS02_01', 'RUN', '运行');
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS02_01', 'INSERT', '新增');
@@ -64,15 +64,15 @@ INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUE
 
 -- ----------------------------------------------------------------------------------------------------------------------
 
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph)VALUES ('SYS03','SYS03', '生产管理', '', 2, '',  '', '0xf187');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph)VALUES ('SYS03','SYS03', '生产管理', '', 2, '',  '', '0xf0ae');
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03', 'RUN', '运行');
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS03_01', 'SYS03_01', '产品管理', 'app.view.imms.mfc.production.Production', 1, '', 'SYS03', '0xf239');
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS03_02', 'SYS03_02', '发卡管理', 'app.view.imms.mfc.rfidCard.RfidCard', 2, '', 'SYS03', '0xf00b');
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS03_03', 'SYS03_03', '看板条码', 'app.view.imms.mfc.barcode.Barcode', 3, '', 'SYS03', '0xf039');
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS03_04', 'SYS03_04', '生产计划', 'app.view.imms.mfc.productionOrder.ProducitonOrder', 4, '', 'SYS03', '0xf039');
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS03_05', 'SYS03_05', '生产实绩', 'app.view.imms.mfc.productionOrderProgress.ProductionOrderProgress', 5, '', 'SYS03', '0xf039');
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS03_06', 'SYS03_06', '移库记录', 'app.view.imms.mfc.productionMoving.ProductionMoving', 6, '', 'SYS03', '0xf039');
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS03_07', 'SYS03_07', '生产品质', 'app.view.imms.mfc.qualityCheck.QualityCheck', 7, '', 'SYS03', '0xf039');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS03_01', 'SYS03_01', '产品管理', 'app.view.imms.mfc.production.Production', 1, '', 'SYS03', '0xf1d0');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS03_02', 'SYS03_02', '发卡管理', 'app.view.imms.mfc.rfidCard.RfidCard', 2, '', 'SYS03', '0xf2c3');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS03_03', 'SYS03_03', '看板条码', 'app.view.imms.mfc.barcode.Barcode', 3, '', 'SYS03', '0xf02a');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS03_04', 'SYS03_04', '生产计划', 'app.view.imms.mfc.productionOrder.ProducitonOrder', 4, '', 'SYS03', '0xf03a');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS03_05', 'SYS03_05', '生产实绩', 'app.view.imms.mfc.productionOrderProgress.ProductionOrderProgress', 5, '', 'SYS03', '0xf0cb');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS03_06', 'SYS03_06', '移库记录', 'app.view.imms.mfc.productionMoving.ProductionMoving', 6, '', 'SYS03', '0xf218');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS03_07', 'SYS03_07', '生产品质', 'app.view.imms.mfc.qualityCheck.QualityCheck', 7, '', 'SYS03', '0xf00e');
 
 
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_01', 'RUN', '运行');
@@ -114,11 +114,11 @@ INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUE
 
 -- ----------------------------------------------------------------------------------------------------------------------
 
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph)VALUES ('SYS04','SYS04', '分析报表', '', 3, '',  '', '0xf187');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph)VALUES ('SYS04','SYS04', '分析报表', '', 3, '',  '', '0xf02f');
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS04', 'RUN', '运行');
 
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS04_01', 'SYS04_01', '生产进度表', 'app.view.imms.rpt.rptProductionOrderProgress.RptProductionOrderProgress', 1, '', 'SYS04', '0xf239');
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS04_02', 'SYS04_02', '品质分析表', 'app.view.imms.rpt.rptQuality.RptQuality', 2, '', 'SYS04', '0xf00b');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS04_01', 'SYS04_01', '生产进度表', 'app.view.imms.rpt.rptProductionOrderProgress.RptProductionOrderProgress', 1, '', 'SYS04', '0xf0ae');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS04_02', 'SYS04_02', '品质分析表', 'app.view.imms.rpt.rptQuality.RptQuality', 2, '', 'SYS04', '0xf200');
 
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS04_01', 'RUN', '运行');
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS04_01', 'PRINT', '打印');
