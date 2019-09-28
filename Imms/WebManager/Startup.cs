@@ -16,6 +16,8 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Diagnostics;
+using System.Net.WebSockets;
+using System.Threading;
 
 namespace Imms.WebManager
 {
@@ -83,7 +85,9 @@ namespace Imms.WebManager
 
             if (env.IsDevelopment())
             {
+                //  注释以禁用开发异常处理功能
                 // app.UseDeveloperExceptionPage();
+                //
             }
             else
             {
@@ -107,7 +111,7 @@ namespace Imms.WebManager
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-        }
+        }        
     }
 
     public class DbContextFactory : IDbContextFactory
