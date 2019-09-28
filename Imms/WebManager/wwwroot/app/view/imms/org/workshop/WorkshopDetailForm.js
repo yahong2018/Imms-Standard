@@ -41,7 +41,7 @@ Ext.define("app.view.imms.org.workshop.WorkshopDetailForm", {
                     url: 'imms/org/workshop/getAll',
                     reader: {
                         type: 'json',
-                        rootProperty: "children"
+                        rootProperty: "rootProperty"
                     }
                 }
             })

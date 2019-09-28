@@ -4,15 +4,18 @@ namespace Imms
 {
     public static class HttpContext
     {
-        public static IServiceProvider ServiceProvider;
+        private static Microsoft.AspNetCore.Http.IHttpContextAccessor m_httpContextAccessor;
+
+        public static void Configure(Microsoft.AspNetCore.Http.IHttpContextAccessor httpContextAccessor)
+        {
+            m_httpContextAccessor = httpContextAccessor;
+        }
 
         public static Microsoft.AspNetCore.Http.HttpContext Current
         {
             get
             {
-                object factory = ServiceProvider.GetService(typeof(Microsoft.AspNetCore.Http.IHttpContextAccessor));
-                Microsoft.AspNetCore.Http.HttpContext context = ((Microsoft.AspNetCore.Http.HttpContextAccessor)factory).HttpContext;
-                return context;
+                return m_httpContextAccessor.HttpContext;
             }
         }
 

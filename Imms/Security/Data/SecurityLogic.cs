@@ -14,6 +14,17 @@ namespace Imms.Security.Data
 {
     public class SystemUserLogic : SimpleCRUDLogic<SystemUser>
     {
+        public static SystemUser GetCurrentUser()
+        {
+            long userId = long.Parse(Imms.HttpContext.Current.User.Claims.First(x => x.Type == "UserId").Value);
+            SystemUser result=null;
+            CommonRepository.UseDbContext(dbContext =>
+            {
+                result = dbContext.Set<SystemUser>().First(x=>x.RecordId==userId);
+            });
+            return result;
+        }
+
         public static void Login(string userCode, string password,Microsoft.AspNetCore.Http.HttpContext httpContext){
             SystemUser systemUser = SystemUserLogic.VerifyLoginAccount(userCode, password);
             SystemUserLogic.Login(systemUser, httpContext);

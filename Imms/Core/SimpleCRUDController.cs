@@ -16,12 +16,14 @@ namespace Imms
         [Route("create"), HttpPost]
         public T Create(T item)
         {
+            this.Verify(item, GlobalConstants.DML_OPERATION_INSERT);
             return Logic.Create(item);
         }
 
         [Route("update"), HttpPost]
         public T Update(T item)
         {
+            this.Verify(item, GlobalConstants.DML_OPERATION_UPDATE);
             return Logic.Update(item);
         }
 
@@ -34,6 +36,39 @@ namespace Imms
         [Route("getAll"), HttpGet]
         public ExtJsResult GetAll()
         {
+            string filterStr = this.GetFilterString();
+            ExtJsResult result = null;
+            if (IsGetByPage())
+            {
+                IQueryCollection query = this.HttpContext.Request.Query;
+
+                int page = int.Parse(query["page"][0]);
+                int start = int.Parse(query["start"][0]);
+                int limit = int.Parse(query["limit"][0]);
+
+                result = Logic.GetAllByPage(page, start, limit, filterStr);
+            }
+            else
+            {
+                result = Logic.GetAllWithWhole(filterStr);
+            }
+            return result;
+        }
+
+        protected virtual void Verify(T item, int operation) { }
+
+        protected virtual void AfterGetAll(ExtJsResult extJsResult)
+        {
+        }
+
+        protected virtual bool IsGetByPage()
+        {
+            IQueryCollection query = this.HttpContext.Request.Query;
+            return query.ContainsKey("page") && query.ContainsKey("start") && query.ContainsKey("limit");
+        }
+
+        protected virtual string GetFilterString()
+        {
             IQueryCollection query = this.HttpContext.Request.Query;
             string filterStr = "";
             if (query.ContainsKey("filterExpr"))
@@ -42,16 +77,7 @@ namespace Imms
                 byte[] bytes = Convert.FromBase64String(filterStr);
                 filterStr = Encoding.UTF8.GetString(bytes);
             }
-
-            if (query.ContainsKey("page") && query.ContainsKey("start") && query.ContainsKey("limit"))
-            {
-                int page = int.Parse(query["page"][0]);
-                int start = int.Parse(query["start"][0]);
-                int limit = int.Parse(query["limit"][0]);
-
-                return Logic.GetAllByPage(page, start, limit, filterStr);
-            }
-            return Logic.GetAllWithWhole(filterStr);
+            return filterStr;
         }
     }
 }

@@ -114,7 +114,8 @@ namespace Imms.Mes.Data.Domain
     {
         public void Configure(EntityTypeBuilder<Workstation> builder)
         {
-            ImmsDbContext.RegisterEntityTable<Workshop>("work_organization_unit");
+            ImmsDbContext.RegisterEntityTable<Workstation>("work_organization_unit");
+
             builder.Ignore(e => e.WorkStaitonCode);
             builder.Ignore(e => e.WorkStationName);
 

@@ -1,20 +1,21 @@
 Ext.define("app.view.imms.org.workstation.Workstation", {
     extend: "app.ux.dbgrid.DbGrid",
     xtype: "org_workstation_Workstation",
-    requires: ["app.model.imms.org.WorkshopModel", "app.store.imms.org.WorkshopStore"],
-    uses: ["app.view.imms.org.workshop.WorkshopDetailForm"],
+    requires: ["app.model.imms.org.WorkstationModel", "app.store.imms.org.WorkstationStore", "app.model.imms.org.WorkshopModel"],
+    uses: ["app.view.imms.org.workstation.WorkstationDetailForm"],
     columns: [
-        { dataIndex: "organizationCode", text: "车间代码", width: 100 },
-        { dataIndex: "organizationName", text: "车间名称", width: 100 },
-        { dataIndex: "nextWorkShopCode", text: "下一车间代码", width: 100 },
-        { dataIndex: "nextWorkShopName", text: "下一车间名称", width: 100 },
+        { dataIndex: "organizationCode", text: "工位代码", width: 100 },
+        { dataIndex: "organizationName", text: "工位名称", width: 100 },
+        { dataIndex: "rfidControllerId", text: "Rfid控制器编号", width: 150 },
+        { dataIndex: "rfidTerminatorId", text: "Rfid工位机编号", width: 150 },
+        { dataIndex: "parent.organizationName", text: "所属车间", width: 100 },
         { dataIndex: "description", text: "备注", flex: 1 }
     ],
     constructor: function (config) {
         var configBase = {
-            store: Ext.create({ xtype: 'imms_org_WorkshopStore' }),
-            detailFormClass: 'imms_org_workshop_WorkshopDetailForm',
-            detailWindowTitle: '车间管理'
+            store: Ext.create({ xtype: 'imms_org_WorkstationStore' }),
+            detailFormClass: 'imms_org_workstation_WorkstationDetailForm',
+            detailWindowTitle: '工位管理'
         }
         Ext.applyIf(config, configBase);
 
