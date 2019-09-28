@@ -35,7 +35,8 @@ Ext.define("app.ux.data.SaveOperation", {
                             var callConfig = {
                                 dataMode: saveAndNew == true ? app.ux.data.DataMode.INSERT : app.ux.data.DataMode.POST,
                                 seq: saveAndNew == true ? app.ux.data.DataOperationSeq.BEFORE : app.ux.data.DataOperationSeq.AFTER,
-                                record: saveAndNew == true ? theNewRecord : oldRecord
+                                record: saveAndNew == true ? theNewRecord : oldRecord,
+                                grid:grid
                             };
 
                             if (formCmp.afterPost) {

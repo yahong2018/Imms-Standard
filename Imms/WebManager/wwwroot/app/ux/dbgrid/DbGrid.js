@@ -16,5 +16,12 @@ Ext.define('app.ux.dbgrid.DbGrid', {
     initComponent: function () {
         this.internalInitComponent();      
         this.callParent(arguments);
+    },
+
+    listeners: {
+        rowdblclick: function (grid, rowindex, e) {
+            debugger;
+            this.showDetailWindow(grid, rowindex, e);
+        }
     }
 });

@@ -14,12 +14,23 @@ Ext.define("app.view.imms.org.workshop.Workshop", {
     ],
     constructor: function (config) {
         var configBase = {
-            store: Ext.create({ xtype: 'imms_org_WorkshopStore' }),
             detailFormClass: 'imms_org_workshop_WorkshopDetailForm',
-            detailWindowTitle: '车间管理'
+            detailWindowTitle: '车间管理',
+            store: Ext.create({ xtype: 'imms_org_WorkshopStore' , grid: this, listeners: {
+                load: function () {
+                    if (this.getCount() > 0 && !this.grid.dataProcessed) {
+                        this.grid.dataProcessed = true;
+                        this.grid.getSelectionModel().select(0);
+                    }
+                }            
+            }})
         }
         Ext.applyIf(config, configBase);
 
         this.callParent(arguments);
     },
+
+    listeners: {
+        beforeselect: 'gridSelectionChanged',
+    }
 });

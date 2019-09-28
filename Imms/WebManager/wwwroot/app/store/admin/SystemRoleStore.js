@@ -22,8 +22,7 @@ Ext.define('app.store.admin.SystemRoleStore', {
     },
     updateRolePrivilege: function (role, privilegeList, callback) {
         var me = this;
-        debugger;
-        
+       
         app.ux.Utils.ajaxRequest({
             url: 'security/systemRole/updatePrivileges?roleId=' + role.get('recordId'),
             method: 'POST',

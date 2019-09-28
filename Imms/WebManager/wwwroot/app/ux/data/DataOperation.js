@@ -5,19 +5,13 @@ Ext.define("app.ux.data.DataOperation", {
     uses: ['app.ux.dbgrid.DetailWindow', 'Ext.util.Base64', 'app.ux.advancedSearch.SearchWindow',
            'app.ux.Utils', 'app.ux.data.DataMode'],
 
-    getInitConfig: function () {
-        var me = this;
+    getInitConfig: function () {      
         return {
             columnLines: true,
             style: 'padding-left:5px;',
             insertDetailWindowClass: 'app.ux.dbgrid.DetailWindow',
             editDetailWindowClass: 'app.ux.dbgrid.DetailWindow',
-            frame: true,
-            listeners: {
-                rowdblclick: function (grid, rowindex, e) {
-                    me.showDetailWindow(grid, rowindex, e);
-                }
-            }
+            frame: true            
         };
     },
 
@@ -78,7 +72,7 @@ Ext.define("app.ux.data.DataOperation", {
         }
     },
 
-    createDetailWindow: function (dataMode) {
+    createDetailWindow: function (dataMode) {       
         var detailWindow;
         if (this.createDetailWindowFun) {
             detailWindow = this.createDetailWindowFun();
@@ -97,8 +91,8 @@ Ext.define("app.ux.data.DataOperation", {
     },
 
     doInsert: function (config) {
-        config=config||{};
         var grid = this;
+        config=config||{};
         if (this.beforeInsert) {
             if (this.beforeInsert(config.sender) === false) {
                 return;
@@ -109,20 +103,30 @@ Ext.define("app.ux.data.DataOperation", {
         detailWindow.title = '新增 — [' + this.detailWindowTitle + ']';
 
         var form = detailWindow.getFormCmp();
-        form.loadRecord(record);
+
         if (form.onRecordLoad) {
             form.onRecordLoad({
                 dataMode: app.ux.data.DataMode.INSERT,
                 seq: app.ux.data.DataOperationSeq.BEFORE,
                 record: record,
-                sender:config.sender
+                grid: grid
+            });
+        }
+
+        form.loadRecord(record);
+
+        if (form.onRecordLoad) {
+            form.onRecordLoad({
+                dataMode: app.ux.data.DataMode.INSERT,
+                seq: app.ux.data.DataOperationSeq.AFTER,
+                record: record,
+                grid: grid
             });
         }
 
         var currentTopWindow = Ext.app.Application.instance.getMainView().down('maincenter').getActiveTab();
         var programId = currentTopWindow.menuData.get('programId');
-        debugger;
-        
+
         var canInsert = app.ux.Utils.hasPrivilege({ programId: programId, privilegeCode: "INSERT" });
         if (!canInsert) {
             detailWindow.down('[buttonName="save"]').setDisabled(true);
@@ -151,6 +155,16 @@ Ext.define("app.ux.data.DataOperation", {
         var detailWindow = this.createDetailWindow(app.ux.data.DataMode.EDIT);
         detailWindow.title = '修改 — [' + this.detailWindowTitle + ']';
         var form = detailWindow.getFormCmp();
+
+        if (form.onRecordLoad) {
+            form.onRecordLoad({
+                dataMode: app.ux.data.DataMode.EDIT,
+                seq: app.ux.data.DataOperationSeq.BEFORE,
+                record: record,
+                grid: grid
+            });
+        }
+
         form.loadRecord(record);
         var idField = form.down('[name="' + record.getIdProperty() + '"]');
         if (idField) {
@@ -160,9 +174,9 @@ Ext.define("app.ux.data.DataOperation", {
         if (form.onRecordLoad) {
             form.onRecordLoad({
                 dataMode: app.ux.data.DataMode.EDIT,
-                seq: app.ux.data.DataOperationSeq.BEFORE,
+                seq: app.ux.data.DataOperationSeq.AFTER,
                 record: record,
-                sender:config.sender
+                grid: grid
             });
         }
 
@@ -177,9 +191,8 @@ Ext.define("app.ux.data.DataOperation", {
         detailWindow.show();
     },
 
-    showDetailWindow: function (grid, rowindex, e) {
-        var grid = this;
-        var record = this.getSelectionModel().getSelection();
+    showDetailWindow: function (grid, rowindex, e) {     
+        var record = grid.getSelectionModel().getSelection();
         if (!record || record.length == 0) {
             return;
         }
@@ -197,9 +210,9 @@ Ext.define("app.ux.data.DataOperation", {
         if (form.onRecordLoad) {
             form.onRecordLoad({
                 dataMode: app.ux.data.DataMode.BROWSE,
-                seq: app.ux.data.DataOperationSeq.BEFORE,
+                seq: app.ux.data.DataOperationSeq.AFTER,
                 record: record,
-                sender:grid
+                grid: grid
             });
         }
 
@@ -216,8 +229,6 @@ Ext.define("app.ux.data.DataOperation", {
     },
 
     doSearch: function (column, operator, value) {
-        debugger;
-
         var grid = this;
         var expr = "";
         grid.getStore().clearCustomerFilter();        

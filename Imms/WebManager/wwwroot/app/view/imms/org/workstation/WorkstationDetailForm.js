@@ -1,7 +1,7 @@
-Ext.define("app.view.imms.org.workstation.WorkstationDetailForm",{
+Ext.define("app.view.imms.org.workstation.WorkstationDetailForm", {
     extend: "Ext.form.Panel",
     xtype: "imms_org_workstation_WorkstationDetailForm",
-  
+
     width: 400,
     bodyPadding: 5,
     defaults: {
@@ -11,6 +11,9 @@ Ext.define("app.view.imms.org.workstation.WorkstationDetailForm",{
         {
             name: 'recordId',
             xtype: 'hidden',
+        }, {
+            name: "parentOrganizationId",
+            xtype: "hidden"
         }, {
             name: "organizationCode",
             xtype: "textfield",
@@ -43,30 +46,20 @@ Ext.define("app.view.imms.org.workstation.WorkstationDetailForm",{
             maxLength: 3,
             enforceMaxLength: true,
             width: 180
-        }, 
+        },
         {
-            name: "parentOrganizationId",
-            xtype: "combobox",
-            fieldLabel: "所属车间",
-            width: 380,
-            valueField: "recordId",
-            displayField: "organizationName",
-            store: Ext.create("Ext.data.Store", {
-                model: "app.model.imms.org.WorkshopModel",
-                proxy: {
-                    type: 'ajax',
-                    url: 'imms/org/workshop/getAll',
-                    reader: {
-                        type: 'json',
-                        rootProperty: "rootProperty"
-                    }
-                }
-            })
-        }, {
             name: "description",
             xtype: "textarea",
             fieldLabel: "备注",
             width: 380
         }
-    ]    
+    ],
+    onRecordLoad:function(config){
+        if (config.dataMode == app.ux.data.DataMode.INSERT && config.seq == app.ux.data.DataOperationSeq.BEFORE){
+            var record = config.record;
+            var grid = config.grid;
+            
+            record.set("parentOrganizationId", grid.store.workshop.get("recordId"));
+        }
+    }
 });
