@@ -2,20 +2,17 @@ using Imms.Data;
 using Imms.Data.Domain;
 using Imms.Mes.Data;
 using Imms.Mes.Data.Domain;
+using Imms.WebManager.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Imms.WebManager.Controllers
 {
-    public class OrganizationController<T> : SimpleCRUDController<T> where T : WorkOrganizationUnit
-    {
-        public OrganizationController() => this.Logic = new SimpleCRUDLogic<T>();
-    }
-
     [Route("imms/org/workshop")]
-    public class WorkshopController : OrganizationController<Workshop>
+    public class WorkshopController : SimpleCRUDController<Workshop>
     {
         public WorkshopController()
         {
+            this.Logic = new SimpleCRUDLogic<Workshop>();
         }
 
         protected override void Verify(Workshop item, int operation)
@@ -28,10 +25,11 @@ namespace Imms.WebManager.Controllers
     }
 
     [Route("imms/org/workstation")]
-    public class WorkstationController : OrganizationController<Workstation>
+    public class WorkstationController : SimpleCRUDController<Workstation>
     {
         public WorkstationController()
         {
+            this.Logic = new WorkstationLogic();            
         }
     }
 }

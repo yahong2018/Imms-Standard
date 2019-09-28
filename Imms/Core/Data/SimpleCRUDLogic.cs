@@ -111,7 +111,7 @@ namespace Imms.Data
             CommonRepository.UseDbContext(dbContext =>
             {
                 StringBuilder selectBuilder = BuildSelectSql(filterStr, start, limit);
-                var list = dbContext.Set<T>().FromSql(selectBuilder.ToString()).ToList();
+                var list = this.DoGetData(selectBuilder.ToString(), dbContext).ToList();
 
                 StringBuilder countBuilder = BuildTotalCountSql(filterStr);
                 long count = (long)dbContext.Database.ExecuteSqlScalar(countBuilder.ToString());
@@ -129,5 +129,10 @@ namespace Imms.Data
 
         protected virtual void BeforeDelete(List<T> item, DbContext dbContext) { }
         protected virtual void AfterDelete(List<T> item, DbContext dbContext) { }
+
+        protected virtual List<T> DoGetData(string sql, DbContext dbContext)
+        {
+            return dbContext.Set<T>().FromSql(sql).ToList();
+        }
     }
 }
