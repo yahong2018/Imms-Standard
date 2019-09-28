@@ -14,9 +14,7 @@ Ext.define("app.view.imms.org.workstation.Workstation", {
         { dataIndex: "rfidTerminatorId", text: "Rfid工位机编号", width: 150 },
         { dataIndex: "description", text: "备注", flex: 1 }
     ],
-    constructor: function (config) {
-        debugger;
-        
+    constructor: function (config) {       
         var configBase = {
             store: Ext.create({ xtype: 'imms_org_WorkstationStore',autoLoad:false }),
             detailFormClass: 'imms_org_workstation_WorkstationDetailForm',

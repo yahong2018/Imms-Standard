@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Imms.Data;
 using Imms.Data.Domain;
 using Imms.Mes.Data;
@@ -18,10 +20,23 @@ namespace Imms.WebManager.Controllers
 
         protected override void Verify(Workshop item, int operation)
         {
-            if (item.NextWorkShopId == item.RecordId && item.NextWorkShopId != 0)
+            if (item.NextWorkshopId == item.RecordId && item.NextWorkshopId != 0)
             {
                 throw new BusinessException(GlobalConstants.EXCEPTION_CODE_PARAMETER_INVALID, "下一车间不可以与本车间等同！");
             }
+        }
+
+        protected override ExtJsResult DoGetAll(){
+            ExtJsResult result = base.DoGetAll();
+            List<Workshop> workshopList = (List<Workshop>) result.RootProperty;
+            CommonRepository.UseDbContext(dbContext=>{
+                var dbList = dbContext.Set<Workshop>().ToList();
+                foreach(Workshop workshop in workshopList){
+                    workshop.NextWorkshop = dbList.FirstOrDefault(x=>x.RecordId == workshop.NextWorkshopId);                    
+                }
+            });
+
+            return result;
         }
     }
 

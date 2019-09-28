@@ -36,6 +36,13 @@ namespace Imms
         [Route("getAll"), HttpGet]
         public ExtJsResult GetAll()
         {
+            return this.DoGetAll();           
+        }
+
+        protected virtual void Verify(T item, int operation) { }
+
+        protected virtual ExtJsResult DoGetAll()
+        {
             string filterStr = this.GetFilterString();
             ExtJsResult result = null;
             if (IsGetByPage())
@@ -53,12 +60,6 @@ namespace Imms
                 result = Logic.GetAllWithWhole(filterStr);
             }
             return result;
-        }
-
-        protected virtual void Verify(T item, int operation) { }
-
-        protected virtual void AfterGetAll(ExtJsResult extJsResult)
-        {
         }
 
         protected virtual bool IsGetByPage()

@@ -20,11 +20,11 @@ namespace Imms.Mes.Data.Domain
 
     public class Workshop : WorkOrganizationUnit
     {
-        public string WorkShopCode { get { return base.OrganizationCode; } set { base.OrganizationCode = value; } }
-        public string WorkShopName { get { return base.OrganizationName; } set { base.OrganizationName = value; } }
+        public string WorkshopCode { get { return base.OrganizationCode; } set { base.OrganizationCode = value; } }
+        public string WorkshopName { get { return base.OrganizationName; } set { base.OrganizationName = value; } }
 
-        public long NextWorkShopId { get; set; }
-        public virtual Workshop NextWorkShop { get; set; }
+        public long NextWorkshopId { get; set; }
+        public virtual Workshop NextWorkshop { get; set; }
     }
 
     public class Workstation : WorkOrganizationUnit
@@ -102,11 +102,11 @@ namespace Imms.Mes.Data.Domain
         public void Configure(EntityTypeBuilder<Workshop> builder)
         {
             ImmsDbContext.RegisterEntityTable<Workshop>("work_organization_unit");
-            builder.Ignore(e => e.WorkShopCode);
-            builder.Ignore(e => e.WorkShopName);
+            builder.Ignore(e => e.WorkshopCode);
+            builder.Ignore(e => e.WorkshopName);
 
-            builder.Property(e => e.NextWorkShopId).HasColumnName("next_workshop_id");
-            builder.HasOne(e=>e.NextWorkShop).WithMany().HasForeignKey(e => e.NextWorkShopId).HasConstraintName("next_workshop_id");
+            builder.Property(e => e.NextWorkshopId).HasColumnName("next_workshop_id");
+            builder.HasOne(e=>e.NextWorkshop).WithMany().HasForeignKey(e => e.NextWorkshopId).HasConstraintName("next_workshop_id");
         }
     }
 

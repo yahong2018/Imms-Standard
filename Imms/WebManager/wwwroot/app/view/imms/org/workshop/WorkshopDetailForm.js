@@ -28,7 +28,7 @@ Ext.define("app.view.imms.org.workshop.WorkshopDetailForm", {
             enforceMaxLength: true,
             width: 380
         }, {
-            name: "nextWorkShopId",
+            name: "nextWorkshopId",
             xtype: "combobox",
             fieldLabel: "下一车间",
             width: 380,
