@@ -7,7 +7,7 @@ namespace Imms.WebManager
 {
     public class KanbanRealtimeHub : Hub
     {
-        public static List<string> connectedIdList = new List<string>();
+        public static List<string> realTimeConnectedIdList = new List<string>();
 
         public KanbanRealtimeHub()
         {
@@ -18,36 +18,36 @@ namespace Imms.WebManager
             string id = Context.ConnectionId;
             lock (this)
             {
-                if (KanbanRealtimeHub.connectedIdList.Contains(id))
+                if (KanbanRealtimeHub.realTimeConnectedIdList.Contains(id))
                 {
-                    KanbanRealtimeHub.connectedIdList.Remove(id);
+                    KanbanRealtimeHub.realTimeConnectedIdList.Remove(id);
                 }
             }
             return base.OnDisconnectedAsync(exception);
         }
 
-        public void RegisterClient()
+        public void RegisterRealtimeClient()
         {
             string id = Context.ConnectionId;
             lock (this)
             {
-                if (!KanbanRealtimeHub.connectedIdList.Contains(id))
+                if (!KanbanRealtimeHub.realTimeConnectedIdList.Contains(id))
                 {
-                    KanbanRealtimeHub.connectedIdList.Add(id);
+                    KanbanRealtimeHub.realTimeConnectedIdList.Add(id);
                 }
             }           
         }       
     }
 
 
-    public class DataPushTask{
+    public class RealtimeDataPushTask{
         private readonly IHubContext<KanbanRealtimeHub> _hubContext;
         private System.Threading.Thread dataPushThread;
         private readonly Random random = new Random(100);
 
         public bool Terminated { get; set; }
 
-        public DataPushTask(IHubContext<KanbanRealtimeHub> hubContext)
+        public RealtimeDataPushTask(IHubContext<KanbanRealtimeHub> hubContext)
         {
             this._hubContext = hubContext;
 
@@ -105,7 +105,7 @@ namespace Imms.WebManager
             }
             lock (this)
             {
-                foreach (string id in KanbanRealtimeHub.connectedIdList)
+                foreach (string id in KanbanRealtimeHub.realTimeConnectedIdList)
                 {
                     _hubContext.Clients.Client(id).SendAsync("PushRealtimeData", realtimeItem);
                 }

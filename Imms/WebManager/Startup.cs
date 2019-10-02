@@ -66,7 +66,7 @@ namespace Imms.WebManager
             GlobalConstants.GetCurrentUserDelegate = Security.Data.SystemUserLogic.GetCurrentUser;
 
             services.AddSignalR(); 
-            services.AddSingleton<DataPushTask,DataPushTask>();          
+            services.AddSingleton<RealtimeDataPushTask,RealtimeDataPushTask>();          
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -118,7 +118,7 @@ namespace Imms.WebManager
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            DataPushTask task = app.ApplicationServices.GetService<DataPushTask>();
+            RealtimeDataPushTask task = app.ApplicationServices.GetService<RealtimeDataPushTask>();
             task.Start();
         }
     }

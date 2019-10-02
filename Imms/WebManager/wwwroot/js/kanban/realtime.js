@@ -275,7 +275,7 @@ connection.on("PushRealtimeData", function (realtimeItem) {
 
 function start_connection() {    
         connection.start().then(function(){
-            connection.invoke("RegisterClient");
+            connection.invoke("RegisterRealtimeClient");
             console.log("connected");
         }).catch(function(){
             setTimeout(start_connection, 5000);
