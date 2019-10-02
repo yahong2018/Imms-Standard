@@ -1,6 +1,9 @@
+using Imms.Data;
+using Imms.Mes.Data.Domain;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 namespace Imms.WebManager
@@ -35,12 +38,13 @@ namespace Imms.WebManager
                 {
                     KanbanRealtimeHub.realTimeConnectedIdList.Add(id);
                 }
-            }           
-        }       
+            }
+        }
     }
 
 
-    public class RealtimeDataPushTask{
+    public class RealtimeDataPushTask
+    {
         private readonly IHubContext<KanbanRealtimeHub> _hubContext;
         private System.Threading.Thread dataPushThread;
         private readonly Random random = new Random(100);
@@ -51,7 +55,7 @@ namespace Imms.WebManager
         {
             this._hubContext = hubContext;
 
-            this.Terminated = false;           
+            this.Terminated = false;
         }
 
         public void Start()
@@ -65,7 +69,7 @@ namespace Imms.WebManager
                                    while (!Terminated)
                                    {
                                        this.PushThreadHandler();
-                                       Thread.Sleep(5000);
+                                       Thread.Sleep(1000); // 1秒钟发布1次数据
                                    }
                                });
                     dataPushThread.Start();
@@ -80,6 +84,14 @@ namespace Imms.WebManager
 
         public void PushRealtimeData()
         {
+            lock (this)
+            {
+                if (KanbanRealtimeHub.realTimeConnectedIdList.Count == 0)
+                {
+                    return;
+                }
+            }
+
             RealtimeItem realtimeItem = new RealtimeItem();
             realtimeItem.line_code = "A301-2";
 
@@ -91,6 +103,8 @@ namespace Imms.WebManager
             realtimeItem.line_summary_data.person_qty = 6;
 
             realtimeItem.line_detail_data = new DetailItem[12];
+            List<ProductionOrderProgress> dbList = this.GetOrderProgress();
+
             for (int i = 0; i < 12; i++)
             {
                 DateTime date = DateTime.Now;
@@ -112,29 +126,44 @@ namespace Imms.WebManager
             }
         }
 
-        public class RealtimeItem
+        public List<ProductionOrderProgress> GetOrderProgress()
         {
-            public string line_code { get; set; }
-            public SummaryItem line_summary_data { get; set; }
-            public DetailItem[] line_detail_data { get; set; }
-        }
+            List<ProductionOrderProgress> result = null;
+            CommonRepository.UseDbContext(dbContext =>
+            {
+                DateTime now = DateTime.Now;
+                DateTime begin = new DateTime(now.Year, now.Month, now.Day);
+                DateTime end = begin.AddDays(1);
 
-        public class SummaryItem
-        {
-            public string production_code { get; set; }
-            public string production_name { get; set; }
-            public string production_order_no { get; set; }
-            public int uph { get; set; }
-            public int person_qty { get; set; }
-        }
+                result = dbContext.Set<ProductionOrderProgress>().Where(x => x.CreateDate >= begin && x.CreateDate < end).ToList();
+            });
 
-        public class DetailItem
-        {
-            public int hour { get; set; }
-            public int index { get; set; }
-            public int qty_plan { get; set; }
-            public int qty_good { get; set; }
-            public int qty_bad { get; set; }
+            return result;
         }
+    }
+
+    public class RealtimeItem
+    {
+        public string line_code { get; set; }
+        public SummaryItem line_summary_data { get; set; }
+        public DetailItem[] line_detail_data { get; set; }
+    }
+
+    public class SummaryItem
+    {
+        public string production_code { get; set; }
+        public string production_name { get; set; }
+        public string production_order_no { get; set; }
+        public int uph { get; set; }
+        public int person_qty { get; set; }
+    }
+
+    public class DetailItem
+    {
+        public int hour { get; set; }
+        public int index { get; set; }
+        public int qty_plan { get; set; }
+        public int qty_good { get; set; }
+        public int qty_bad { get; set; }
     }
 }

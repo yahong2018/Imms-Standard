@@ -12,10 +12,8 @@ namespace Imms.Mes.Data.Domain
         public long ProductionId { get; set; }
         public long WorkshopId { get; set; }
         public int QtyPlanned { get; set; }
-        public int QtyFinished { get; set; }
-        public int QtySecondQuality { get; set; }
-        public int QtyDefect { get; set; }
-        public int QtyActual { get; set; }
+        public int QtyGood { get; set; }
+        public int QtyBad { get; set; }        
 
         public virtual Material Production { get; set; }
         public virtual Workshop Workshop { get; set; }
@@ -133,7 +131,7 @@ namespace Imms.Mes.Data.Domain
         }
     }
 
-    public class ProductionOrderProgressConfigure : OrderEntityConfigure<ProductionOrderProgress>
+    public class ProductionOrderProgressConfigure : TrackableEntityConfigure<ProductionOrderProgress>
     {
         protected override void InternalConfigure(EntityTypeBuilder<ProductionOrderProgress> builder)
         {
@@ -151,8 +149,8 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.BadQty).HasColumnName("bad_qty");
             builder.Property(e => e.RfidCardNo).HasColumnName("rfid_card_no");
             builder.Property(e => e.ReportType).HasColumnName("report_type");
-            builder.Property(e => e.WorkstationId).HasColumnName("work_station_id");
-            builder.Property(e => e.WorkshopId).HasColumnName("work_shop_id");
+            builder.Property(e => e.WorkstationId).HasColumnName("workstation_id");
+            builder.Property(e => e.WorkshopId).HasColumnName("workshop_id");
 
             builder.HasOne(e => e.Production).WithMany().HasForeignKey(e => e.ProductionId).HasConstraintName("production_id");
             builder.HasOne(e => e.Workstation).WithMany().HasForeignKey(e => e.WorkstationId).HasConstraintName("workstation_id");
@@ -170,11 +168,9 @@ namespace Imms.Mes.Data.Domain
 
             builder.Property(e => e.ProductionId).HasColumnName("production_id");
             builder.Property(e => e.WorkshopId).HasColumnName("workshop_id").HasColumnType("bigint(20)");
-            builder.Property(e => e.QtyPlanned).HasColumnName("qty_planned").HasColumnType("int(11)");
-            builder.Property(e => e.QtyActual).HasColumnName("qty_actual").HasColumnType("int(11)");
-            builder.Property(e => e.QtyFinished).HasColumnName("qty_finished").HasColumnType("int(11)");
-            builder.Property(e => e.QtySecondQuality).HasColumnName("qty_second_quality").HasColumnType("int(11)");
-            builder.Property(e => e.QtyDefect).HasColumnName("qty_defect").HasColumnType("int(11)");
+            builder.Property(e => e.QtyPlanned).HasColumnName("qty_planned").HasColumnType("int(11)");            
+            builder.Property(e => e.QtyGood).HasColumnName("qty_finished").HasColumnType("int(11)");
+            builder.Property(e => e.QtyBad).HasColumnName("qty_second_quality").HasColumnType("int(11)");            
 
             builder.HasOne(e => e.Production).WithMany().HasForeignKey(e => e.ProductionId).HasConstraintName("production_id");
             builder.HasOne(e => e.Workshop).WithMany().HasForeignKey(e => e.WorkshopId).HasConstraintName("workshop_id");
