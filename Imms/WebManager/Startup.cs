@@ -58,7 +58,6 @@ namespace Imms.WebManager
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
             GlobalConstants.DbContextFactory = new DbContextFactory();
 
             ImmsDbContext.RegisterModelBuilders(new Imms.Security.Data.SecurityModelBuilder());
@@ -66,7 +65,8 @@ namespace Imms.WebManager
 
             GlobalConstants.GetCurrentUserDelegate = Security.Data.SystemUserLogic.GetCurrentUser;
 
-            services.AddSignalR();
+            services.AddSignalR(); 
+            services.AddSingleton<DataPushTask,DataPushTask>();          
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -108,15 +108,18 @@ namespace Imms.WebManager
 
             app.UseSignalR(routes =>
             {
-                routes.MapHub<ChatHub>("/chathub");
-            });
-
+                routes.MapHub<KanbanRealtimeHub>("/kanbanHub/realtime");
+            });            
+            
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            DataPushTask task = app.ApplicationServices.GetService<DataPushTask>();
+            task.Start();
         }
     }
 

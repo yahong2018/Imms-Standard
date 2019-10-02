@@ -31,7 +31,8 @@ namespace Imms.Mes.Data.Domain
         public long RfidControllerId { get; set; }
         public long ProductionId { get; set; }
         public DateTime ReportTime { get; set; }
-        public int ReportQty { get; set; }
+        public int GoodQty { get; set; }
+        public int BadQty { get; set; }
         public string RfidCardNo { get; set; }
         public int ReportType { get; set; }
         public long WorkstationId { get; set; }
@@ -123,12 +124,12 @@ namespace Imms.Mes.Data.Domain
 
             builder.Property(e => e.PrevProgressRecordId).HasColumnName("prev_progress_record_id");
 
-            builder.HasOne(e=>e.RfidCard).WithMany().HasForeignKey(e=>e.RfidCardId).HasConstraintName("rfid_card_id");
-            builder.HasOne(e=>e.ProductionOrder).WithMany().HasForeignKey(e=>e.ProductionOrderId).HasConstraintName("production_order_id");
-            builder.HasOne(e=>e.Production).WithMany().HasForeignKey(e=>e.ProductionId).HasConstraintName("production_id");
-            builder.HasOne(e=>e.Workshop).WithMany().HasForeignKey(e=>e.WorkshopId).HasConstraintName("workshop_id");
-            builder.HasOne(e=>e.Workstation).WithMany().HasForeignKey(e=>e.WorkstationId).HasConstraintName("workstation_id");
-            builder.HasOne(e=>e.Operator).WithMany().HasForeignKey(e=>e.OperatorId).HasConstraintName("operator_id");
+            builder.HasOne(e => e.RfidCard).WithMany().HasForeignKey(e => e.RfidCardId).HasConstraintName("rfid_card_id");
+            builder.HasOne(e => e.ProductionOrder).WithMany().HasForeignKey(e => e.ProductionOrderId).HasConstraintName("production_order_id");
+            builder.HasOne(e => e.Production).WithMany().HasForeignKey(e => e.ProductionId).HasConstraintName("production_id");
+            builder.HasOne(e => e.Workshop).WithMany().HasForeignKey(e => e.WorkshopId).HasConstraintName("workshop_id");
+            builder.HasOne(e => e.Workstation).WithMany().HasForeignKey(e => e.WorkstationId).HasConstraintName("workstation_id");
+            builder.HasOne(e => e.Operator).WithMany().HasForeignKey(e => e.OperatorId).HasConstraintName("operator_id");
         }
     }
 
@@ -146,7 +147,8 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.RfidControllerId).HasColumnName("rfid_controller_id");
             builder.Property(e => e.ProductionId).HasColumnName("production_id");
             builder.Property(e => e.ReportTime).HasColumnName("report_time");
-            builder.Property(e => e.ReportQty).HasColumnName("report_qty");
+            builder.Property(e => e.GoodQty).HasColumnName("good_qty");
+            builder.Property(e => e.BadQty).HasColumnName("bad_qty");
             builder.Property(e => e.RfidCardNo).HasColumnName("rfid_card_no");
             builder.Property(e => e.ReportType).HasColumnName("report_type");
             builder.Property(e => e.WorkstationId).HasColumnName("work_station_id");

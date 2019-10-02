@@ -9,6 +9,16 @@
         "dist/browser/signalr.js",
         "dist/browser/signalr.min.js"
       ]
+    },
+    {
+      "provider": "cdnjs",
+      "library": "babel-polyfill@7.6.0",
+      "destination": "wwwroot/lib/babel-polyfill/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "echarts@4.3.0",
+      "destination": "wwwroot/lib/echarts/"
     }
   ]
 }
