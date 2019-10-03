@@ -34,7 +34,7 @@ var option = {
     xAxis: {
         type: 'category',
         boundaryGap: false,
-        data: ['9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'],
+        data: ['8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'],
         splitLine: {
             show: true,
             lineStyle: {
@@ -45,9 +45,8 @@ var option = {
     yAxis: {
         type: 'value',
         min: 0,
-        max: 150,
-        interval: 30,
-
+        max: 160,
+        interval: 20,
     },
     series: [
         {
@@ -59,7 +58,7 @@ var option = {
             lineStyle: {
                 type: 'dashed'
             },
-            data: [100, 20, 80, 100, 80, 20, 80, 100, 100, 20, 80, 100]
+            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         },
         {
             name: '不良品',
@@ -70,7 +69,7 @@ var option = {
             lineStyle: {
                 type: 'dashed'
             },
-            data: [0, 80, 0, 0, 0, 0, 0, 0, 0, 80, 0, 0]
+            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         }
     ]
 };
@@ -117,18 +116,19 @@ var server_data = {
         person_qty: 6
     },
     line_detail_data: [
-        { hour: 8, index: 0, qty_plan: 100, qty_good: 100, qty_bad: 0 },
-        { hour: 9, index: 1, qty_plan: 100, qty_good: 60, qty_bad: 5 },
-        { hour: 10, index: 2, qty_plan: 100, qty_good: 100, qty_bad: 0 },
-        { hour: 11, index: 3, qty_plan: 100, qty_good: 100, qty_bad: 0 },
-        { hour: 12, index: 4, qty_plan: 100, qty_good: 100, qty_bad: 0 },
-        { hour: 13, index: 5, qty_plan: 100, qty_good: 90, qty_bad: 10 },
-        { hour: 14, index: 6, qty_plan: 100, qty_good: 100, qty_bad: 0 },
-        { hour: 15, index: 7, qty_plan: 100, qty_good: 100, qty_bad: 0 },
-        { hour: 16, index: 8, qty_plan: 100, qty_good: 100, qty_bad: 0 },
-        { hour: 17, index: 9, qty_plan: 100, qty_good: 100, qty_bad: 0 },
-        { hour: 18, index: 10, qty_plan: 100, qty_good: 10, qty_bad: 0 },
-        { hour: 19, index: 11, qty_plan: 100, qty_good: 0, qty_bad: 0 },
+        { hour: 8, index: -1, qty_plan: 0, qty_good: 0, qty_bad: 0 },
+        { hour: 9, index: 0, qty_plan: 100, qty_good: 0, qty_bad: 0 },
+        { hour: 10, index: 1, qty_plan: 100, qty_good: 0, qty_bad: 0 },
+        { hour: 11, index: 2, qty_plan: 100, qty_good: 0, qty_bad: 0 },
+        { hour: 12, index: 3, qty_plan: 100, qty_good: 0, qty_bad: 0 },
+        { hour: 13, index: 4, qty_plan: 100, qty_good: 0, qty_bad: 0 },
+        { hour: 14, index: 5, qty_plan: 100, qty_good: 0, qty_bad: 0 },
+        { hour: 15, index: 6, qty_plan: 100, qty_good: 0, qty_bad: 0 },
+        { hour: 16, index: 7, qty_plan: 100, qty_good: 0, qty_bad: 0 },
+        { hour: 17, index: 8, qty_plan: 100, qty_good: 0, qty_bad: 0 },
+        { hour: 18, index: 9, qty_plan: 100, qty_good: 0, qty_bad: 0 },
+        { hour: 19, index: 10, qty_plan: 100, qty_good: 0, qty_bad: 0 },
+        { hour: 20, index: 11, qty_plan: 100, qty_good: 0, qty_bad: 0 },
     ]
 };
 
@@ -163,14 +163,18 @@ function fill_detail_data(config) {
     };
     total_plan = total_actual = total_good = total_bad = 0;
 
-    for (var i = 0; i < detail_items.length; i++) {
+    var hour = new Date().getHours() + 1;
+    for (var i = 0; i < detail_items.length; i++) {        
         var item = detail_items[i];
         var index = item.index;
+        if (hour >= item.hour) {
+            config.good_items.push(item.qty_good);
+            config.bad_items.push(item.qty_bad);
+        }
+
         if (index < 0 || index > table.rows.length) {
             continue;
         }
-        config.good_items.push(item.qty_good);
-        config.bad_items.push(item.qty_bad);
 
         var row = table.rows[index + 1];
         var sub_total = item.qty_good + item.qty_bad;
@@ -210,7 +214,7 @@ function fill_detail_data(config) {
 function fill_detail_summary() {
     var table = document.getElementById("detail-summary");
     var now = new Date();
-    var hour = now.getHours();
+    var hour = now.getHours() + 1;
     var detail_items = server_data.line_detail_data || [];
     var item = {};
     for (var i = 0; i < detail_items.length; i++) {
@@ -220,8 +224,8 @@ function fill_detail_summary() {
         }
     }
 
-    var text = "当前时间<br/>" + hour + ":00" + "~" + (hour + 1) + ":00";
-    var row_current = table.rows[1];
+    var text = "当前时间<br/>" + (hour -1) + ":00" + "~" + hour + ":00";
+    var row_current = table.rows[1]; 
     row_current.cells[0].innerHTML = text;
     row_current.cells[1].innerText = item.qty_plan;
 
@@ -242,7 +246,7 @@ function fill_detail_summary() {
     row_total.cells[2].innerText = total_actual;
     row_total.cells[3].innerText = (((total_plan == 0) ? 0 : (total_actual / total_plan)) * 100).toFixed(2) + "%";
     row_total.cells[4].innerText = total_bad;
-    row_total.cells[5].innerText = (((total_actual == 0) ? 0 : (total_good / total_actual)) * 100).toFixed(2) + "%";
+    row_total.cells[5].innerText = (((total_actual == 0) ? 0 : (total_bad / total_actual)) * 100).toFixed(2) + "%";
 }
 
 var connection = new signalR.HubConnectionBuilder().withUrl("/kanbanHub/realtime").build();
@@ -256,7 +260,7 @@ connection.on("PushRealtimeData", function (realtimeItem) {
     fill_line_summary();
     fill_detail_data({ good_items: good_items, bad_items: bad_items });
     fill_detail_summary();
-
+  
     var options = {
         series: [
             {
@@ -273,13 +277,13 @@ connection.on("PushRealtimeData", function (realtimeItem) {
     myChart.setOption(options);
 });
 
-function start_connection() {    
-        connection.start().then(function(){
-            connection.invoke("RegisterRealtimeClient");
-            console.log("connected");
-        }).catch(function(){
-            setTimeout(start_connection, 5000);
-        });
+function start_connection() {
+    connection.start().then(function () {
+        connection.invoke("RegisterRealtimeClient");
+        console.log("connected");
+    }).catch(function () {
+        setTimeout(start_connection, 5000);
+    });
 };
 
 connection.onclose(function () {

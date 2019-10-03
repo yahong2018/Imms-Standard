@@ -10,7 +10,8 @@ namespace Imms.WebManager
 {
     public class KanbanRealtimeHub : Hub
     {
-        public static List<string> realTimeConnectedIdList = new List<string>();
+        public static SortedList<string, WebSocketClient> realTimeConnectedIdList = new SortedList<string, WebSocketClient>();
+        public static RealtimeItem demoRealtimeItem = new RealtimeItem();
 
         public KanbanRealtimeHub()
         {
@@ -19,9 +20,9 @@ namespace Imms.WebManager
         public override Task OnDisconnectedAsync(Exception exception)
         {
             string id = Context.ConnectionId;
-            lock (this)
+            lock (KanbanRealtimeHub.realTimeConnectedIdList)
             {
-                if (KanbanRealtimeHub.realTimeConnectedIdList.Contains(id))
+                if (KanbanRealtimeHub.realTimeConnectedIdList.ContainsKey(id))
                 {
                     KanbanRealtimeHub.realTimeConnectedIdList.Remove(id);
                 }
@@ -32,22 +33,35 @@ namespace Imms.WebManager
         public void RegisterRealtimeClient()
         {
             string id = Context.ConnectionId;
-            lock (this)
+            lock (KanbanRealtimeHub.realTimeConnectedIdList)
             {
-                if (!KanbanRealtimeHub.realTimeConnectedIdList.Contains(id))
+                if (!KanbanRealtimeHub.realTimeConnectedIdList.ContainsKey(id))
                 {
-                    KanbanRealtimeHub.realTimeConnectedIdList.Add(id);
+                    WebSocketClient client = new WebSocketClient();
+                    client.ConnectionId = id;
+                    client.Inited = false;
+
+                    KanbanRealtimeHub.realTimeConnectedIdList.Add(id, client);
                 }
             }
+
+            this.Clients.Client(id).SendAsync("PushRealtimeData", demoRealtimeItem);
         }
     }
 
+    public class WebSocketClient
+    {
+        public string ConnectionId { get; set; }
+        public bool Inited { get; set; }
+    }
 
     public class RealtimeDataPushTask
     {
         private readonly IHubContext<KanbanRealtimeHub> _hubContext;
         private System.Threading.Thread dataPushThread;
         private readonly Random random = new Random(100);
+        private int lastRecordCount = 0;
+        private int[] hours = new int[] { 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
 
         public bool Terminated { get; set; }
 
@@ -56,24 +70,59 @@ namespace Imms.WebManager
             this._hubContext = hubContext;
 
             this.Terminated = false;
+            this.InitDemoData();
+        }
+
+        private void InitDemoData()
+        {
+            KanbanRealtimeHub.demoRealtimeItem.line_code = "A301-2";
+            KanbanRealtimeHub.demoRealtimeItem.line_summary_data = new SummaryItem();
+            KanbanRealtimeHub.demoRealtimeItem.line_summary_data.production_code = "AL666-ACC-01M";
+            KanbanRealtimeHub.demoRealtimeItem.line_summary_data.production_name = "测试品名";
+            KanbanRealtimeHub.demoRealtimeItem.line_summary_data.production_order_no = "WO-20191002-001";
+            KanbanRealtimeHub.demoRealtimeItem.line_summary_data.uph = 30;
+            KanbanRealtimeHub.demoRealtimeItem.line_summary_data.person_qty = 6;
+
+            KanbanRealtimeHub.demoRealtimeItem.line_detail_data = new DetailItem[this.hours.Length];
+            int hour = DateTime.Now.Hour;
+            List<ProductionOrderProgress> allList = this.GetOrderProgress(hour, true);
+
+            for (int i = 0; i < this.hours.Length; i++)
+            {
+                DateTime date = DateTime.Now;
+
+                DetailItem item = new DetailItem();
+                KanbanRealtimeHub.demoRealtimeItem.line_detail_data[i] = item;
+                item.index = i - 1;
+                item.qty_plan = 100;
+                if (date.Hour > this.hours[i] && date.Hour != this.hours[0])
+                {
+                    var dbItem = allList.Where(x=>x.CreateDate.Hour+1 == this.hours[i]);
+                    item.qty_good = dbItem.Select(x=>x.GoodQty).Sum(); 
+                    item.qty_bad = dbItem.Select(x=>x.BadQty).Sum();
+                }
+                else
+                {
+                    item.qty_good = 0;
+                    item.qty_bad = 0;
+                }
+                item.hour = this.hours[i];
+            }
         }
 
         public void Start()
         {
-            lock (this)
+            if (dataPushThread == null)
             {
-                if (dataPushThread == null)
-                {
-                    dataPushThread = new System.Threading.Thread(() =>
+                dataPushThread = new System.Threading.Thread(() =>
+                           {
+                               while (!Terminated)
                                {
-                                   while (!Terminated)
-                                   {
-                                       this.PushThreadHandler();
-                                       Thread.Sleep(1000); // 1秒钟发布1次数据
-                                   }
-                               });
-                    dataPushThread.Start();
-                }
+                                   this.PushThreadHandler();
+                                   Thread.Sleep(1000); // 1秒钟发布1次数据
+                               }
+                           });
+                dataPushThread.Start();
             }
         }
 
@@ -84,58 +133,44 @@ namespace Imms.WebManager
 
         public void PushRealtimeData()
         {
-            lock (this)
+            if (KanbanRealtimeHub.realTimeConnectedIdList.Count == 0)
             {
-                if (KanbanRealtimeHub.realTimeConnectedIdList.Count == 0)
-                {
-                    return;
-                }
+                return;
             }
-
-            RealtimeItem realtimeItem = new RealtimeItem();
-            realtimeItem.line_code = "A301-2";
-
-            realtimeItem.line_summary_data = new SummaryItem();
-            realtimeItem.line_summary_data.production_code = "AL666-ACC-01M";
-            realtimeItem.line_summary_data.production_name = "测试品名";
-            realtimeItem.line_summary_data.production_order_no = "WO-20191002-001";
-            realtimeItem.line_summary_data.uph = 30;
-            realtimeItem.line_summary_data.person_qty = 6;
-
-            realtimeItem.line_detail_data = new DetailItem[12];
-            List<ProductionOrderProgress> dbList = this.GetOrderProgress();
-
-            for (int i = 0; i < 12; i++)
+            int hour = DateTime.Now.Hour;
+            List<ProductionOrderProgress> hourList = this.GetOrderProgress(hour);
+            if (lastRecordCount == hourList.Count)
             {
-                DateTime date = DateTime.Now;
-
-                DetailItem item = new DetailItem();
-                realtimeItem.line_detail_data[i] = item;
-                item.index = i;
-                item.hour = date.Hour;
-                item.qty_plan = 100;
-                item.qty_good = random.Next(100);
-                item.qty_bad = random.Next(item.qty_plan - item.qty_good);
+                return;
             }
-            lock (this)
+            lastRecordCount = hourList.Count;
+            DetailItem detailItem = KanbanRealtimeHub.demoRealtimeItem.line_detail_data.Where(x => x.hour == DateTime.Now.Hour + 1).Single();
+            detailItem.qty_good = hourList.Select(x => x.GoodQty).Sum();
+            detailItem.qty_bad = hourList.Select(x => x.BadQty).Sum();
+
+            lock (KanbanRealtimeHub.realTimeConnectedIdList)
             {
-                foreach (string id in KanbanRealtimeHub.realTimeConnectedIdList)
+                foreach (string id in KanbanRealtimeHub.realTimeConnectedIdList.Keys)
                 {
-                    _hubContext.Clients.Client(id).SendAsync("PushRealtimeData", realtimeItem);
+                    _hubContext.Clients.Client(id).SendAsync("PushRealtimeData", KanbanRealtimeHub.demoRealtimeItem);
                 }
             }
         }
 
-        public List<ProductionOrderProgress> GetOrderProgress()
+        public List<ProductionOrderProgress> GetOrderProgress(int hour, bool all = false)
         {
             List<ProductionOrderProgress> result = null;
             CommonRepository.UseDbContext(dbContext =>
             {
                 DateTime now = DateTime.Now;
-                DateTime begin = new DateTime(now.Year, now.Month, now.Day);
-                DateTime end = begin.AddDays(1);
-
-                result = dbContext.Set<ProductionOrderProgress>().Where(x => x.CreateDate >= begin && x.CreateDate < end).ToList();
+                DateTime begin = new DateTime(now.Year, now.Month, now.Day, hour, 0, 0);
+                DateTime end = begin.AddHours(1);
+                if (all)
+                {
+                    begin = new DateTime(now.Year, now.Month, now.Day);
+                    end = begin.AddDays(1);
+                }
+                result = dbContext.Set<ProductionOrderProgress>().Where(x => x.ReportTime >= begin && x.ReportTime < end).ToList();
             });
 
             return result;
