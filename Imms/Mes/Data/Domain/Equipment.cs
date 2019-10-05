@@ -34,18 +34,16 @@ namespace Imms.Mes.Data.Domain
         public string RfidNo{get;set;}
         public int CardType{get;set;}
         public int CardStatus{get;set;}
-        public long WorkShopId{get;set;}
+        public long WorkshopId{get;set;}
         public long ProductionId {get;set;}
-        public int Qty{get;set;}
-        public long OperatorId{get;set;}        
+        public int Qty{get;set;}        
 
-        public virtual Material Production{get;set;}
-        public virtual Operator Operator{get;set;}
-        public virtual Workshop WorkShop {get;set;}
+        public virtual Material Production{get;set;}        
+        public virtual Workshop Workshop {get;set;}
     }
 
 
-    public class RfidCardConfigure : EntityConfigure<RfidCard>
+    public class RfidCardConfigure : TrackableEntityConfigure<RfidCard>
     {
         protected override void InternalConfigure(EntityTypeBuilder<RfidCard> builder)
         {
@@ -57,13 +55,11 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.CardType).HasColumnName("card_type");
             builder.Property(e => e.CardStatus).HasColumnName("card_status");
             builder.Property(e => e.ProductionId).HasColumnName("production_id");
-            builder.Property(e => e.WorkShopId).HasColumnName("work_shop_id");
+            builder.Property(e => e.WorkshopId).HasColumnName("workshop_id");
             builder.Property(e => e.Qty).HasColumnName("qty");
-            builder.Property(e => e.OperatorId).HasColumnName("operator_id");
-
-            builder.HasOne(e=>e.Production).WithMany().HasForeignKey(e=>e.ProductionId).HasConstraintName("production_id");
-            builder.HasOne(e=>e.Operator).WithMany().HasForeignKey(e=>e.OperatorId).HasConstraintName("operator_id");
-            builder.HasOne(e=>e.WorkShop).WithMany().HasForeignKey(e=>e.WorkShopId).HasConstraintName("work_shop_id");
+            
+            builder.HasOne(e=>e.Production).WithMany().HasForeignKey(e=>e.ProductionId).HasConstraintName("production_id");            
+            builder.HasOne(e=>e.Workshop).WithMany().HasForeignKey(e=>e.WorkshopId).HasConstraintName("workshop_id");
         }
     }
 

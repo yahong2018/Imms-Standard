@@ -125,14 +125,13 @@ create table rfid_card
   card_type      int                     not null,        --  卡类别: 0. 工艺数量   1. 员工卡
   card_status    int                     not null,        
   production_id  bigint                  not null,        -- （工艺数量卡）所代表的产品
-  operation_id   bigint                  null,            -- （工艺数量卡）所代表的工艺
+  workshop_id   bigint                   null,             -- （工艺数量卡）所代表的工艺
   qty            int                     null,            -- （工艺数量卡）数量
-  operator_id    bigint                  null,            -- （员工卡）   操作员
-
+  
   create_by      bigint                  not null,
   create_date    datetime                not null,
-  update_by      bigint                  not null,
-  update_date    datetime                not null,
+  update_by      bigint                  null,
+  update_date    datetime                null,
   opt_flag       int                     not null,
 
   PRIMARY KEY(record_id),

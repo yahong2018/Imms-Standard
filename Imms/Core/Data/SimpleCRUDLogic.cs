@@ -55,7 +55,7 @@ namespace Imms.Data
             dbContext.SaveChanges();
 
             this.AfterUpdate(item, dbContext);
-        }        
+        }
 
         public void Delete(long[] ids, DbContext dbContext)
         {
@@ -71,13 +71,17 @@ namespace Imms.Data
             this.AfterDelete(items, dbContext);
         }
 
-        public ExtJsResult GetAllWithWhole(string filterStr)
+        public ExtJsResult GetAllWithWhole(string filterStr, GetDataDelegate<T> afterGetDataHandler = null)
         {
             ExtJsResult result = new ExtJsResult();
             CommonRepository.UseDbContext(dbContext =>
             {
                 StringBuilder sql = BuildSelectSql(filterStr, -1, -1);
-                var list = dbContext.Set<T>().FromSql(sql.ToString());
+                var list = dbContext.Set<T>().FromSql(sql.ToString()).ToList();
+                if (afterGetDataHandler != null)
+                {
+                    afterGetDataHandler(list, dbContext);
+                }
                 result.total = list.Count();
                 result.RootProperty = list;
             });
@@ -118,13 +122,19 @@ namespace Imms.Data
             return sql;
         }
 
-        public ExtJsResult GetAllByPage(int page, int start, int limit, string filterStr)
+        public ExtJsResult GetAllByPage(int page, int start, int limit, string filterStr, GetDataDelegate<T> afterGetDataHandler = null)
         {
             ExtJsResult result = new ExtJsResult();
             CommonRepository.UseDbContext(dbContext =>
             {
                 StringBuilder selectBuilder = BuildSelectSql(filterStr, start, limit);
-                var list = this.DoGetData(selectBuilder.ToString(), dbContext).ToList();
+                string sql = selectBuilder.ToString();
+
+                List<T> list = this.DoGetData(sql, dbContext).ToList(); ;
+                if (afterGetDataHandler != null)
+                {
+                    afterGetDataHandler(list, dbContext);
+                }
 
                 StringBuilder countBuilder = BuildTotalCountSql(filterStr);
                 long count = (long)dbContext.Database.ExecuteSqlScalar(countBuilder.ToString());
@@ -148,4 +158,6 @@ namespace Imms.Data
             return dbContext.Set<T>().FromSql(sql).ToList();
         }
     }
+
+    public delegate void GetDataDelegate<T>(List<T> inputList, DbContext dbContext) where T : class, IEntity;
 }

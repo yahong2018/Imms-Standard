@@ -12,6 +12,7 @@ namespace Imms
     public abstract class SimpleCRUDController<T> : Controller where T : class, IEntity
     {
         protected SimpleCRUDLogic<T> Logic { get; set; }
+        protected GetDataDelegate<T> AfterGetDataHandler { get; set; }
 
         [Route("create"), HttpPost]
         public T Create(T item)
@@ -36,7 +37,7 @@ namespace Imms
         [Route("getAll"), HttpGet]
         public ExtJsResult GetAll()
         {
-            return this.DoGetAll();           
+            return this.DoGetAll();
         }
 
         protected virtual void Verify(T item, int operation) { }
@@ -53,11 +54,11 @@ namespace Imms
                 int start = int.Parse(query["start"][0]);
                 int limit = int.Parse(query["limit"][0]);
 
-                result = Logic.GetAllByPage(page, start, limit, filterStr);
+                result = Logic.GetAllByPage(page, start, limit, filterStr,this.AfterGetDataHandler);
             }
             else
             {
-                result = Logic.GetAllWithWhole(filterStr);
+                result = Logic.GetAllWithWhole(filterStr,this.AfterGetDataHandler);
             }
             return result;
         }
