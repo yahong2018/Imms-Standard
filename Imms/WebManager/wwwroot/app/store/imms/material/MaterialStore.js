@@ -4,9 +4,9 @@ Ext.define("app.store.imms.material.MaterialStore",{
     alias:'widget.app_store_imms_material_MaterialStore',
      
     dao:{
-        deleteUrl: '/imms/material/material/delete.handler',
-        insertUrl: '/imms/material/material/create.handler',
-        updateUrl: '/imms/material/material/update.handler',
-        selectUrl: '/imms/material/material/getAllByPage.handler',
+        deleteUrl: 'imms/material/material/delete',
+        insertUrl: 'imms/material/material/create',
+        updateUrl: 'imms/material/material/update',
+        selectUrl: 'imms/material/material/getAll',
     }
 });

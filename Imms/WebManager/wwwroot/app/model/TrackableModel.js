@@ -1,7 +1,6 @@
 Ext.define('app.model.TrackableModel', {
-    extend: 'Ext.data.Model',
-    requires: ["app.ux.ZhxhDate"],
-    uses:["app.model.EmptyGenerator"],
+    extend: 'app.model.EntityModel',
+    requires: ["app.ux.ZhxhDate"],    
     fields: [
         { name: "createBy", dbFieldName: 'CREATE_BY', type: "string" },
         { name: "createDate", dbFieldName: 'CREATE_DATE', type: 'zhxhDate', dateFormat: 'Y-m-d H:i:s' },

@@ -66,7 +66,7 @@ INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUE
 
 INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph)VALUES ('SYS03','SYS03', '生产管理', '', 2, '',  '', '0xf0ae');
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03', 'RUN', '运行');
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS03_01', 'SYS03_01', '产品管理', 'app.view.imms.mfc.production.Production', 1, '', 'SYS03', '0xf1d0');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS03_01', 'SYS03_01', '产品管理', 'app.view.imms.material.material.Material', 1, '', 'SYS03', '0xf1d0');
 INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS03_02', 'SYS03_02', '发卡管理', 'app.view.imms.mfc.rfidCard.RfidCard', 2, '', 'SYS03', '0xf2c3');
 INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS03_03', 'SYS03_03', '看板条码', 'app.view.imms.mfc.barcode.Barcode', 3, '', 'SYS03', '0xf02a');
 INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS03_04', 'SYS03_04', '生产计划', 'app.view.imms.mfc.productionOrder.ProducitonOrder', 4, '', 'SYS03', '0xf03a');

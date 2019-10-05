@@ -1,5 +1,5 @@
 Ext.define("app.model.imms.operator.OperatorModel",{
-    extend:"app.model.EntityModel",
+    extend:"app.model.TrackableModel",
     fields:[        
         { name: "workshopCode", dbFieldName: 'workshop_code', type: "string" },
         { name: "employeeId", dbFieldName: 'employee_id', type: "string" },
