@@ -16,13 +16,9 @@ namespace Imms.Security.Data
     {
         public static SystemUser GetCurrentUser()
         {
-            long userId = long.Parse(Imms.HttpContext.Current.User.Claims.First(x => x.Type == "UserId").Value);
-            SystemUser result=null;
-            CommonRepository.UseDbContext(dbContext =>
-            {
-                result = dbContext.Set<SystemUser>().First(x=>x.RecordId==userId);
-            });
-            return result;
+            string userString = Imms.HttpContext.Current.User.Claims.First(x => x.Type == "CurrentUser").Value;
+            SystemUser currentUser = userString.ToObject<SystemUser>();            
+            return currentUser;
         }
 
         public static void Login(string userCode, string password,Microsoft.AspNetCore.Http.HttpContext httpContext){
@@ -32,16 +28,22 @@ namespace Imms.Security.Data
 
         public static async void Login(SystemUser systemUser, Microsoft.AspNetCore.Http.HttpContext httpContext)
         {
-            var claims = new List<Claim>
+            // var claims = new List<Claim>
+            //     {
+            //         new Claim("UserId",systemUser.RecordId.ToString()),
+            //         new Claim("UserCode", systemUser.UserCode),
+            //         new Claim("UserName",systemUser.UserName)
+            //     };
+            // foreach (RoleUser roleUser in systemUser.Roles)
+            // {
+            //     claims.Add(new Claim("RoleCode", roleUser.Role.RoleCode));
+            // }
+            var claims = new List<Claim>{
                 {
-                    new Claim("UserId",systemUser.RecordId.ToString()),
-                    new Claim("UserCode", systemUser.UserCode),
-                    new Claim("UserName",systemUser.UserName)
-                };
-            foreach (RoleUser roleUser in systemUser.Roles)
-            {
-                claims.Add(new Claim("RoleCode", roleUser.Role.RoleCode));
-            }
+                    new Claim("CurrentUser",systemUser.ToJson())
+                }
+            };
+
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             ClaimsPrincipal user = new ClaimsPrincipal(claimsIdentity);
             await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, user);

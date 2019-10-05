@@ -1,18 +1,21 @@
 
+using Imms.Mes.Data;
 using Imms.Mes.Data.Domain;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Imms.WebManager.Controllers
 {
-    [Route("imms/opertor")]
+    [Route("imms/operator")]
     public class OperatorController : SimpleCRUDController<Operator>
     {
+        public OperatorController()=>this.Logic = new OperatorLogic();
+
         protected override void Verify(Operator item, int operation)
         {
-            Workstation workstation = Imms.Data.CommonRepository.GetOneByFilter<Workstation>(x => x.RecordId == item.OrganizationId);
-            if (workstation == null)
+            Workshop workshop = Imms.Data.CommonRepository.GetOneByFilter<Workshop>(x => x.OrganizationCode == item.WorkshopCode);
+            if (workshop == null)
             {
-                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_CUSTOM, "操作员所属工位错误!");
+                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_CUSTOM, "所属车间错误!");
             }
 
             if (string.IsNullOrEmpty(item.EmployeeId) || string.IsNullOrEmpty(item.EmployeeName) || string.IsNullOrEmpty(item.EmployeeCardNo))

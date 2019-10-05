@@ -1,9 +1,9 @@
 Ext.define("app.model.imms.operator.OperatorModel",{
     extend:"app.model.EntityModel",
     fields:[        
-        { name: "organizationId", dbFieldName: 'organization_id', type: "int" },
-        { name: "employeeId", dbFieldName: 'employee_id', type: "int" },
+        { name: "workshopCode", dbFieldName: 'workshop_code', type: "string" },
+        { name: "employeeId", dbFieldName: 'employee_id', type: "string" },
         { name: "employeeName", dbFieldName: 'employee_name', type: "string" },
-        { name: "EmployeeCardNo", dbFieldName: 'employee_card_no', type: "string" },
+        { name: "employeeCardNo", dbFieldName: 'employee_card_no', type: "string" },
     ]
 });

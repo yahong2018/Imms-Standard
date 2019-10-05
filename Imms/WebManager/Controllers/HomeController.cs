@@ -11,6 +11,7 @@ using Imms.Data;
 using Imms.Security.Data.Domain;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Imms.Security.Data;
 
 namespace Imms.WebManager.Controllers
 {
@@ -32,7 +33,7 @@ namespace Imms.WebManager.Controllers
         [Route("userMenu"), HttpGet]
         public List<SystemProgram> GetUserMenu()
         {
-            long userId = long.Parse(this.HttpContext.User.Claims.First(x => x.Type == "UserId").Value);
+            long userId = GlobalConstants.GetCurrentUser().RecordId;
             List<SystemProgram> programList = new List<SystemProgram>();
             CommonRepository.UseDbContext(dbContext =>
             {
@@ -68,9 +69,7 @@ namespace Imms.WebManager.Controllers
         [Route("currentLogin"), HttpGet]
         public ActionResult<string> GetCurrentLogin()
         {
-            string userCode = this.HttpContext.User.Claims.First(x => x.Type == "UserCode").Value;
-            string userName = this.HttpContext.User.Claims.First(x => x.Type == "UserName").Value;
-            long userId = long.Parse(this.HttpContext.User.Claims.First(x => x.Type == "UserId").Value);
+            SystemUser currentUser = (SystemUser) GlobalConstants.GetCurrentUser();
             string loginText = null;
 
             CommonRepository.UseDbContext(dbContext =>
@@ -81,7 +80,7 @@ namespace Imms.WebManager.Controllers
                     from r in dbContext.Set<SystemRole>()
                     where rp.RoleId == ur.RoleId
                        && r.RecordId == ur.RoleId
-                       && ur.UserId == userId
+                       && ur.UserId == currentUser.RecordId
                     select r
                 ).Distinct()
                 .SelectMany(x => x.Privileges).ToList();
@@ -89,8 +88,8 @@ namespace Imms.WebManager.Controllers
                 string privilegeText = GlobalConstants.ToJson(privilegeList);
 
                 loginText = "{\"company\":\"爱三(佛山)汽车配件有限公司\","
-                           + "\"userName\":\"" + userName + "\","
-                           + "\"userCode\":\"" + userCode + "\","
+                           + "\"userName\":\"" + currentUser.UserName + "\","
+                           + "\"userCode\":\"" + currentUser.UserCode + "\","
                            + "\"privielges\":" + privilegeText
                            + "}";
             });

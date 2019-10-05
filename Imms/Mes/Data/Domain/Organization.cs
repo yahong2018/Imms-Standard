@@ -10,7 +10,7 @@ namespace Imms.Mes.Data.Domain
 {
     public partial class Operator : TrackableEntity<long>
     {        
-        public long OrganizationId { get; set; }        
+        public string WorkshopCode { get; set; }        
         public string EmployeeId { get; set; }
         public string EmployeeName { get; set; }
         public string EmployeeCardNo { get; set; }
@@ -88,7 +88,7 @@ namespace Imms.Mes.Data.Domain
             builder.ToTable("operator");
             ImmsDbContext.RegisterEntityTable<Operator>("operator");
 
-            builder.Property(e => e.OrganizationId).HasColumnName("organization_id").HasColumnType("bigint(20)");
+            builder.Property(e => e.WorkshopCode).HasColumnName("workshop_code");
             builder.Property(e => e.EmployeeId).HasColumnName("employee_id");
             builder.Property(e => e.EmployeeName).HasColumnName("employee_name");
             builder.Property(e => e.EmployeeCardNo).HasColumnName("employee_card_no");

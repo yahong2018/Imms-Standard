@@ -38,9 +38,9 @@ INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUE
 INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph)VALUES ('SYS02','SYS02', '组织架构', '', 1, '', '', '0xf0e8');
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS02', 'RUN', '运行');
 
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS02_01', 'SYS02_01', '车间管理', 'app.view.imms.org.workshop.Workshop', 0, '',  'SYS02', '0xf1ad');
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS02_02', 'SYS02_02', '工位管理', 'app.view.imms.org.workstation.Workstation', 1, '', 'SYS02', '0xf239');
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS02_03', 'SYS02_03', '操作员管理', 'app.view.imms.org.operator.Operator',2, '', 'SYS02', '0xf2be');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS02_01', 'SYS02_01', '组织结构', 'app.view.imms.org.Organization', 0, '',  'SYS02', '0xf1ad');
+-- INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS02_02', 'SYS02_02', '工位管理', 'app.view.imms.org.workstation.Workstation', 1, '', 'SYS02', '0xf239');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS02_03', 'SYS02_03', '操作员管理', 'app.view.imms.operator.Operator',2, '', 'SYS02', '0xf2be');
 INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS02_04', 'SYS02_04', '工位机登录记录', 'app.view.imms.org.workstationLogin.WorkstationLogin',3, '', 'SYS02', '0xf090');
 
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS02_01', 'RUN', '运行');
@@ -48,10 +48,10 @@ INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUE
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS02_01', 'UPDATE', '修改');
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS02_01', 'DELETE', '删除');
 
-INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS02_02', 'RUN', '运行');
-INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS02_02', 'INSERT', '新增');
-INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS02_02', 'UPDATE', '修改');
-INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS02_02', 'DELETE', '删除');
+-- INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS02_02', 'RUN', '运行');
+-- INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS02_02', 'INSERT', '新增');
+-- INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS02_02', 'UPDATE', '修改');
+-- INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS02_02', 'DELETE', '删除');
 
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS02_03', 'RUN', '运行');
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS02_03', 'INSERT', '新增');
