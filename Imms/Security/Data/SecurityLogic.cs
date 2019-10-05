@@ -126,16 +126,21 @@ namespace Imms.Security.Data
         {
             CommonRepository.UseDbContextWithTransaction(dbContext =>
             {
-                string sql = "delete from " + ImmsDbContext.GetEntityTableName<RoleUser>() + " where user_id = @p0";
-                dbContext.Database.ExecuteSqlCommand(sql, userId);
-
-                foreach (RoleUser roleUser in roleUsers)
-                {
-                    dbContext.Set<RoleUser>().Add(roleUser);
-                }
-                dbContext.SaveChanges();
+                this.UpdateRoles(userId, roleUsers, dbContext);
             });
             return roleUsers.Length;
+        }
+
+        public void UpdateRoles(long userId, RoleUser[] roleUsers, DbContext dbContext)
+        {
+            string sql = "delete from " + ImmsDbContext.GetEntityTableName<RoleUser>() + " where user_id = @p0";
+            dbContext.Database.ExecuteSqlCommand(sql, userId);
+
+            foreach (RoleUser roleUser in roleUsers)
+            {
+                dbContext.Set<RoleUser>().Add(roleUser);
+            }
+            dbContext.SaveChanges();
         }
 
         public int ChangeUserPassword(long userId, string old,string pwd1,string pwd2){

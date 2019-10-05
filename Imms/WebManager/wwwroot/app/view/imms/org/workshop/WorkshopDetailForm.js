@@ -36,6 +36,7 @@ Ext.define("app.view.imms.org.workshop.WorkshopDetailForm", {
             displayField: "organizationName",
             store: Ext.create("Ext.data.Store", {
                 model: "app.model.imms.org.WorkshopModel",
+                autoLoad:false,
                 proxy: {
                     type: 'ajax',
                     url: 'imms/org/workshop/getAll',
@@ -51,5 +52,9 @@ Ext.define("app.view.imms.org.workshop.WorkshopDetailForm", {
             fieldLabel: "备注",
             width: 380
         }
-    ]
+    ],
+    onRecordLoad:function(config){
+        var store = this.down('[name="nextWorkshopId"]').store;
+        store.load();
+    }
 });

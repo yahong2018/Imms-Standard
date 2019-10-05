@@ -20,7 +20,6 @@ Ext.define('app.ux.dbgrid.DbGrid', {
 
     listeners: {
         rowdblclick: function (grid, rowindex, e) {
-            debugger;
             this.showDetailWindow(grid, rowindex, e);
         }
     }

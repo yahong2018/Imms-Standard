@@ -200,7 +200,17 @@ Ext.define("app.ux.data.DataOperation", {
         record = record[0];
         var detailWindow = this.createDetailWindow(app.ux.data.DataMode.BROWSE);
         detailWindow.title = this.detailWindowTitle;
+
         var form = detailWindow.getFormCmp();
+        if (form.onRecordLoad) {
+            form.onRecordLoad({
+                dataMode: app.ux.data.DataMode.BROWSE,
+                seq: app.ux.data.DataOperationSeq.BEFORE,
+                record: record,
+                grid: grid
+            });
+        }
+
         form.loadRecord(record);
         var idField = form.down('[name="' + record.getIdProperty() + '"]');
         if (idField) {

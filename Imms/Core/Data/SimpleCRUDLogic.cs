@@ -9,53 +9,66 @@ namespace Imms.Data
     {
         public T Create(T item)
         {
-            CommonRepository.UseDbContext(dbContext =>
+            CommonRepository.UseDbContextWithTransaction(dbContext =>
             {
-                VerifierFactory.Verify(dbContext, item, GlobalConstants.DML_OPERATION_INSERT);
-                this.BeforeInsert(item, dbContext);
-
-                dbContext.Set<T>().Add(item);
-                dbContext.SaveChanges();
-
-                this.AfterInsert(item, dbContext);
+                this.Create(item, dbContext);
             });
             return item;
         }
-
 
         public T Update(T item)
         {
-            CommonRepository.UseDbContext(dbContext =>
+            CommonRepository.UseDbContextWithTransaction(dbContext =>
             {
-                VerifierFactory.Verify(dbContext, item, GlobalConstants.DML_OPERATION_UPDATE);
-                this.BeforeUpdate(item, dbContext);
-
-                GlobalConstants.ModifyEntityStatus(item, dbContext);
-                dbContext.SaveChanges();
-
-                this.AfterUpdate(item, dbContext);
+                this.Update(item, dbContext);
             });
             return item;
         }
-
 
         public int Delete(long[] ids)
         {
             CommonRepository.UseDbContextWithTransaction(dbContext =>
             {
-                var items = dbContext.Set<T>().Where(x => ids.Contains((long)x.RecordId)).ToList();
-                this.BeforeDelete(items, dbContext);
-
-                foreach (var item in items)
-                {
-                    dbContext.Set<T>().Remove(item);
-                }
-                dbContext.SaveChanges();
-
-                this.AfterDelete(items, dbContext);
+                Delete(ids, dbContext);
             });
 
             return ids.Length;
+        }
+
+        public void Create(T item, DbContext dbContext)
+        {
+            VerifierFactory.Verify(dbContext, item, GlobalConstants.DML_OPERATION_INSERT);
+            this.BeforeInsert(item, dbContext);
+
+            dbContext.Set<T>().Add(item);
+            dbContext.SaveChanges();
+
+            this.AfterInsert(item, dbContext);
+        }
+
+        public void Update(T item, DbContext dbContext)
+        {
+            VerifierFactory.Verify(dbContext, item, GlobalConstants.DML_OPERATION_UPDATE);
+            this.BeforeUpdate(item, dbContext);
+
+            GlobalConstants.ModifyEntityStatus(item, dbContext);
+            dbContext.SaveChanges();
+
+            this.AfterUpdate(item, dbContext);
+        }        
+
+        public void Delete(long[] ids, DbContext dbContext)
+        {
+            var items = dbContext.Set<T>().Where(x => ids.Contains((long)x.RecordId)).ToList();
+            this.BeforeDelete(items, dbContext);
+
+            foreach (var item in items)
+            {
+                dbContext.Set<T>().Remove(item);
+            }
+            dbContext.SaveChanges();
+
+            this.AfterDelete(items, dbContext);
         }
 
         public ExtJsResult GetAllWithWhole(string filterStr)
