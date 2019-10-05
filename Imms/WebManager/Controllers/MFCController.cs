@@ -30,8 +30,14 @@ namespace Imms.WebManager.Controllers
         protected override void Verify(RfidCard item, int operation)
         {
             //
-            // 检查productionId和workshopId
+            // 检查productionId和workshopId 
             //
+        }
+
+        [Route("printBarCode")]
+        public IActionResult PrintBarCode()
+        {
+            return View("Imms/MFC/RfidCard/PrintBarCode");
         }
     }
 }

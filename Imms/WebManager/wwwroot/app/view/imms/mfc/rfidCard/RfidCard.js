@@ -21,18 +21,17 @@ Ext.define("app.view.imms.mfc.rfidCard.RfidCard", {
             text: '打印条码', privilege: "PRINT", handler: function () {
                 var grid = this.up("app_view_imms_mfc_rfidCard_RfidCard");
                 var records = grid.getSelectionModel().getSelection();
-                if(records.length==0){
-                    Ext.Msg.alert("系统提示","请先选定需要打印的Rfid卡！");
+                if (records.length == 0) {
+                    Ext.Msg.alert("系统提示", "请先选定需要打印的Rfid卡！");
                     return;
                 };
-                var idList =[];
-                for(var i=0;i<records.length;i++)                {
+                var idList = [];
+                for (var i = 0; i < records.length; i++) {
                     idList.push(records[i].get("recordId"));
                 }
                 var strIdList = idList.join(",");
-                debugger;
                 var encodedStr = Ext.util.Base64.encode(strIdList);
-                window.open("imms/mfc/printRfidCard?idList="+encodedStr,"_blank");
+                window.open("imms/mfc/rfidCard/printBarCode?idList=" + encodedStr, "_blank");
             }
         },
     ],
