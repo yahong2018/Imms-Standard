@@ -98,11 +98,36 @@ create table work_organization_unit
     primary key(record_id)
 );
 
-
-
 --
 -- 员工：就是操作员 operator
 --
+create table operator
+(
+    record_id              bigint    auto_increment    not null,
+    employee_id            varchar(20)                 not null,
+    employee_name          varchar(50)                 not null,
+    employee_card_no       varchar(20)                 not null,
+    
+    org_id                 bigint                      null,
+    org_code               varchar(50)                 null,
+    org_name               varchar(50)                 null,
+
+    create_by_id           bigint                      not null,
+    create_by_code         varchar(20)                 not null,
+    create_by_name         varchar(50)                 not null,
+    create_time            datetime                    not null,
+
+    update_by_id           bigint                      null,
+    update_by_code         varchar(20)                 null,
+    update_by_name         varchar(50)                 null,
+    update_time            datetime                    null,
+
+    opt_flag               int                         not null default 0,
+
+    primary key(record_id)
+);
+
+
 alter table operator
    add employee_id         varchar(12)   not null,   -- 工号
    add employee_name       varchar(50)   not null,   -- 姓名 

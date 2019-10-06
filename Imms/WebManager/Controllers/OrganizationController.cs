@@ -62,7 +62,7 @@ namespace Imms.WebManager.Controllers
 
         protected override void Verify(Operator item, int operation)
         {
-            Workshop workshop = Imms.Data.CommonRepository.GetOneByFilter<Workshop>(x => x.OrgCode == item.WorkshopCode);
+            Workshop workshop = Imms.Data.CommonRepository.GetOneByFilter<Workshop>(x => x.RecordId == item.orgId);
             if (workshop == null)
             {
                 throw new BusinessException(GlobalConstants.EXCEPTION_CODE_CUSTOM, "所属车间错误!");

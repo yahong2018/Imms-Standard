@@ -32,15 +32,17 @@ namespace Imms.Mes.Data.Domain
     }
 
     public partial class Operator : TrackableEntity<long>
-    {
-        public string WorkshopCode { get; set; }
+    {        
         public string EmployeeId { get; set; }
         public string EmployeeName { get; set; }
         public string EmployeeCardNo { get; set; }
 
+        public long orgId{get;set;}
+        public string orgCode { get; set; }
+        public string orgName{get;set;}
+
         public static readonly string ROLE_WORKSHOP_OPERATOR = "WORKSHOP_OPERATOR";
     }
-
     
 
     public class WorkstationLogin : Entity<long>
@@ -93,7 +95,9 @@ namespace Imms.Mes.Data.Domain
             builder.ToTable("operator");
             ImmsDbContext.RegisterEntityTable<Operator>("operator");
 
-            builder.Property(e => e.WorkshopCode).HasColumnName("workshop_code");
+            builder.Property(e => e.orgName).HasColumnName("org_name");
+            builder.Property(e => e.orgId).HasColumnName("org_id");
+            builder.Property(e => e.orgCode).HasColumnName("org_code");
             builder.Property(e => e.EmployeeId).HasColumnName("employee_id");
             builder.Property(e => e.EmployeeName).HasColumnName("employee_name");
             builder.Property(e => e.EmployeeCardNo).HasColumnName("employee_card_no");
