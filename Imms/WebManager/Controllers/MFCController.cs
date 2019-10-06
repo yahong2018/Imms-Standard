@@ -43,12 +43,12 @@ namespace Imms.WebManager.Controllers
                    {
                        x.Workshop.WorkshopCode,
                        x.RfidNo,
-                       x.Production.MaterialNo,
+                       MaterialNo=x.Production.MaterialCode,
                        x.Qty
                    }
                  ).ToList();
 
-                ViewBag.DataList = new List<System.Tuple<string, string, int,string>>();
+                ViewBag.DataList = new List<Tuple<string, string, int, string>>();
                 foreach (var item in dataList)
                 {
                     string json = item.ToJson();
@@ -56,7 +56,7 @@ namespace Imms.WebManager.Controllers
                     imgDataList.Add(base64String);
 
                     System.Tuple<string, string, int, string> tuple = Tuple.Create<string, string, int, string>(item.WorkshopCode, item.MaterialNo, item.Qty, item.RfidNo);
-                    ViewBag.DataList.Add(tuple);
+                    base.ViewBag.DataList.Add(tuple);
                 }
             });
 

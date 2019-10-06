@@ -127,12 +127,31 @@ create table operator
     primary key(record_id)
 );
 
+--
+-- 产品
+--
+create table material
+(
+    record_id              bigint     auto_increment   not null,
+    material_code          varchar(20)                 not null,
+    material_name          varchar(50)                 not null,
+    description            varchar(250)                null,
 
-alter table operator
-   add employee_id         varchar(12)   not null,   -- 工号
-   add employee_name       varchar(50)   not null,   -- 姓名 
-   add employee_card_no    varchar(20)   not null default ''         -- 工卡号
-;
+
+    create_by_id           bigint                      not null,
+    create_by_code         varchar(20)                 not null,
+    create_by_name         varchar(50)                 not null,
+    create_time            datetime                    not null,
+
+    update_by_id           bigint                      null,
+    update_by_code         varchar(20)                 null,
+    update_by_name         varchar(50)                 null,
+    update_time            datetime                    null,
+
+    opt_flag               int                         not null default 0,
+
+    primary key(record_id)
+);
 
 
 --

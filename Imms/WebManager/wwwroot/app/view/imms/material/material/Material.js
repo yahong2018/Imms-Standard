@@ -6,7 +6,7 @@ Ext.define("app.view.imms.material.material.Material", {
     uses: ["app.view.imms.material.material.MaterialDetailForm"],
 
     columns: [
-        { dataIndex: "materialNo", text: '产品编码', width: 100 },
+        { dataIndex: "materialCode", text: '产品编码', width: 150 },
         { dataIndex: "materialName", text: '产品名称', width: 150 },       
         { dataIndex: "description", text: '产品描述', flex:1 }
     ],

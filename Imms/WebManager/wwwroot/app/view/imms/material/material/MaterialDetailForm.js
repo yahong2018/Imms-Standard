@@ -1,5 +1,5 @@
 Ext.define("app.view.imms.material.material.MaterialDetailForm", {
-    extend: "Ext.form.FormPanel",
+    extend: "app.ux.TrackableFormPanel",
     xtype: "app_view_imms_material_material_MaterialDetailForm",
     padding:10,
     defaults: {
@@ -7,14 +7,10 @@ Ext.define("app.view.imms.material.material.MaterialDetailForm", {
     },
     items: [
         {
-            name:"recordId",
-            xtype:"hidden"
-        },
-        {
-            name: "materialNo",
+            name: "materialCode",
             fieldLabel: "产品编码",
             xtype: "textfield",
-            maxLength: 12,
+            maxLength: 20,
             allowBlank: false,
             enforceMaxLength: true,
             width: 380,
@@ -23,7 +19,7 @@ Ext.define("app.view.imms.material.material.MaterialDetailForm", {
             name: "materialName",
             fieldLabel: "产品名称",
             xtype: "textfield",
-            maxLength: 30,            
+            maxLength: 50,            
             allowBlank: false,
             enforceMaxLength: true,
             width: 380,
