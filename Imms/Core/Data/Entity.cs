@@ -132,20 +132,28 @@ namespace Imms.Data
 
     public interface ITrackableEntity
     {
-        long CreateBy { get; set; }
-        DateTime CreateDate { get; set; }
-        long? UpdateBy { get; set; }
-        DateTime? UpdateDate { get; set; }
+        long CreateById { get; set; }
+        string CreateByCode{get;set;}
+        string CreateByName{get;set;}
+        DateTime CreateTime { get; set; }
+        long? UpdateById { get; set; }
+        string UpdateByCode{get;set;}
+        string UpdateByName{get;set;}
+        DateTime? UpdateTime { get; set; }
         int OptFlag { get; set; }
     }
 
     public class TrackableEntity<T> : Entity<T>, ITrackableEntity where T : IComparable
     {
-        public long CreateBy { get; set; }
-        public DateTime CreateDate { get; set; }
-        public long? UpdateBy { get; set; }
-        public DateTime? UpdateDate { get; set; }
-        public int OptFlag { get; set; }
+        public long CreateById { get ; set; }
+        public string CreateByCode { get ; set ; }
+        public string CreateByName { get ; set ; }
+        public DateTime CreateTime { get ; set ; }
+        public long? UpdateById { get ; set ; }
+        public string UpdateByCode { get ; set ; }
+        public string UpdateByName { get ; set ; }
+        public DateTime? UpdateTime { get ; set ; }
+        public int OptFlag { get ; set ; }
     }
 
     public interface IOrderEntity
@@ -191,10 +199,16 @@ namespace Imms.Data
         {
             base.InternalConfigure(builder);
 
-            builder.Property(typeof(long), "CreateBy").HasColumnName("create_by");
-            builder.Property(typeof(DateTime), "CreateDate").HasColumnName("create_date");
-            builder.Property(typeof(long?), "UpdateBy").HasColumnName("update_by");
-            builder.Property(typeof(DateTime?), "UpdateDate").HasColumnName("update_date");
+            builder.Property(typeof(long), "CreateById").HasColumnName("create_by_id");
+            builder.Property(typeof(string),"CreateByCode").HasColumnName("create_by_code");
+            builder.Property(typeof(string),"CreateByName").HasColumnName("create_by_name");            
+            builder.Property(typeof(DateTime), "CreateTime").HasColumnName("create_time");
+
+            builder.Property(typeof(long?), "UpdateById").HasColumnName("update_by_id");
+            builder.Property(typeof(string),"UpdateByCode").HasColumnName("update_by_code");
+            builder.Property(typeof(string),"UpdateByName").HasColumnName("update_by_name");
+            builder.Property(typeof(DateTime?), "UpdateTime").HasColumnName("update_time");
+            
             builder.Property(typeof(int), "OptFlag").HasColumnName("opt_flag");
         }
     }

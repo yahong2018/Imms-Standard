@@ -64,11 +64,40 @@ from conterinfo
 --
 -- 组织
 --
-alter table work_organization_unit
-   add rfid_controller_id  int not null default 0,  -- 工位：控制器
-   add rfid_terminator_id  int not null default 0,  -- 工位：工位机的序号   
-   add next_workshop_id    bigint  not null default 0 -- 车间: 下一个车间
-;
+create table work_organization_unit
+(
+    record_id              bigint    auto_increment    not null,
+    org_code               varchar(50)                 not null,
+    org_name               varchar(50)                 not null,
+    org_type               varchar(50)                 not null,
+    description            varchar(250)                null,
+
+    parent_id              bigint                      not null default 0,
+    parent_code            varchar(50)                 not null default '',
+    parent_name            varchar(50)                 not null default '',
+
+    next_workshop_id       bigint                      not null default 0,
+    next_workshop_code     varchar(50)                 not null default '',
+    next_workshop_name     varchar(50)                 not null default '',
+
+    rfid_controller_id     int                         not null default 0,
+    rfid_terminator_id     int                         not null default 0,
+
+    create_by_id           bigint                      not null,
+    create_by_code         varchar(20)                 not null,
+    create_by_name         varchar(50)                 not null,
+    create_time            datetime                    not null,
+
+    update_by_id           bigint                      null,
+    update_by_code         varchar(20)                 null,
+    update_by_name         varchar(50)                 null,
+    update_time            datetime                    null,
+
+    opt_flag               int                         not null default 0,
+
+    primary key(record_id)
+);
+
 
 
 --

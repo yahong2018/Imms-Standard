@@ -54,7 +54,7 @@ Ext.define("app.store.StoreOperation", {
     },
 
     addFixedFilter: function (filter) {
-        this.fixedFilter.push("(" + filter + ")");
+        this.fixedFilter.push(filter);
     },
 
     clearCustomerFilter: function () {
@@ -62,7 +62,7 @@ Ext.define("app.store.StoreOperation", {
     },
 
     addCustomFilter: function (filter) {
-        this.customerFilter.push("(" + filter + ")");
+        this.customerFilter.push(filter);
     },
 
     buildFilterUrl: function () {
@@ -75,10 +75,7 @@ Ext.define("app.store.StoreOperation", {
             this.getProxy().url = url;
             return;
         }
-        var filter = allFilters[0];
-        if (allFilters.length > 1) {
-            filter = allFilters.join(" and ");
-        }
+        var filter = JSON.stringify(allFilters);
         if (url.indexOf("?") == -1) {
             url += "?";
         }

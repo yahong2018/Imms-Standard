@@ -12,10 +12,18 @@ Ext.define("app.view.imms.org.workstation.WorkstationDetailForm", {
             name: 'recordId',
             xtype: 'hidden',
         }, {
-            name: "parentOrganizationId",
+            name: "parentId",
             xtype: "hidden"
-        }, {
-            name: "organizationCode",
+        },{
+            name: "parentCode",
+            xtype: "hidden"
+        },
+        {
+            name: "parentName",
+            xtype: "hidden"
+        },
+         {
+            name: "orgCode",
             xtype: "textfield",
             fieldLabel: "工位代码",
             allowBlank: false,
@@ -23,7 +31,7 @@ Ext.define("app.view.imms.org.workstation.WorkstationDetailForm", {
             enforceMaxLength: true,
             width: 180
         }, {
-            name: "organizationName",
+            name: "orgName",
             xtype: "textfield",
             fieldLabel: "工位名称",
             allowBlank: false,
@@ -59,7 +67,9 @@ Ext.define("app.view.imms.org.workstation.WorkstationDetailForm", {
             var record = config.record;
             var grid = config.grid;
             
-            record.set("parentOrganizationId", grid.store.workshop.get("recordId"));
+            record.set("parentId", grid.store.workshop.get("recordId"));
+            record.set("parentCode", grid.store.workshop.get("orgCode"));
+            record.set("parentName", grid.store.workshop.get("orgName"));
         }
     }
 });

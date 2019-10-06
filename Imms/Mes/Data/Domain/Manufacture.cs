@@ -169,8 +169,8 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.ProductionId).HasColumnName("production_id");
             builder.Property(e => e.WorkshopId).HasColumnName("workshop_id").HasColumnType("bigint(20)");
             builder.Property(e => e.QtyPlanned).HasColumnName("qty_planned").HasColumnType("int(11)");            
-            builder.Property(e => e.QtyGood).HasColumnName("qty_finished").HasColumnType("int(11)");
-            builder.Property(e => e.QtyBad).HasColumnName("qty_second_quality").HasColumnType("int(11)");            
+            builder.Property(e => e.QtyGood).HasColumnName("qty_good").HasColumnType("int(11)");
+            builder.Property(e => e.QtyBad).HasColumnName("qty_bad").HasColumnType("int(11)");            
 
             builder.HasOne(e => e.Production).WithMany().HasForeignKey(e => e.ProductionId).HasConstraintName("production_id");
             builder.HasOne(e => e.Workshop).WithMany().HasForeignKey(e => e.WorkshopId).HasConstraintName("workshop_id");

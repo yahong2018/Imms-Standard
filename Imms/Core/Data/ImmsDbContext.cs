@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Imms.Data.Domain;
+using Imms.Security.Data.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -120,15 +121,20 @@ namespace Imms.Data
                 return;
 
             ITrackableEntity trackableEntity = entry.Entity as ITrackableEntity;
+            SystemUser currentUser = GlobalConstants.GetCurrentUser();
             if (entry.State == EntityState.Added)
             {
-                trackableEntity.CreateBy = GlobalConstants.GetCurrentUser().RecordId;
-                trackableEntity.CreateDate = DateTime.Now;
+                trackableEntity.CreateById = currentUser.RecordId;
+                trackableEntity.CreateByCode = currentUser.UserCode;
+                trackableEntity.CreateByName = currentUser.UserName;
+                trackableEntity.CreateTime = DateTime.Now;                
             }
             else if (entry.State == EntityState.Modified)
             {
-                trackableEntity.UpdateBy = GlobalConstants.GetCurrentUser().RecordId;
-                trackableEntity.UpdateDate = DateTime.Now;
+                trackableEntity.UpdateById = currentUser.RecordId;
+                trackableEntity.UpdateByCode = currentUser.UserCode;
+                trackableEntity.UpdateByName = currentUser.UserName;
+                trackableEntity.UpdateTime = DateTime.Now;
             }
         }
 

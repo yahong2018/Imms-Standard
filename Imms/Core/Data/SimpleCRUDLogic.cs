@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 
@@ -71,77 +72,80 @@ namespace Imms.Data
             this.AfterDelete(items, dbContext);
         }
 
-        public ExtJsResult GetAllWithWhole(string filterStr, GetDataDelegate<T> afterGetDataHandler = null)
+
+        public ExtJsResult GetAll(int page, int start, int limit, string filterStr, GetDataSourceDelegate<T> getDataSourceHandler = null, FilterDataSourceDelegate<T> filterHandler = null)
         {
+            FilterExpression[] filterList = filterStr.ToObject<FilterExpression[]>();
+            return this.GetAll(page,start, limit, filterList, getDataSourceHandler, filterHandler);
+        }
+
+        public ExtJsResult GetAll(int page,int start, int limit, FilterExpression[] filterList, GetDataSourceDelegate<T> getDataSourceHandler = null, FilterDataSourceDelegate<T> filterHandler = null)
+        {
+            GetDataSourceDelegate<T> getDataSource = getDataSourceHandler;
+            if (getDataSource == null)
+            {
+                getDataSource = this.GetDataSource;
+            }
+            FilterDataSourceDelegate<T> filter = filterHandler;
+            if (filter == null)
+            {
+                filter = this.FilterDataSource;
+            }
+
             ExtJsResult result = new ExtJsResult();
             CommonRepository.UseDbContext(dbContext =>
             {
-                StringBuilder sql = BuildSelectSql(filterStr, -1, -1);
-                var list = dbContext.Set<T>().FromSql(sql.ToString()).ToList();
-                if (afterGetDataHandler != null)
+                IQueryable<T> dataSource = filter(getDataSource(dbContext), filterList);
+                if (start > 0)
                 {
-                    afterGetDataHandler(list, dbContext);
+                    dataSource = dataSource.Skip(start);
                 }
-                result.total = list.Count();
+                if (limit > 0)
+                {
+                    dataSource = dataSource.Take(limit);
+                }
+                List<T> list = dataSource.ToList();
+                int count = 0;
+                if (filterList != null && filterList.Length > 0)
+                {
+                    count = this.FilterDataSource(this.GetDataSource(dbContext), filterList).Count();
+                }
+                else
+                {
+                    count = list.Count;
+                }
+
                 result.RootProperty = list;
+                result.total = count;
             });
             return result;
         }
 
-        private static StringBuilder BuildSelectSql(string filterStr, int start, int limit)
+        protected virtual IQueryable<T> GetDataSource(DbContext dbContext)
         {
-            StringBuilder sql = new StringBuilder("select * from " + ImmsDbContext.GetEntityTableName<T>());
-            if (!string.IsNullOrEmpty(filterStr) || start != -1)
-            {
-                if (!string.IsNullOrEmpty(filterStr))
-                {
-                    sql.Append(" where ").Append(filterStr);
-                }
-
-                if (start != -1)
-                {
-                    sql.Append(" limit ").Append(start);
-                }
-                if (limit != -1)
-                {
-                    sql.Append(",").Append(limit);
-                }
-            }
-
-            return sql;
+            return dbContext.Set<T>();
         }
 
-        private static StringBuilder BuildTotalCountSql(string filterStr)
+        protected virtual IQueryable<T> FilterDataSource(IQueryable<T> query, FilterExpression[] expressions)
         {
-            StringBuilder sql = new StringBuilder("select count(*) from " + ImmsDbContext.GetEntityTableName<T>());
-            if (!string.IsNullOrEmpty(filterStr))
+            if (expressions != null)
             {
-                sql.Append(" where ").Append(filterStr);
-            }
+                string whereString = this.BuildWhereString(expressions);
+                string[] values = expressions.Select(x => x.R).ToArray();
 
-            return sql;
+                return query.Where(whereString, values);
+            }
+            return query;
         }
 
-        public ExtJsResult GetAllByPage(int page, int start, int limit, string filterStr, GetDataDelegate<T> afterGetDataHandler = null)
+        private string BuildWhereString(FilterExpression[] filterList)
         {
-            ExtJsResult result = new ExtJsResult();
-            CommonRepository.UseDbContext(dbContext =>
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (FilterExpression filter in filterList)
             {
-                StringBuilder selectBuilder = BuildSelectSql(filterStr, start, limit);
-                string sql = selectBuilder.ToString();
-
-                List<T> list = this.DoGetData(sql, dbContext).ToList(); ;
-                if (afterGetDataHandler != null)
-                {
-                    afterGetDataHandler(list, dbContext);
-                }
-
-                StringBuilder countBuilder = BuildTotalCountSql(filterStr);
-                long count = (long)dbContext.Database.ExecuteSqlScalar(countBuilder.ToString());
-                result.total = (int)count;
-                result.RootProperty = list;
-            });
-            return result;
+                stringBuilder.Append(filter.ToWhereString());
+            }
+            return stringBuilder.ToString();
         }
 
         protected virtual void BeforeInsert(T item, DbContext dbContext) { }
@@ -159,5 +163,24 @@ namespace Imms.Data
         }
     }
 
-    public delegate void GetDataDelegate<T>(List<T> inputList, DbContext dbContext) where T : class, IEntity;
+    public class FilterExpression
+    {
+        public string L { get; set; }
+        public string O { get; set; }
+        public string R { get; set; }
+        public string J { get; set; }
+
+        public string ToWhereString()
+        {
+            if ("like" == this.O)
+            {
+                return $" {this.J} ({this.L}.contains(@0))";
+            }
+
+            return $" {this.J} ({this.L} {this.O} @0)";
+        }
+    }
+
+    public delegate IQueryable<T> GetDataSourceDelegate<T>(DbContext dbContext) where T : class, IEntity;
+    public delegate IQueryable<T> FilterDataSourceDelegate<T>(IQueryable<T> query, FilterExpression[] expressions) where T : class, IEntity;
 }

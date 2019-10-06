@@ -97,7 +97,7 @@ namespace Imms.WebManager
                 item.qty_plan = 100;
                 if (date.Hour > this.hours[i] && date.Hour != this.hours[0])
                 {
-                    var dbItem = allList.Where(x=>x.CreateDate.Hour+1 == this.hours[i]);
+                    var dbItem = allList.Where(x=>x.CreateTime.Hour+1 == this.hours[i]);
                     item.qty_good = dbItem.Select(x=>x.GoodQty).Sum(); 
                     item.qty_bad = dbItem.Select(x=>x.BadQty).Sum();
                 }

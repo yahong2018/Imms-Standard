@@ -12,7 +12,8 @@ namespace Imms
     public abstract class SimpleCRUDController<T> : Controller where T : class, IEntity
     {
         protected SimpleCRUDLogic<T> Logic { get; set; }
-        protected GetDataDelegate<T> AfterGetDataHandler { get; set; }
+        protected GetDataSourceDelegate<T> GetDataSourceHandler { get; set; }
+        protected FilterDataSourceDelegate<T> FilterDataSourceHandler { get; set; }
 
         [Route("create"), HttpPost]
         public T Create(T item)
@@ -37,37 +38,29 @@ namespace Imms
         [Route("getAll"), HttpGet]
         public ExtJsResult GetAll()
         {
-            return this.DoGetAll();
-        }
+            int page = -1, start = -1, limit = -1;
 
-        protected virtual void Verify(T item, int operation) { }
+            IQueryCollection query = this.HttpContext.Request.Query;
+            if (query.ContainsKey("page"))
+            {
+                int.TryParse(query["page"][0], out page);
+            }
+            if (query.ContainsKey("start"))
+            {
+                int.TryParse(query["start"][0], out start);
+            }
+            if (query.ContainsKey("limit"))
+            {
+                int.TryParse(query["limit"][0], out limit);
+            }
 
-        protected virtual ExtJsResult DoGetAll()
-        {
             string filterStr = this.GetFilterString();
-            ExtJsResult result = null;
-            if (IsGetByPage())
-            {
-                IQueryCollection query = this.HttpContext.Request.Query;
+            ExtJsResult result = Logic.GetAll(page, start, limit, filterStr,this.GetDataSourceHandler,this.FilterDataSourceHandler);
 
-                int page = int.Parse(query["page"][0]);
-                int start = int.Parse(query["start"][0]);
-                int limit = int.Parse(query["limit"][0]);
-
-                result = Logic.GetAllByPage(page, start, limit, filterStr,this.AfterGetDataHandler);
-            }
-            else
-            {
-                result = Logic.GetAllWithWhole(filterStr,this.AfterGetDataHandler);
-            }
             return result;
         }
 
-        protected virtual bool IsGetByPage()
-        {
-            IQueryCollection query = this.HttpContext.Request.Query;
-            return query.ContainsKey("page") && query.ContainsKey("start") && query.ContainsKey("limit");
-        }
+        protected virtual void Verify(T item, int operation) { }
 
         protected virtual string GetFilterString()
         {

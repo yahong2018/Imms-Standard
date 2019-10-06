@@ -58,8 +58,8 @@ namespace Imms.WebManager
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            GlobalConstants.DbContextFactory = new DbContextFactory();
 
+            GlobalConstants.DbContextFactory = new DbContextFactory();
             ImmsDbContext.RegisterModelBuilders(new Imms.Security.Data.SecurityModelBuilder());
             ImmsDbContext.RegisterModelBuilders(new Imms.Mes.Data.MesModelBuilder());
 

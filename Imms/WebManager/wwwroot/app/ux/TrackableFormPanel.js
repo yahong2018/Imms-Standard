@@ -3,29 +3,50 @@ Ext.define('app.ux.TrackableFormPanel', {
     alias: "widget.app_ux_TrackableFormPanel",
 
     constructor: function (config) {
-        var configBase = {
-            items: [{
-                xtype: "hidden",
-                name: "createBy",
-            }, {
-                xtype: "hidden",
-                name: "createDate",
-            }, {
-                xtype: "hidden",
-                name: "updateBy",
-            }, {
-                xtype: "hidden",
-                name: "updateDate",
-            }, {
-                xtype: "hidden",
-                name: "optLock",
-            }, {
-                xtype: "hidden",
-                name: "delFlag",
-            }]
-        };
+        var tempItems = [{
+            name: 'recordId',
+            xtype: 'hidden',
+        }, {
+            xtype: "hidden",
+            name: "createById",
+        }, {
+            xtype: "hidden",
+            name: "createByCode",
+        }, {
+            xtype: "hidden",
+            name: "createByName",
+        }, {
+            xtype: "hidden",
+            name: "createTime",
+        }, {
+            xtype: "hidden",
+            name: "updateById",
+        }, {
+            xtype: "hidden",
+            name: "updateByCode",
+        }, {
+            xtype: "hidden",
+            name: "updateByName",
+        }, {
+            xtype: "hidden",
+            name: "updateTime",
+        }, {
+            xtype: "hidden",
+            name: "optFlag",
+        }];
 
-        Ext.applyIf(config,configBase);
+        for (var i = 0; i < tempItems.length; i++) {
+            var exists = false;
+            for (var j = 0; j < this.items.length; j++) {
+                if (tempItems[i].name == this.items[j].name) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                this.items.push(tempItems[i]);
+            }
+        }
 
         this.callParent(arguments);
     }

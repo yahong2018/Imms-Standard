@@ -25,19 +25,6 @@ namespace Imms.WebManager.Controllers
                 throw new BusinessException(GlobalConstants.EXCEPTION_CODE_PARAMETER_INVALID, "下一车间不可以与本车间等同！");
             }
         }
-
-        protected override ExtJsResult DoGetAll(){
-            ExtJsResult result = base.DoGetAll();
-            List<Workshop> workshopList = (List<Workshop>) result.RootProperty;
-            CommonRepository.UseDbContext(dbContext=>{
-                var dbList = dbContext.Set<Workshop>().ToList();
-                foreach(Workshop workshop in workshopList){
-                    workshop.NextWorkshop = dbList.FirstOrDefault(x=>x.RecordId == workshop.NextWorkshopId);                    
-                }
-            });
-
-            return result;
-        }
     }
 
     [Route("imms/org/workstation")]
@@ -56,9 +43,35 @@ namespace Imms.WebManager.Controllers
             int page = int.Parse(query["page"][0]);
             int start = int.Parse(query["start"][0]);
             int limit = int.Parse(query["limit"][0]);
-            string filterStr = "parent_organization_id = " + workshopId;
-            ExtJsResult result = Logic.GetAllByPage(page, start, limit, filterStr);
+            FilterExpression expression = new FilterExpression()
+            {
+                L = "parentId",
+                O = "=",
+                R = workshopId.ToString()
+            };
+
+            ExtJsResult result = Logic.GetAll(page, start, limit, new FilterExpression[] { expression });
             return result;
+        }
+    }
+
+    [Route("imms/org/operator")]
+    public class OperatorController : SimpleCRUDController<Operator>
+    {
+        public OperatorController() => this.Logic = new OperatorLogic();
+
+        protected override void Verify(Operator item, int operation)
+        {
+            Workshop workshop = Imms.Data.CommonRepository.GetOneByFilter<Workshop>(x => x.OrgCode == item.WorkshopCode);
+            if (workshop == null)
+            {
+                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_CUSTOM, "所属车间错误!");
+            }
+
+            if (string.IsNullOrEmpty(item.EmployeeId) || string.IsNullOrEmpty(item.EmployeeName) || string.IsNullOrEmpty(item.EmployeeCardNo))
+            {
+                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_CUSTOM, "工号、姓名、工卡号都必须输入!");
+            }
         }
     }
 }

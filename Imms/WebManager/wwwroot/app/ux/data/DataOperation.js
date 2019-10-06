@@ -239,8 +239,7 @@ Ext.define("app.ux.data.DataOperation", {
     },
 
     doSearch: function (column, operator, value) {
-        var grid = this;
-        var expr = "";
+        var grid = this;        
         grid.getStore().clearCustomerFilter();        
         if (column != null && operator != null && value != '' && value != null) {
             var model = grid.store.getModel();
@@ -256,33 +255,8 @@ Ext.define("app.ux.data.DataOperation", {
             if (field == null) {
                 return;
             }
-            if (field.dbFieldName != null) {
-                fieldName = field.dbFieldName;
-            }
-
-            expr = fieldName + ' ' + operator.get('abbr');
-            var fieldType = field.type;
-            if (fieldType == 'string' || fieldType == 'date') {
-                expr = expr + "'"+ value + "'";
-            } else {
-                expr = expr + value;
-            }            
-            grid.getStore().addCustomFilter(expr);
-
-            // expr = Ext.util.Base64.encode(expr);
-            // expr = 'filterExpr=' + expr;
+            grid.getStore().addCustomFilter({ L: field.name, O: operator.get('abbr'), R: value });
         }
-        /*
-        if (grid.getStore().getProxy().DefaultUrl == null) {
-            grid.getStore().getProxy().DefaultUrl = grid.getStore().getProxy().url;
-        }
-        var url = grid.getStore().getProxy().DefaultUrl;
-        if (url.indexOf("?") == -1) {
-            url += "?";
-        }
-        url += expr;
-        grid.getStore().getProxy().url = url;
-        */
 
         grid.getStore().buildFilterUrl();
         grid.getStore().loadPage(1);

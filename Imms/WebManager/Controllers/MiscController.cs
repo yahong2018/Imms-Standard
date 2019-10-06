@@ -7,7 +7,7 @@ namespace Imms.WebManager.Controllers
 {   
     public class BarCodeController : Controller
     {
-        [Route("qrcode/create")]
+        [Route("misc/qrcode/create")]
         public void GetQRCode(string base64Content, int pixel)
         {
             Response.ContentType = "image/jpeg";

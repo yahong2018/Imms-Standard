@@ -8,29 +8,22 @@ using System.Text;
 
 namespace Imms.Mes.Data.Domain
 {
-    public partial class Operator : TrackableEntity<long>
-    {        
-        public string WorkshopCode { get; set; }        
-        public string EmployeeId { get; set; }
-        public string EmployeeName { get; set; }
-        public string EmployeeCardNo { get; set; }
-
-        public static readonly string ROLE_WORKSHOP_OPERATOR="WORKSHOP_OPERATOR";
-    }
-
     public class Workshop : WorkOrganizationUnit
     {
-        public string WorkshopCode { get { return base.OrganizationCode; } set { base.OrganizationCode = value; } }
-        public string WorkshopName { get { return base.OrganizationName; } set { base.OrganizationName = value; } }
+        public string WorkshopCode { get { return base.OrgCode; } set { base.OrgCode = value; } }
+        public string WorkshopName { get { return base.OrgName; } set { base.OrgName = value; } }
 
         public long NextWorkshopId { get; set; }
+        public string NextWorkshopCode { get; set; }
+        public string NextWorkshopName { get; set; }
+
         public virtual Workshop NextWorkshop { get; set; }
     }
 
     public class Workstation : WorkOrganizationUnit
     {
-        public string WorkStaitonCode { get { return base.OrganizationCode; } set { base.OrganizationCode = value; } }
-        public string WorkStationName { get { return base.OrganizationName; } set { base.OrganizationName = value; } }
+        public string WorkStaitonCode { get { return base.OrgCode; } set { base.OrgCode = value; } }
+        public string WorkStationName { get { return base.OrgName; } set { base.OrgName = value; } }
 
         public int RfidControllerId { get; set; }
         public int RfidTerminatorId { get; set; }
@@ -38,21 +31,33 @@ namespace Imms.Mes.Data.Domain
         public virtual RfidController RfidController { get; set; }
     }
 
-    public class WorkstationLogin:Entity<long>
+    public partial class Operator : TrackableEntity<long>
     {
-        public int RfidTerminatorId{get;set;}
-        public int RfidControllerGroupId{ get; set; }
-        public string RfidCardNo{ get; set; }
-        public DateTime LoginTime{ get; set; }
-        public int RfidControllerId{ get; set; }
-        public long WorkstationId{ get; set; }
-        public long RfidCardId{ get; set; }
-        public long OperatorId{ get; set; }
+        public string WorkshopCode { get; set; }
+        public string EmployeeId { get; set; }
+        public string EmployeeName { get; set; }
+        public string EmployeeCardNo { get; set; }
 
-        public virtual RfidCard RfidCard{get;set;}
-        public virtual Operator Operator{get;set;}
-        public virtual Workstation WorkStation{get;set;}
-        public virtual RfidController RfidController{get;set;}
+        public static readonly string ROLE_WORKSHOP_OPERATOR = "WORKSHOP_OPERATOR";
+    }
+
+    
+
+    public class WorkstationLogin : Entity<long>
+    {
+        public int RfidTerminatorId { get; set; }
+        public int RfidControllerGroupId { get; set; }
+        public string RfidCardNo { get; set; }
+        public DateTime LoginTime { get; set; }
+        public int RfidControllerId { get; set; }
+        public long WorkstationId { get; set; }
+        public long RfidCardId { get; set; }
+        public long OperatorId { get; set; }
+
+        public virtual RfidCard RfidCard { get; set; }
+        public virtual Operator Operator { get; set; }
+        public virtual Workstation WorkStation { get; set; }
+        public virtual RfidController RfidController { get; set; }
     }
 
     public class WorkstationLoginConfigure : TrackableEntityConfigure<WorkstationLogin>
@@ -72,10 +77,10 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.RfidCardId).HasColumnName("rfid_card_id");
             builder.Property(e => e.OperatorId).HasColumnName("operator_id");
 
-            builder.HasOne(e=>e.RfidCard).WithMany().HasForeignKey(e=>e.RfidCardId).HasConstraintName("rfid_card_id");
-            builder.HasOne(e=>e.Operator).WithMany().HasForeignKey(e=>e.OperatorId).HasConstraintName("operator_id");
-            builder.HasOne(e=>e.WorkStation).WithMany().HasForeignKey(e=>e.WorkstationId).HasConstraintName("workstation_id");
-            builder.HasOne(e=>e.RfidController).WithMany().HasForeignKey(e=>e.RfidControllerId).HasConstraintName("rfid_controller_id");
+            builder.HasOne(e => e.RfidCard).WithMany().HasForeignKey(e => e.RfidCardId).HasConstraintName("rfid_card_id");
+            builder.HasOne(e => e.Operator).WithMany().HasForeignKey(e => e.OperatorId).HasConstraintName("operator_id");
+            builder.HasOne(e => e.WorkStation).WithMany().HasForeignKey(e => e.WorkstationId).HasConstraintName("workstation_id");
+            builder.HasOne(e => e.RfidController).WithMany().HasForeignKey(e => e.RfidControllerId).HasConstraintName("rfid_controller_id");
         }
     }
 
@@ -104,7 +109,10 @@ namespace Imms.Mes.Data.Domain
             builder.Ignore(e => e.WorkshopName);
 
             builder.Property(e => e.NextWorkshopId).HasColumnName("next_workshop_id");
-            builder.HasOne(e=>e.NextWorkshop).WithMany().HasForeignKey(e => e.NextWorkshopId).HasConstraintName("next_workshop_id");
+            builder.Property(e=>e.NextWorkshopCode).HasColumnName("next_workshop_code");
+            builder.Property(e=>e.NextWorkshopName).HasColumnName("next_workshop_name");
+
+            builder.HasOne(e => e.NextWorkshop).WithMany().HasForeignKey(e => e.NextWorkshopId).HasConstraintName("next_workshop_id");
         }
     }
 
@@ -127,7 +135,7 @@ namespace Imms.Mes.Data.Domain
     {
         public void Configure(EntityTypeBuilder<WorkOrganizationUnit> builder)
         {
-            builder.HasDiscriminator("organization_type", typeof(string))
+            builder.HasDiscriminator("org_type", typeof(string))
                .HasValue<Workstation>(GlobalConstants.TYPE_ORG_WORK_STATETION)
                .HasValue<Workshop>(GlobalConstants.TYPE_ORG_WORK_SHOP)
                ;

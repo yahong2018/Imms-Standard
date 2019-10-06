@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Imms.Data;
+using Imms.Security.Data.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Newtonsoft.Json;
@@ -39,7 +40,7 @@ namespace Imms
 
         //组织机构类型
         public const string TYPE_ORG_PLANT = "ORG_PLANT";   // 工厂
-        public const string TYPE_ORG_WORK_SHOP="ORG_WORK_SHOP"; //车间
+        public const string TYPE_ORG_WORK_SHOP = "ORG_WORK_SHOP"; //车间
         public const string TYPE_ORG_WORK_CENTER = "ORG_WORK_CENTER";  //工作中心
         public const string TYPE_ORG_WORK_LINE = "ORG_WORK_LINE";      // 生产线
         public const string TYPE_ORG_WORK_STATETION = "ORG_WORK_STATION";  //工作站
@@ -64,7 +65,7 @@ namespace Imms
         public static Imms.Data.IDbContextFactory DbContextFactory = null;
         public static Logger DefaultLogger = new Logger();
 
-        public static void ModifyEntityStatus<T>(T item, DbContext dbContext) where T : class,IEntity
+        public static void ModifyEntityStatus<T>(T item, DbContext dbContext) where T : class, IEntity
         {
             T old = dbContext.Set<T>().Find(item.RecordId);
             dbContext.Entry<T>(old).CurrentValues.SetValues(item);
@@ -85,7 +86,7 @@ namespace Imms
                 DEFAULT_ENCODING = System.Text.Encoding.GetEncoding(DEFAULT_CHARSET);
             }
 
-            JsonConvert.DefaultSettings = ()=> new JsonSerializerSettings()
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings()
             {
                 ContractResolver = new DefaultContractResolver
                 {
@@ -108,8 +109,13 @@ namespace Imms
         //
         //反序列化
         //
-        public static T ToObject<T>(this string jsonStr)
+        public static T ToObject<T>(this string jsonStr) where T : class
         {
+            if (string.IsNullOrEmpty(jsonStr))
+            {
+                return null;
+            }
+
             T result = JsonConvert.DeserializeObject<T>(jsonStr);
 
             return result;
@@ -130,20 +136,22 @@ namespace Imms
         //
         public static T LoadBeanFromFile<T>(this string fileName)
         {
-            string gstJson = System.IO.File.ReadAllText(fileName);           
+            string gstJson = System.IO.File.ReadAllText(fileName);
             T result = JsonConvert.DeserializeObject<T>(gstJson);
             return result;
         }
 
         public static GetCurrentUserHandler GetCurrentUserDelegate;
 
-        public static Imms.Data.Entity<long> GetCurrentUser(){
-            if(GetCurrentUserDelegate!=null){
+        public static SystemUser GetCurrentUser()
+        {
+            if (GetCurrentUserDelegate != null)
+            {
                 return GetCurrentUserDelegate();
             }
             return null;
         }
     }
 
-    public delegate Imms.Data.Entity<long> GetCurrentUserHandler();
+    public delegate SystemUser GetCurrentUserHandler();
 }
