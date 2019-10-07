@@ -41,9 +41,11 @@ namespace Imms.WebManager.Controllers
                  (x =>
                    new
                    {
-                       x.Workshop.WorkshopCode,
+                       x.WorkshopCode,
+                       x.WorkshopName,
+                       x.ProductionCode,                       
+                       x.ProductionName,
                        x.RfidNo,
-                       MaterialNo=x.Production.MaterialCode,
                        x.Qty
                    }
                  ).ToList();
@@ -55,7 +57,8 @@ namespace Imms.WebManager.Controllers
                     string base64String = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(json), Base64FormattingOptions.None);
                     imgDataList.Add(base64String);
 
-                    System.Tuple<string, string, int, string> tuple = Tuple.Create<string, string, int, string>(item.WorkshopCode, item.MaterialNo, item.Qty, item.RfidNo);
+                    System.Tuple<string, string, int, string> tuple = Tuple.Create<string, string, int, string>
+                            (item.WorkshopName+"("+item.WorkshopCode+")",item.ProductionName+"("+ item.ProductionCode+")", item.Qty, item.RfidNo);
                     base.ViewBag.DataList.Add(tuple);
                 }
             });

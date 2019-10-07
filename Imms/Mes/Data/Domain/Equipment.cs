@@ -34,8 +34,15 @@ namespace Imms.Mes.Data.Domain
         public string RfidNo{get;set;}
         public int CardType{get;set;}
         public int CardStatus{get;set;}
+
+        public long ProductionId { get; set; }
+        public string ProductionCode{get;set;}
+        public string ProductionName{get;set;}
+
         public long WorkshopId{get;set;}
-        public long ProductionId {get;set;}
+        public string WorkshopCode{get;set;}
+        public string WorkshopName{get;set;}
+        
         public int Qty{get;set;}        
 
         public virtual Material Production{get;set;}        
@@ -54,8 +61,15 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.RfidNo).HasColumnName("rfid_no");
             builder.Property(e => e.CardType).HasColumnName("card_type");
             builder.Property(e => e.CardStatus).HasColumnName("card_status");
+
             builder.Property(e => e.ProductionId).HasColumnName("production_id");
+            builder.Property(e => e.ProductionCode).HasColumnName("production_code");
+            builder.Property(e => e.ProductionName).HasColumnName("production_name");
+
             builder.Property(e => e.WorkshopId).HasColumnName("workshop_id");
+            builder.Property(e => e.WorkshopCode).HasColumnName("workshop_code");
+            builder.Property(e => e.WorkshopName).HasColumnName("workshop_name");
+
             builder.Property(e => e.Qty).HasColumnName("qty");
             
             builder.HasOne(e=>e.Production).WithMany().HasForeignKey(e=>e.ProductionId).HasConstraintName("production_id");            

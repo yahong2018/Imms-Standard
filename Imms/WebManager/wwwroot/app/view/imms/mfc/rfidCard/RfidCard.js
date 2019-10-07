@@ -9,10 +9,10 @@ Ext.define("app.view.imms.mfc.rfidCard.RfidCard", {
     columns: [
         { dataIndex: "rfidNo", text: '卡号', width: 100 },
         // { dataIndex: "cardStatus", text: '状态', width: 100 },
-        { dataIndex: "workshopCode", text: '车间编号', width: 100, disableSearch: true },
-        { dataIndex: "workshopName", text: '车间名称', width: 100, disableSearch: true },
-        { dataIndex: "productionCode", text: '产品编号', width: 100, disableSearch: true },
-        { dataIndex: "productionName", text: '产品名称', width: 100, disableSearch: true },
+        { dataIndex: "workshopCode", text: '车间编号', width: 100 },
+        { dataIndex: "workshopName", text: '车间名称', width: 100 },
+        { dataIndex: "productionCode", text: '产品编号', width: 150 },
+        { dataIndex: "productionName", text: '产品名称', width: 150 },
         { dataIndex: "qty", text: '数量', width: 100 },
     ],
     additionToolbarItems: [

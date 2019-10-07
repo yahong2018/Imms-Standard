@@ -1,5 +1,5 @@
 Ext.define("app.view.imms.mfc.rfidCard.RfidCardDetailForm", {
-    extend: "Ext.form.Panel",
+    extend: "app.ux.TrackableFormPanel",
     xtype: "imms_mfc_rfidCard_RfidCardDetailForm",
     padding: 10,
     defaults: {
@@ -7,7 +7,11 @@ Ext.define("app.view.imms.mfc.rfidCard.RfidCardDetailForm", {
     },
     items: [
         {
-            name: "recordId",
+            name:"workshopCode",
+            xtype:"hidden"
+        },
+        {
+            name: "workshopName",
             xtype: "hidden"
         },
         {
@@ -17,9 +21,27 @@ Ext.define("app.view.imms.mfc.rfidCard.RfidCardDetailForm", {
             allowBlank: false,
             width: 380,
             valueField: "recordId",
-            displayField: "organizationName",
-            store: Ext.create("app.store.imms.org.WorkshopStore", { autoLoad: false })
+            displayField: "orgName",
+            store: Ext.create("app.store.imms.org.WorkshopStore", { autoLoad: false }),
+            listeners: {
+                change: function (self, newValue, oldValue, eOpts) {
+                    var record = self.getSelectedRecord();
+                    var form = self.up("imms_mfc_rfidCard_RfidCardDetailForm");
+                    var orgCode = form.down("[name='workshopCode']");
+                    var orgName = form.down("[name='workshopName']");
+                    orgCode.setValue(record.get("orgCode"));
+                    orgName.setValue(record.get("orgName"));
+                }
+            }
         },
+        {
+            name: "productionCode", 
+            xtype: "hidden"
+        },
+        {
+            name: "productionName",
+            xtype: "hidden"
+        },        
         {
             name: "productionId",
             xtype: "combobox",
@@ -28,7 +50,18 @@ Ext.define("app.view.imms.mfc.rfidCard.RfidCardDetailForm", {
             width: 380,
             valueField: "recordId",
             displayField: "materialName",
-            store: Ext.create("app.store.imms.material.MaterialStore", { autoLoad: false })
+            store: Ext.create("app.store.imms.material.MaterialStore", { autoLoad: false }),
+            listeners: {
+                change: function (self, newValue, oldValue, eOpts) {
+
+                    var record = self.getSelectedRecord();
+                    var form = self.up("imms_mfc_rfidCard_RfidCardDetailForm");
+                    var productionCode = form.down("[name='productionCode']");
+                    var productionName = form.down("[name='productionName']");
+                    productionCode.setValue(record.get("materialCode"));
+                    productionName.setValue(record.get("materialName"));
+                }
+            }
         },
         {
             name: "qty",

@@ -15,8 +15,8 @@
             margin-top: 15px;
             margin-left:30px;
             padding-left:10px;
-            height: 130px;
-            width: 480px;
+            height: 150px;
+            width: 520px;
             position: relative;
             border: 1px dashed black;
         }
@@ -29,15 +29,15 @@
         .barcode {
             position: absolute;
             top: 50%;
-            margin-top: -47px;
+            margin-top: -57px;
         }
 
         .lablel {
-            width: 320px;
+            width: 400px;
             position: absolute;
             top: 50%;
             margin-top: -50px;
-            left: 120px;
+            left: 150px;
         }
     </style>
 </head>
@@ -47,7 +47,7 @@
         <div class="container" style="float:left;">
             <div class="left">
                 <img class="barcode"
-                    src='qrcode/create?base64Content=@ViewBag.BarcodeDataList[i]&pixel=2'>
+                    src='misc/qrcode/create?base64Content=@ViewBag.BarcodeDataList[i]&pixel=2'>
             </div>
             <div class="lablel">
                 <div>车间：@ViewBag.DataList[i].Item1</div>
@@ -61,7 +61,7 @@
             <div class="container" style="float:left;">
                 <div class="left">
                     <img class="barcode"
-                        src='qrcode/create?base64Content=@ViewBag.BarcodeDataList[i+1]&pixel=2'>
+                        src='misc/qrcode/create?base64Content=@ViewBag.BarcodeDataList[i+1]&pixel=2'>
                 </div>
                 <div class="lablel">
                     <div>车间：@ViewBag.DataList[i+1].Item1</div>

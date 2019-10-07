@@ -153,6 +153,44 @@ create table material
     primary key(record_id)
 );
 
+--
+-- 发卡管理
+--    本表不可以修改，只可以新增，如果已经被使用，则不可以删除。
+--
+create table rfid_card
+(
+    record_id              bigint  auto_increment      not null,
+            
+    rfid_no                varchar(20)                 not null,
+    card_type              int                         not null,       --  卡类别: 0. 工艺数量   1. 员工卡
+    card_status            int                         not null,        
+
+    production_id          bigint                      not null,       -- （工艺数量卡）所代表的产品
+    production_code        varchar(20)                 not null,
+    production_name        varchar(50)                 not null,
+
+    workshop_id            bigint                      not null,       -- （工艺数量卡）所代表的工艺
+    workshop_code          varchar(20)                 not null,  
+    workshop_name          varchar(50)                 not null,
+
+    qty                    int                         null,            -- （工艺数量卡）数量
+  
+    create_by_id           bigint                      not null,
+    create_by_code         varchar(20)                 not null,
+    create_by_name         varchar(50)                 not null,
+    create_time            datetime                    not null,
+
+    update_by_id           bigint                      null,
+    update_by_code         varchar(20)                 null,
+    update_by_name         varchar(50)                 null,
+    update_time            datetime                    null,
+    
+    opt_flag               int                         not null default 0,
+
+  PRIMARY KEY(record_id)
+);
+
+
 
 --
 -- 员工在工位机上的登录表
@@ -182,36 +220,6 @@ create table Workstation_login
 );
 
 
-
---
--- 产品 ： 就是物料
---
-
---
--- 发卡管理
---    本表不可以修改，只可以新增，如果已经被使用，则不可以删除。
---
-create table rfid_card
-(
-  record_id      bigint  auto_increment  not null,
-  rfid_no        varchar(20)             not null,
-  card_type      int                     not null,        --  卡类别: 0. 工艺数量   1. 员工卡
-  card_status    int                     not null,        
-  production_id  bigint                  not null,        -- （工艺数量卡）所代表的产品
-  workshop_id   bigint                   null,             -- （工艺数量卡）所代表的工艺
-  qty            int                     null,            -- （工艺数量卡）数量
-  
-  create_by      bigint                  not null,
-  create_date    datetime                not null,
-  update_by      bigint                  null,
-  update_date    datetime                null,
-  opt_flag       int                     not null,
-
-  PRIMARY KEY(record_id),
-  index IDX_RFID_CARD_0(rfid_no),
-  index IDX_RFID_CARD_1(card_type),
-  index IDX_RFID_CARD_2(card_status)       
-);
 
 --
 -- 生产计划: 就用produciton_order表
