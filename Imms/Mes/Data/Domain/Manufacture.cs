@@ -13,16 +13,18 @@ namespace Imms.Mes.Data.Domain
         public string ProductionCode { get; set; }
         public string ProductionName { get; set; }
 
-        public long WorkshopId { get; set; }
-        public string WorkshopCode { get; set; }
-        public string WorkshopName { get; set; }
+        // public long WorkshopId { get; set; }
+        // public string WorkshopCode { get; set; }
+        // public string WorkshopName { get; set; }
+
+        public DateTime PlanProductDate { get; set; }  //计划生产日期
 
         public int QtyPlanned { get; set; }
         public int QtyGood { get; set; }
         public int QtyBad { get; set; }
 
         public virtual Material Production { get; set; }
-        public virtual Workshop Workshop { get; set; }
+        // public virtual Workshop Workshop { get; set; }
         public virtual List<QualityCheck> QualityChecks { get; set; } = new List<QualityCheck>();
         public virtual List<ProductionOrderProgress> Progresses { get; set; } = new List<ProductionOrderProgress>();
     }
@@ -212,16 +214,18 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.ProductionCode).HasColumnName("production_code");
             builder.Property(e => e.ProductionName).HasColumnName("production_name");
 
-            builder.Property(e => e.WorkshopId).HasColumnName("workshop_id").HasColumnType("bigint(20)");
-            builder.Property(e => e.WorkshopCode).HasColumnName("workshop_code");
-            builder.Property(e => e.WorkshopName).HasColumnName("workshop_name");
+            // builder.Property(e => e.WorkshopId).HasColumnName("workshop_id").HasColumnType("bigint(20)");
+            // builder.Property(e => e.WorkshopCode).HasColumnName("workshop_code");
+            // builder.Property(e => e.WorkshopName).HasColumnName("workshop_name");
+
+            builder.Property(e => e.PlanProductDate).HasColumnName("plan_product_date");
 
             builder.Property(e => e.QtyPlanned).HasColumnName("qty_planned").HasColumnType("int(11)");
             builder.Property(e => e.QtyGood).HasColumnName("qty_good").HasColumnType("int(11)");
             builder.Property(e => e.QtyBad).HasColumnName("qty_bad").HasColumnType("int(11)");
 
             builder.HasOne(e => e.Production).WithMany().HasForeignKey(e => e.ProductionId).HasConstraintName("production_id");
-            builder.HasOne(e => e.Workshop).WithMany().HasForeignKey(e => e.WorkshopId).HasConstraintName("workshop_id");
+            // builder.HasOne(e => e.Workshop).WithMany().HasForeignKey(e => e.WorkshopId).HasConstraintName("workshop_id");
             builder.HasMany(e => e.QualityChecks).WithOne(e => e.ProductionOrder).HasForeignKey(e => e.ProductionOrderId).HasConstraintName("production_order_id");
             builder.HasMany(e => e.Progresses).WithOne(e => e.ProductionOrder).HasForeignKey(e => e.ProductionOrderId).HasConstraintName("production_order_id");
         }

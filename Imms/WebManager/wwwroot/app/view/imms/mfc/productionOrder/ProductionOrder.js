@@ -9,9 +9,11 @@ Ext.define("app.view.imms.mfc.productionOrder.ProductionOrder",{
         { dataIndex: "orderStatus", text: '状态', width: 150 },
         { dataIndex: "productionCode", text: '产品编号', width: 150 },
         { dataIndex: "productionName", text: '产品名称', width: 150 },
-        { dataIndex: "workshopCode", text: '车间编号', width: 150 },
-        { dataIndex: "workshopName", text: '车间名称', width: 150 },
 
+        // { dataIndex: "workshopCode", text: '车间编号', width: 150 },
+        // { dataIndex: "workshopName", text: '车间名称', width: 150 },
+
+        { dataIndex: "planProductDate", text: '计划生产日期', width: 150 },
         { dataIndex: "qtyPlanned", text: '计划数量', width: 150 },
         { dataIndex: "qtyGood", text: '完工数', width: 150 },
         { dataIndex: "qtyBad", text: '次品数', width: 150 },                

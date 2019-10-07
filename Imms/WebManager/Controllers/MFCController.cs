@@ -106,7 +106,7 @@ namespace Imms.WebManager.Controllers
                 throw new BusinessException(GlobalConstants.EXCEPTION_CODE_DATA_NOT_FOUND, $"工位代码为{item.WorkstationCode}的工位资料不存在！");
             }
             item.WorkstationId = workstation.RecordId;
-            item.WorkstationCode = workstation.OrgName;     
+            item.WorkstationName = workstation.OrgName;     
         }
     }
 }

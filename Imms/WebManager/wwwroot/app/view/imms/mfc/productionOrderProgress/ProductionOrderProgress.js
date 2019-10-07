@@ -4,6 +4,7 @@ Ext.define("app.view.imms.mfc.productionOrderProgress.ProductionOrderProgress", 
     requires: ["app.model.imms.mfc.ProductionOrderProgressModel", "app.store.imms.mfc.ProductionOrderProgressStore",
         "app.model.imms.mfc.RfidCardModel", "app.store.imms.mfc.RfidCardStore",
         "app.model.imms.org.WorkstationModel", "app.store.imms.org.WorkstationStore",
+        "app.model.imms.org.WorkshopModel", "app.store.imms.org.WorkshopStore",
         "app.model.imms.material.MaterialModel", "app.store.imms.material.MaterialStore",
         "app.model.imms.org.OperatorModel", "app.store.imms.org.OperatorStore",
         "app.model.imms.mfc.ProductionOrderModel", "app.store.imms.mfc.ProductionOrderStore"

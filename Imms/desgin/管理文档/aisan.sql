@@ -204,9 +204,11 @@ create table production_order
     production_code        varchar(20)                 not null,
     production_name        varchar(50)                 not null,
 
-    workshop_id            bigint                      not null,
-    workshop_code          varchar(20)                 not null,
-    workshop_name          varchar(50)                 not null,
+    -- workshop_id            bigint                      not null,
+    -- workshop_code          varchar(20)                 not null,
+    -- workshop_name          varchar(50)                 not null,
+
+    plan_product_date      datetime                    not null,
 
     qty_planned            int                         not null,
     qty_good               int                         null,
