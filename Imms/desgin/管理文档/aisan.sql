@@ -190,6 +190,43 @@ create table rfid_card
   PRIMARY KEY(record_id)
 );
 
+--
+-- 生产计划: 就用produciton_order表
+--
+create table production_order
+(
+    record_id              bigint  auto_increment      not null,
+
+    order_no               varchar(20)                 not null,
+    order_status           int                         not null,
+
+    production_id          bigint                      not null,
+    production_code        varchar(20)                 not null,
+    production_name        varchar(50)                 not null,
+
+    workshop_id            bigint                      not null,
+    workshop_code          varchar(20)                 not null,
+    workshop_name          varchar(50)                 not null,
+
+    qty_planned            int                         not null,
+    qty_good               int                         null,
+    qty_bad                int                         null,
+
+    create_by_id           bigint                      not null,
+    create_by_code         varchar(20)                 not null,
+    create_by_name         varchar(50)                 not null,
+    create_time            datetime                    not null,
+
+    update_by_id           bigint                      null,
+    update_by_code         varchar(20)                 null,
+    update_by_name         varchar(50)                 null,
+    update_time            datetime                    null,
+    
+    opt_flag               int                         not null default 0,
+
+    primary key(record_id)
+);
+
 
 
 --
@@ -221,9 +258,7 @@ create table Workstation_login
 
 
 
---
--- 生产计划: 就用produciton_order表
---
+
 
 --
 -- 生产实绩: production_order_progress

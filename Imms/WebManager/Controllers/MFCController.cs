@@ -43,7 +43,7 @@ namespace Imms.WebManager.Controllers
                    {
                        x.WorkshopCode,
                        x.WorkshopName,
-                       x.ProductionCode,                       
+                       x.ProductionCode,
                        x.ProductionName,
                        x.RfidNo,
                        x.Qty
@@ -58,7 +58,7 @@ namespace Imms.WebManager.Controllers
                     imgDataList.Add(base64String);
 
                     System.Tuple<string, string, int, string> tuple = Tuple.Create<string, string, int, string>
-                            (item.WorkshopName+"("+item.WorkshopCode+")",item.ProductionName+"("+ item.ProductionCode+")", item.Qty, item.RfidNo);
+                            (item.WorkshopName + "(" + item.WorkshopCode + ")", item.ProductionName + "(" + item.ProductionCode + ")", item.Qty, item.RfidNo);
                     base.ViewBag.DataList.Add(tuple);
                 }
             });
@@ -67,5 +67,11 @@ namespace Imms.WebManager.Controllers
 
             return View("Imms/MFC/RfidCard/PrintBarCode");
         }
+    }
+
+    [Route("imms/mfc/productionOrder")]
+    public class ProductionOrderController : SimpleCRUDController<ProductionOrder>
+    {
+        public ProductionOrderController() => this.Logic = new SimpleCRUDLogic<ProductionOrder>();
     }
 }
