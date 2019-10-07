@@ -10,16 +10,16 @@ namespace Imms.Mes.Data.Domain
     public partial class ProductionOrder : OrderEntity<long>
     {
         public long ProductionId { get; set; }
-        public string ProductionCode{get;set;}
-        public string ProductionName{get;set;}
+        public string ProductionCode { get; set; }
+        public string ProductionName { get; set; }
 
         public long WorkshopId { get; set; }
-        public string WorkshopCode{get;set;}
-        public string WorkshopName{get;set;}
+        public string WorkshopCode { get; set; }
+        public string WorkshopName { get; set; }
 
         public int QtyPlanned { get; set; }
         public int QtyGood { get; set; }
-        public int QtyBad { get; set; }        
+        public int QtyBad { get; set; }
 
         public virtual Material Production { get; set; }
         public virtual Workshop Workshop { get; set; }
@@ -30,17 +30,36 @@ namespace Imms.Mes.Data.Domain
     public class ProductionOrderProgress : TrackableEntity<long>
     {
         public long ProductionOrderId { get; set; }
-        public long OperationId { get; set; }
+        public string ProductionOrderNo { get; set; }
+
+        public long WorkshopId { get; set; }
+        public string WorkshopCode { get; set; }
+        public string WorkshopName { get; set; }
+
+        public long WorkstationId { get; set; }
+        public string WorkstationCode { get; set; }
+        public string WorkstationName { get; set; }
+
+        public long ProductionId { get; set; }
+        public string ProductionCode { get; set; }
+        public string ProductionName { get; set; }
+
         public long RfidTerminatorId { get; set; }
         public long RfidControllerId { get; set; }
-        public long ProductionId { get; set; }
+
         public DateTime ReportTime { get; set; }
-        public int GoodQty { get; set; }
-        public int BadQty { get; set; }
+        public int ReportQty { get; set; }
         public string RfidCardNo { get; set; }
         public int ReportType { get; set; }
-        public long WorkstationId { get; set; }
-        public long WorkshopId { get; set; }
+
+        public int GoodQty { get; set; }
+        public int BadQty { get; set; }
+
+        public long OperatorId { get; set; }
+        public string EmployeeId { get; set; }
+        public string EmployeeName { get; set; }
+
+        public string Remark { get; set; }
 
         public virtual Material Production { get; set; }
         public virtual Workstation Workstation { get; set; }
@@ -146,17 +165,34 @@ namespace Imms.Mes.Data.Domain
             ImmsDbContext.RegisterEntityTable<ProductionOrder>("production_order_progress");
 
             builder.Property(e => e.ProductionOrderId).HasColumnName("production_order_id");
-            builder.Property(e => e.OperationId).HasColumnName("operation_id");
+            builder.Property(e => e.ProductionOrderNo).HasColumnName("production_order_no");
+
+            builder.Property(e => e.WorkshopId).HasColumnName("workshop_id");
+            builder.Property(e => e.WorkshopCode).HasColumnName("workshop_code");
+            builder.Property(e => e.WorkshopName).HasColumnName("workshop_name");
+
+            builder.Property(e => e.WorkstationId).HasColumnName("workstation_id");
+            builder.Property(e => e.WorkstationCode).HasColumnName("workstation_code");
+            builder.Property(e => e.WorkstationName).HasColumnName("workstation_name");
+
+            builder.Property(e => e.ProductionId).HasColumnName("production_id");
+            builder.Property(e => e.ProductionCode).HasColumnName("production_code");
+            builder.Property(e => e.ProductionName).HasColumnName("production_name");
+
             builder.Property(e => e.RfidTerminatorId).HasColumnName("rfid_terminator_id");
             builder.Property(e => e.RfidControllerId).HasColumnName("rfid_controller_id");
-            builder.Property(e => e.ProductionId).HasColumnName("production_id");
+
             builder.Property(e => e.ReportTime).HasColumnName("report_time");
-            builder.Property(e => e.GoodQty).HasColumnName("good_qty");
-            builder.Property(e => e.BadQty).HasColumnName("bad_qty");
+            builder.Property(e => e.ReportQty).HasColumnName("report_qty");
             builder.Property(e => e.RfidCardNo).HasColumnName("rfid_card_no");
             builder.Property(e => e.ReportType).HasColumnName("report_type");
-            builder.Property(e => e.WorkstationId).HasColumnName("workstation_id");
-            builder.Property(e => e.WorkshopId).HasColumnName("workshop_id");
+
+            builder.Property(e => e.GoodQty).HasColumnName("good_qty");
+            builder.Property(e => e.BadQty).HasColumnName("bad_qty");
+
+            builder.Property(e => e.OperatorId).HasColumnName("operator_id");
+            builder.Property(e => e.EmployeeId).HasColumnName("employee_id");
+            builder.Property(e => e.EmployeeName).HasColumnName("employee_name");
 
             builder.HasOne(e => e.Production).WithMany().HasForeignKey(e => e.ProductionId).HasConstraintName("production_id");
             builder.HasOne(e => e.Workstation).WithMany().HasForeignKey(e => e.WorkstationId).HasConstraintName("workstation_id");
@@ -180,9 +216,9 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.WorkshopCode).HasColumnName("workshop_code");
             builder.Property(e => e.WorkshopName).HasColumnName("workshop_name");
 
-            builder.Property(e => e.QtyPlanned).HasColumnName("qty_planned").HasColumnType("int(11)");            
+            builder.Property(e => e.QtyPlanned).HasColumnName("qty_planned").HasColumnType("int(11)");
             builder.Property(e => e.QtyGood).HasColumnName("qty_good").HasColumnType("int(11)");
-            builder.Property(e => e.QtyBad).HasColumnName("qty_bad").HasColumnType("int(11)");            
+            builder.Property(e => e.QtyBad).HasColumnName("qty_bad").HasColumnType("int(11)");
 
             builder.HasOne(e => e.Production).WithMany().HasForeignKey(e => e.ProductionId).HasConstraintName("production_id");
             builder.HasOne(e => e.Workshop).WithMany().HasForeignKey(e => e.WorkshopId).HasConstraintName("workshop_id");

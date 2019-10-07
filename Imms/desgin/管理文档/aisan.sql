@@ -228,6 +228,61 @@ create table production_order
 );
 
 
+--
+-- 生产实绩: production_order_progress
+--
+create table production_order_progress
+(
+    record_id              bigint   auto_increment   not null,
+
+    production_order_id    bigint                    not null,
+    production_order_no    varchar(20)               not null,
+
+    workshop_id            bigint                    not null, -- 车间Id
+    workshop_code          varchar(20)               not null,
+    workshop_name          varchar(50)               not null,
+
+    workstation_id         bigint                    not null, -- 工位Id
+    workstation_code       varchar(20)               not null,
+    workstation_name       varchar(50)               not null,
+
+    production_id          bigint                    not null, -- 产品编号
+    produciton_code        varchar(20)               not null,
+    production_name        varchar(50)               not null,
+
+    rfid_terminator_id     int                       not null, -- 机器号
+    rfid_controller_id     int                       not null, -- 组号
+    
+    report_time            datetime                  not null, -- 报告时间
+    report_qty             int                       not null, -- 数量
+    rfid_card_no           varchar(20)               not null default '', -- RFID卡号，如果是尾数，则为空
+    report_type            int                       not null, -- 数量类型：0. 整数刷卡申报  1.尾数       
+
+    good_qty               int                       not null,
+    bad_qty                int                       not null,
+
+    operator_id            bigint                    not null,
+    employee_id            varchar(20)               not null,
+    employee_name          varchar(50)               not null,
+
+    remark                 varchar(250)              null,
+
+    create_by_id           bigint                    not null,
+    create_by_code         varchar(20)               not null,
+    create_by_name         varchar(50)               not null,
+    create_time            datetime                  not null,
+
+    update_by_id           bigint                    null,
+    update_by_code         varchar(20)               null,
+    update_by_name         varchar(50)               null,
+    update_time            datetime                  null,
+    
+    opt_flag               int                       not null default 0,
+    
+    primary key(record_id)
+);
+
+
 
 --
 -- 员工在工位机上的登录表
@@ -260,41 +315,6 @@ create table Workstation_login
 
 
 
---
--- 生产实绩: production_order_progress
---
-create table production_order_progress
-(
-    record_id      bigint   auto_increment   not null,
-    production_order_id  bigint              not null,
-    operation_id   bigint                    not null,
-    rfid_terminator_id int                   not null, -- 机器号
-    rfid_controller_id int                   not null, -- 组号
-    production_id  bigint                    not null, -- 产品编号
-    report_time    datetime                  not null, -- 报告时间
-    report_qty     int                       not null, -- 数量
-    rfid_card_no   varchar(20)               not null default '', -- RFID卡号，如果是尾数，则为空
-    report_type    int                       not null, -- 数量类型：0. 整数刷卡申报  1.尾数
-    workstation_id bigint                   not null, -- 工位Id
-    workshop_id  bigint                     not null, -- 车间Id
-
-
-    create_by      bigint                  not null,
-    create_date    datetime                not null,
-    update_by      bigint                  not null,
-    update_date    datetime                not null,
-    opt_flag       int                     not null,    
-    
-    PRIMARY KEY(record_id),
-    index idx_production_order_progress_0(production_order_id),
-    index idx_production_order_progress_1(operation_id),
-    index idx_production_order_progress_2(rfid_terminator_id),
-    index idx_production_order_progress_3(rfid_controller_id),
-    index idx_production_order_progress_4(production_id),
-    index idx_production_order_progress_5(rfid_card_no),
-    index idx_production_order_progress_6(workstation_id),
-    index idx_production_order_progress_7(workshop_id)
-);
 
 --
 -- 交接记录: production_moving

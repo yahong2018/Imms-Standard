@@ -19,7 +19,7 @@ namespace Imms.WebManager.Controllers
         protected override void Verify(RfidCard item, int operation)
         {
             //
-            // 检查productionId和workshopId 
+            // 验证Production、Workshop
             //
         }
 
@@ -73,5 +73,11 @@ namespace Imms.WebManager.Controllers
     public class ProductionOrderController : SimpleCRUDController<ProductionOrder>
     {
         public ProductionOrderController() => this.Logic = new SimpleCRUDLogic<ProductionOrder>();
+    }
+
+    [Route("imms/mfc/productionOrderProgress")]
+    public class ProductionOrderProgressController : SimpleCRUDController<ProductionOrderProgress>
+    {
+        public ProductionOrderProgressController() => this.Logic = new SimpleCRUDLogic<ProductionOrderProgress>();
     }
 }
