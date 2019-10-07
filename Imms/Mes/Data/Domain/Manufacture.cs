@@ -95,22 +95,34 @@ namespace Imms.Mes.Data.Domain
 
     public class ProductionMoving : TrackableEntity<long>
     {
-        public string RfidNo { get; set; }
+        public long ProductionOrderId { get; set; }
+        public string ProductionOrderNo { get; set; }
+
+        public long ProductionId { get; set; }
+        public string ProductionCode { get; set; }
+        public string ProductionName { get; set; }
+
         public long RfidCardId { get; set; }
+        public string RfidNo { get; set; }
+
         public int RfidTerminatorId { get; set; }
         public int RfidControllerGroupId { get; set; }
 
-        public long ProductionOrderId { get; set; }
-        public long ProductionId { get; set; }
         public int Qty { get; set; }
 
         public long OperatorId { get; set; }
+        public string EmployeeId { get; set; }
+        public string EmployeeName { get; set; }
+
         public DateTime MovingTime { get; set; }
 
         public long WorkstationId { get; set; }
+        public string WorkstationCode { get; set; }
+        public string WorkstationName { get; set; }
+
         public long WorkshopId { get; set; }
-        public long PrevWorkshopId { get; set; }
-        public long PrevWorkstationId { get; set; }
+        public string WorkshopCode { get; set; }
+        public string WorkshopName { get; set; }
 
         public long PrevProgressRecordId { get; set; }
 
@@ -130,22 +142,34 @@ namespace Imms.Mes.Data.Domain
             builder.ToTable("production_moving");
             ImmsDbContext.RegisterEntityTable<ProductionOrder>("production_moving");
 
-            builder.Property(e => e.RfidNo).HasColumnName("rfid_no");
+            builder.Property(e => e.ProductionOrderId).HasColumnName("production_order_id");
+            builder.Property(e => e.ProductionOrderNo).HasColumnName("production_order_no");
+
+            builder.Property(e => e.ProductionId).HasColumnName("production_id");
+            builder.Property(e => e.ProductionCode).HasColumnName("production_code");
+            builder.Property(e => e.ProductionName).HasColumnName("production_name");
+
             builder.Property(e => e.RfidCardId).HasColumnName("rfid_card_id");
+            builder.Property(e => e.RfidNo).HasColumnName("rfid_no");
+            
             builder.Property(e => e.RfidTerminatorId).HasColumnName("rfid_terminator_id");
             builder.Property(e => e.RfidControllerGroupId).HasColumnName("rfid_controller_group_id");
-
-            builder.Property(e => e.ProductionOrderId).HasColumnName("production_order_id");
-            builder.Property(e => e.ProductionId).HasColumnName("production_id");
+            
             builder.Property(e => e.Qty).HasColumnName("qty");
 
             builder.Property(e => e.OperatorId).HasColumnName("operator_id");
+            builder.Property(e => e.EmployeeId).HasColumnName("employee_id");
+            builder.Property(e => e.EmployeeName).HasColumnName("employee_name");
+
             builder.Property(e => e.MovingTime).HasColumnName("moving_time");
 
             builder.Property(e => e.WorkstationId).HasColumnName("workstation_id");
+            builder.Property(e => e.WorkstationCode).HasColumnName("workstation_code");
+            builder.Property(e => e.WorkstationName).HasColumnName("workstation_name");
+
             builder.Property(e => e.WorkshopId).HasColumnName("workshop_id");
-            builder.Property(e => e.PrevWorkshopId).HasColumnName("prev_workshop_id");
-            builder.Property(e => e.PrevWorkstationId).HasColumnName("prev_workstation_id");
+            builder.Property(e => e.WorkshopCode).HasColumnName("workshop_code");
+            builder.Property(e => e.WorkshopName).HasColumnName("workshop_name");            
 
             builder.Property(e => e.PrevProgressRecordId).HasColumnName("prev_progress_record_id");
 

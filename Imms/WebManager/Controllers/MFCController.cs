@@ -85,7 +85,7 @@ namespace Imms.WebManager.Controllers
             ProductionOrder order = CommonRepository.GetOneByFilter<ProductionOrder>(x => x.OrderNo == item.ProductionOrderNo);
             if (order == null)
             {
-                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_DATA_NOT_FOUND,$"计划单号为{item.ProductionOrderNo}的生产计划不存在！");
+                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_DATA_NOT_FOUND, $"计划单号为{item.ProductionOrderNo}的生产计划不存在！");
             }
             item.ProductionOrderId = order.RecordId;
             item.ProductionId = order.ProductionId;
@@ -106,7 +106,15 @@ namespace Imms.WebManager.Controllers
                 throw new BusinessException(GlobalConstants.EXCEPTION_CODE_DATA_NOT_FOUND, $"工位代码为{item.WorkstationCode}的工位资料不存在！");
             }
             item.WorkstationId = workstation.RecordId;
-            item.WorkstationName = workstation.OrgName;     
+            item.WorkstationName = workstation.OrgName;
         }
+    }
+
+    [Route("imms/mfc/productionOrderMoving")]
+    public class ProductionMovingController : SimpleCRUDController<ProductionMoving>
+    {
+        public ProductionMovingController() => this.Logic = new SimpleCRUDLogic<ProductionMoving>();
+
+
     }
 }

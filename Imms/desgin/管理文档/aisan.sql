@@ -284,6 +284,57 @@ create table production_order_progress
     primary key(record_id)
 );
 
+--
+-- 交接记录: production_moving
+--
+create table production_moving
+(
+    record_id                  bigint                    auto_increment    not null,
+       
+    production_order_id        bigint                    not null,
+    production_order_no        varchar(20)               not null,
+   
+    production_id              bigint                    not null,
+    production_code            varchar(20)               not null,
+    production_name            varchar(50)               not null,
+            
+    rfid_no                    varchar(20)               not null,
+    rfid_card_id               bigint                    not null,
+    
+    rfid_terminator_id         int                       not null,
+    rfid_controller_group_id   int                       not null,             
+                
+    qty                        int                       not null,
+            
+    operator_id                bigint                    not null,
+    employee_id                varchar(20)               not null,
+    employee_name              varchar(50)               not null,
+   
+    moving_time                datetime                  not null,
+   
+    workstation_id             int                       not null,
+    workstation_code           varchar(20)               not null,
+    workstation_name           varchar(50)               not null,
+   
+    workshop_id                bigint                    not null,
+    workshop_code              varchar(20)               not null,
+    workshop_name              varchar(50)               not null,
+   
+    prev_progress_record_id    bigint                    not null,
+
+    create_by_id               bigint                    not null,
+    create_by_code             varchar(20)               not null,
+    create_by_name             varchar(50)               not null,
+    create_time                datetime                  not null,
+    
+    update_by_id               bigint                    null,
+    update_by_code             varchar(20)               null,
+    update_by_name             varchar(50)               null,
+    update_time                datetime                  null,
+        
+    opt_flag                   int                       not null default 0,
+    PRIMARY KEY(record_id)
+);
 
 
 --
@@ -317,54 +368,6 @@ create table Workstation_login
 
 
 
-
---
--- 交接记录: production_moving
---
-create table production_moving
-(
-    record_id                  bigint        auto_increment    not null,
-    rfid_no                    varchar(20)   not null,
-    rfid_card_id               bigint        not null,
-    rfid_terminator_id         int           not null,
-    rfid_controller_group_id   int           not null,
-
-    production_order_id        bigint        not null,
-    production_id              bigint        not null,
-    qty                        int           not null,
-
-    operator_id                bigint        not null,
-    moving_time                datetime      not null,
-
-    workstation_id       int           not null,
-    workshop_id          bigint        not null,
-    prev_workshop_id     bigint        not null,
-    prev_workstation_id  bigint        not null,
-
-    prev_progress_record_id  bigint    not null,
-
-    create_by      bigint                      not null,
-    create_date    datetime                    not null,
-    update_by      bigint                      not null,
-    update_date    datetime                    not null,
-    opt_flag       int                         not null,    -- 0. 记录由工位机提交   1.记录由ERP同步
-
-    PRIMARY KEY(record_id),
-    index idx_production_moving_0(rfid_no),
-    index idx_production_moving_1(rfid_controller_group_id),
-    index idx_production_moving_2(rfid_terminator_id),
-
-    index idx_production_moving_3(rfid_card_id),
-    index idx_production_moving_4(production_order_id),
-    index idx_production_moving_5(production_id),
-    index idx_production_moving_6(workstation_id),
-    index idx_production_moving_7(workshop_id),
-    index idx_production_moving_8(prev_workshop_id),
-    index idx_production_moving_9(prev_workstation_id),
-    index idx_production_moving_10(prev_progress_record_id),
-    index idx_production_moving_11(operator_id),
-    index idx_production_moving_12(moving_time)
-);
 
 
 --
