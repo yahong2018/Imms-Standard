@@ -247,7 +247,7 @@ create table production_order_progress
     workstation_name       varchar(50)               not null,
 
     production_id          bigint                    not null, -- 产品编号
-    produciton_code        varchar(20)               not null,
+    production_code        varchar(20)               not null,
     production_name        varchar(50)               not null,
 
     rfid_terminator_id     int                       not null, -- 机器号
@@ -255,7 +255,7 @@ create table production_order_progress
     
     report_time            datetime                  not null, -- 报告时间
     report_qty             int                       not null, -- 数量
-    rfid_card_no           varchar(20)               not null default '', -- RFID卡号，如果是尾数，则为空
+    rfid_card_no           varchar(20)               null, -- RFID卡号，如果是尾数，则为空
     report_type            int                       not null, -- 数量类型：0. 整数刷卡申报  1.尾数       
 
     good_qty               int                       not null,

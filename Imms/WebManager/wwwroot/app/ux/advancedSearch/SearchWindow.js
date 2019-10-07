@@ -51,7 +51,7 @@ Ext.define("app.ux.advancedSearch.SearchWindow", {
                 }
                 var expr = me.getSearchCondition();
                 var grid = me.dbGrid;
-                grid.getStore().clearCustomerFilter();
+                grid.getStore().clearCustomFilter();
                 grid.getStore().addCustomFilter(expr);
                 grid.getStore().buildFilterUrl();
                 grid.getStore().loadPage(1);

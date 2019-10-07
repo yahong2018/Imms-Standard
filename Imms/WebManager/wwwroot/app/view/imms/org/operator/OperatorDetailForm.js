@@ -21,18 +21,7 @@ Ext.define("app.view.imms.org.operator.OperatorDetailForm", {
             width: 380,
             valueField: "recordId",
             displayField: "orgName",
-            store: Ext.create("Ext.data.Store", {
-                model: "app.model.imms.org.WorkshopModel",
-                autoLoad: false,
-                proxy: {
-                    type: 'ajax',
-                    url: 'imms/org/workshop/getAll',
-                    reader: {
-                        type: 'json',
-                        rootProperty: "rootProperty"
-                    }
-                }
-            }),
+            store: Ext.create({ xtype: "imms_org_WorkshopStore", autoLoad: true, pageSize: 0 }),
             listeners: {
                 change: function (self, newValue, oldValue, eOpts) {
                     var record = self.getSelectedRecord();

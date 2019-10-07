@@ -1,7 +1,8 @@
 Ext.define("app.view.imms.org.operator.Operator", {
     extend: "app.ux.dbgrid.DbGrid",
     xtype: "app_view_imms_org_operator_Operator",
-    requires: ["app.model.imms.org.OperatorModel", "app.store.imms.org.OperatorStore","app.model.imms.org.WorkshopModel"],
+    requires: ["app.model.imms.org.OperatorModel", "app.store.imms.org.OperatorStore",
+    "app.model.imms.org.WorkshopModel","app.store.imms.org.WorkshopStore"],
     uses: ["app.view.imms.org.operator.OperatorDetailForm"],
     columns: [
         { dataIndex: "orgCode", text: "车间编号", width: 100 },

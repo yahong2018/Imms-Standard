@@ -19,7 +19,7 @@ Ext.define("app.model.imms.mfc.ProductionOrderProgressModel", {
 
         { name: "operatorId", type: "int" },
         { name: "employeeId", type: "string" },
-        { name: "emploeyeeName", type: "string" },
+        { name: "employeeName", type: "string" },
 
         { name: "rfidTerminatorId", type: "int" },
         { name: "rfidControllerId", type: "int" },

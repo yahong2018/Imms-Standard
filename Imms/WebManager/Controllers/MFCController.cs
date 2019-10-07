@@ -79,5 +79,34 @@ namespace Imms.WebManager.Controllers
     public class ProductionOrderProgressController : SimpleCRUDController<ProductionOrderProgress>
     {
         public ProductionOrderProgressController() => this.Logic = new SimpleCRUDLogic<ProductionOrderProgress>();
+
+        protected override void Verify(ProductionOrderProgress item, int operation)
+        {
+            ProductionOrder order = CommonRepository.GetOneByFilter<ProductionOrder>(x => x.OrderNo == item.ProductionOrderNo);
+            if (order == null)
+            {
+                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_DATA_NOT_FOUND,$"计划单号为{item.ProductionOrderNo}的生产计划不存在！");
+            }
+            item.ProductionOrderId = order.RecordId;
+            item.ProductionId = order.ProductionId;
+            item.ProductionCode = order.ProductionCode;
+            item.ProductionName = order.ProductionName;
+
+            Workshop workshop = CommonRepository.GetOneByFilter<Workshop>(x => x.OrgCode == item.WorkshopCode);
+            if (workshop == null)
+            {
+                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_DATA_NOT_FOUND, $"车间代码为{item.WorkshopCode}的车间资料不存在！");
+            }
+            item.WorkshopId = workshop.RecordId;
+            item.WorkshopName = workshop.OrgName;
+
+            Workstation workstation = CommonRepository.GetOneByFilter<Workstation>(x => x.OrgCode == item.WorkstationCode);
+            if (workstation == null)
+            {
+                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_DATA_NOT_FOUND, $"工位代码为{item.WorkstationCode}的工位资料不存在！");
+            }
+            item.WorkstationId = workstation.RecordId;
+            item.WorkstationCode = workstation.OrgName;     
+        }
     }
 }

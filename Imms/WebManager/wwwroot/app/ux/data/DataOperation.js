@@ -240,7 +240,7 @@ Ext.define("app.ux.data.DataOperation", {
 
     doSearch: function (column, operator, value) {
         var grid = this;        
-        grid.getStore().clearCustomerFilter();        
+        grid.getStore().clearCustomFilter();        
         if (column != null && operator != null && value != '' && value != null) {
             var model = grid.store.getModel();
             if (model == null) {

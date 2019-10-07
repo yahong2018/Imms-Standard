@@ -57,7 +57,7 @@ Ext.define("app.store.StoreOperation", {
         this.fixedFilter.push(filter);
     },
 
-    clearCustomerFilter: function () {
+    clearCustomFilter: function () {
         this.customerFilter = [];
     },
 
