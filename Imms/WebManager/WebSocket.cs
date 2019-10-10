@@ -1,6 +1,7 @@
 using Imms.Data;
 using Imms.Mes.Data.Domain;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,6 +63,7 @@ namespace Imms.WebManager
         private readonly Random random = new Random(100);
         private int lastRecordCount = 0;
         private int[] hours = new int[] { 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
+        private DbContext dbContext;
 
         public bool Terminated { get; set; }
 
@@ -69,6 +71,7 @@ namespace Imms.WebManager
         {
             this._hubContext = hubContext;
 
+            this.dbContext = GlobalConstants.DbContextFactory.GetContext();
             this.Terminated = false;
             this.InitDemoData();
         }
@@ -97,9 +100,9 @@ namespace Imms.WebManager
                 item.qty_plan = 100;
                 if (date.Hour > this.hours[i] && date.Hour != this.hours[0])
                 {
-                    var dbItem = allList.Where(x=>x.CreateTime.Hour+1 == this.hours[i]);
-                    item.qty_good = dbItem.Select(x=>x.GoodQty).Sum(); 
-                    item.qty_bad = dbItem.Select(x=>x.BadQty).Sum();
+                    var dbItem = allList.Where(x => x.CreateTime.Hour + 1 == this.hours[i]);
+                    item.qty_good = dbItem.Select(x => x.GoodQty).Sum();
+                    item.qty_bad = dbItem.Select(x => x.BadQty).Sum();
                 }
                 else
                 {
@@ -159,20 +162,15 @@ namespace Imms.WebManager
 
         public List<ProductionOrderProgress> GetOrderProgress(int hour, bool all = false)
         {
-            List<ProductionOrderProgress> result = null;
-            CommonRepository.UseDbContext(dbContext =>
+            DateTime now = DateTime.Now;
+            DateTime begin = new DateTime(now.Year, now.Month, now.Day, hour, 0, 0);
+            DateTime end = begin.AddHours(1);
+            if (all)
             {
-                DateTime now = DateTime.Now;
-                DateTime begin = new DateTime(now.Year, now.Month, now.Day, hour, 0, 0);
-                DateTime end = begin.AddHours(1);
-                if (all)
-                {
-                    begin = new DateTime(now.Year, now.Month, now.Day);
-                    end = begin.AddDays(1);
-                }
-                result = dbContext.Set<ProductionOrderProgress>().Where(x => x.ReportTime >= begin && x.ReportTime < end).ToList();
-            });
-
+                begin = new DateTime(now.Year, now.Month, now.Day);
+                end = begin.AddDays(1);
+            }
+            List<ProductionOrderProgress> result = dbContext.Set<ProductionOrderProgress>().Where(x => x.ReportTime >= begin && x.ReportTime < end).ToList();
             return result;
         }
     }
