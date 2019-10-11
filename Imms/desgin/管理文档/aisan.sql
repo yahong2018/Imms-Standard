@@ -338,6 +338,52 @@ create table production_moving
 
 
 --
+-- 生产品质: quality_check
+--
+create table quality_check
+(
+  record_id                      bigint     auto_increment   not null,
+  production_order_id            bigint                      not null,  
+  production_order_no            varchar(20)                 not null,  
+
+  production_id                  bigint                      not null,
+  production_code                varchar(20)                 not null,
+  production_name                varchar(50)                 not null,
+
+  discover_id                    bigint                      not null,  
+  discover_code                  varchar(20)                 not null,
+  discover_name                  varchar(50)                 not null,  
+  discover_time                  datetime                    not null,
+
+  producer_id                    bigint                      not null,
+  producer_code                  varchar(20)                 not null,
+  producer_name                  varchar(50)                 not null,
+  produce_time                   datetime                    not null, 
+
+  response_id                    bigint                      not null,  
+  response_code                  varchar(20)                 not null,
+  response_name                  varchar(20)                 not null,
+
+  defect_type_code               varchar(20)                 not null, 
+  defect_description             varchar(500)                not null,
+  qty                            int                         not null,
+
+  create_by_id                   bigint                    not null,
+  create_by_code                 varchar(20)               not null,
+  create_by_name                 varchar(50)               not null,
+  create_time                    datetime                  not null,
+  
+  update_by_id                   bigint                    null,
+  update_by_code                 varchar(20)               null,
+  update_by_name                 varchar(50)               null,
+  update_time                    datetime                  null,
+      
+  opt_flag                       int                       not null default 0, 
+
+  PRIMARY KEY(record_id)  
+);
+
+--
 -- 员工在工位机上的登录表
 --
 create table Workstation_login
@@ -365,42 +411,4 @@ create table Workstation_login
 );
 
 
-
-
-
-
-
---
--- 生产品质: quality_check
---
-
-create table quality_check
-(
-  record_id      bigint     auto_increment   not null,
-  production_order_id  bigint                not null,  -- 工单编号
-  production_id  bigint                      not null,  -- 产品id  
-  discover_id    bigint                      not null,  -- 发现人
-  discover_time  datetime                    not null,  -- 发现时间
-  producer_id    bigint                      not null,  -- 产生人
-  produce_time   datetime                    not null,  -- 产生时间  
-  response_id    bigint                      not null,  -- 责任人
-  defect_type_id varchar(20)                 not null,  -- 缺陷代码
-  defect_description varchar(500)            not null,  -- 缺陷描述
-
-  create_by      bigint                      not null,
-  create_date    datetime                    not null,
-  update_by      bigint                      not null,
-  update_date    datetime                    not null,
-  opt_flag       int                         not null,  
-
-  PRIMARY KEY(record_id),
-  index idx_quality_check_0(production_order_id),
-  index idx_quality_check_1(production_id),
-  index idx_quality_check_2(discover_id),
-  index idx_quality_check_3(discover_time),
-  index idx_quality_check_4(producer_id),
-  index idx_quality_check_5(produce_time),
-  index idx_quality_check_6(response_id),
-  index idx_quality_check_7(defect_type_id)  
-);
 

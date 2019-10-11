@@ -72,19 +72,29 @@ namespace Imms.Mes.Data.Domain
     public class QualityCheck : TrackableEntity<long>
     {
         public long ProductionOrderId { get; set; }
+        public string ProductionOrderNo{get;set;}
+
         public long ProductionId { get; set; }
+        public string ProductionCode{get;set;}
+        public string ProductionName{get;set;}
 
         public long DiscoverId { get; set; }
+        public string DiscoverCode{get;set;}
+        public string DiscoverName{get;set;}
         public DateTime DiscoverTime { get; set; }
 
         public long ProducerId { get; set; }
+        public string ProducerCode{get;set;}
+        public string ProducerName{get;set;}
         public DateTime ProduceTime { get; set; }
 
         public long ResponseId { get; set; }
+        public string ResponseCode{get;set;}
+        public string ResponseName{get;set;}
 
-        public string DefectTypeId { get; set; }
-
+        public string DefectTypeCode { get; set; }
         public string DefectDescription { get; set; }
+        public int Qty{get;set;}
 
         public virtual ProductionOrder ProductionOrder { get; set; }
         public virtual Material Production { get; set; }
@@ -255,7 +265,7 @@ namespace Imms.Mes.Data.Domain
         }
     }
 
-    public class QualityCheckConfigure : OrderEntityConfigure<QualityCheck>
+    public class QualityCheckConfigure : TrackableEntityConfigure<QualityCheck>
     {
         protected override void InternalConfigure(EntityTypeBuilder<QualityCheck> builder)
         {
@@ -264,16 +274,31 @@ namespace Imms.Mes.Data.Domain
             ImmsDbContext.RegisterEntityTable<ProductionOrder>("quality_check");
 
             builder.Property(e => e.ProductionOrderId).HasColumnName("production_order_id");
-            builder.Property(e => e.ProductionId).HasColumnName("production_id");
-            builder.Property(e => e.DiscoverId).HasColumnName("discover_id");
-            builder.Property(e => e.DiscoverTime).HasColumnName("discover_time");
-            builder.Property(e => e.ProducerId).HasColumnName("producer_id");
-            builder.Property(e => e.ProduceTime).HasColumnName("produce_time");
-            builder.Property(e => e.ResponseId).HasColumnName("response_id");
-            builder.Property(e => e.DefectTypeId).HasColumnName("defect_type_id");
-            builder.Property(e => e.DefectDescription).HasColumnName("defect_description");
+            builder.Property(e => e.ProductionOrderNo).HasColumnName("production_order_no");
 
-            builder.HasOne(e => e.ProductionOrder).WithMany().HasForeignKey(e => e.ProductionOrderId).HasConstraintName("production_order_id");
+            builder.Property(e => e.ProductionId).HasColumnName("production_id");
+            builder.Property(e => e.ProductionCode).HasColumnName("production_code");
+            builder.Property(e => e.ProductionName).HasColumnName("production_name");
+
+            builder.Property(e => e.DiscoverId).HasColumnName("discover_id");
+            builder.Property(e => e.DiscoverCode).HasColumnName("discover_code");
+            builder.Property(e => e.DiscoverName).HasColumnName("discover_name");
+            builder.Property(e => e.DiscoverTime).HasColumnName("discover_time");
+
+            builder.Property(e => e.ProducerId).HasColumnName("producer_id");
+            builder.Property(e => e.ProducerCode).HasColumnName("producer_code");
+            builder.Property(e => e.ProducerName).HasColumnName("producer_name");
+            builder.Property(e => e.ProduceTime).HasColumnName("produce_time");
+
+            builder.Property(e => e.ResponseId).HasColumnName("response_id");
+            builder.Property(e => e.ResponseCode).HasColumnName("response_code");
+            builder.Property(e => e.ResponseName).HasColumnName("response_name");
+
+            builder.Property(e => e.DefectTypeCode).HasColumnName("defect_type_code");
+            builder.Property(e => e.DefectDescription).HasColumnName("defect_description");
+            builder.Property(e => e.Qty).HasColumnName("qty");
+
+            builder.HasOne(e => e.ProductionOrder).WithMany(e=>e.QualityChecks).HasForeignKey(e => e.ProductionOrderId).HasConstraintName("production_order_id");
             builder.HasOne(e => e.Production).WithMany().HasForeignKey(e => e.ProductionId).HasConstraintName("production_id");
             builder.HasOne(e => e.Discover).WithMany().HasForeignKey(e => e.DiscoverId).HasConstraintName("discover_id");
             builder.HasOne(e => e.Producer).WithMany().HasForeignKey(e => e.ProducerId).HasConstraintName("producer_id");

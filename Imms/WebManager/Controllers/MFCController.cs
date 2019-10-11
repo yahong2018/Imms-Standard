@@ -117,4 +117,10 @@ namespace Imms.WebManager.Controllers
 
 
     }
+
+    [Route("imms/mfc/qualityCheck")]
+    public class QualityCheckController : SimpleCRUDController<QualityCheck>
+    {
+        public QualityCheckController() => this.Logic=new SimpleCRUDLogic<QualityCheck>();
+    }
 }
