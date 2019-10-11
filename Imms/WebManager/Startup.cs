@@ -56,7 +56,12 @@ namespace Imms.WebManager
                 x.SerializerSettings.Formatting = Formatting.Indented;
             });
 
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
+                options=>{
+                    options.LoginPath = new PathString("/login");
+                    options.AccessDeniedPath = new PathString("/denied");
+                }                
+            );
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             GlobalConstants.DbContextFactory = new DbContextFactory();
@@ -102,6 +107,8 @@ namespace Imms.WebManager
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+            
+            app.UseErrorHandling();
             app.UseAuthentication();
 
             Imms.HttpContext.Configure(app.ApplicationServices.GetRequiredService<Microsoft.AspNetCore.Http.IHttpContextAccessor>());

@@ -17,9 +17,11 @@ namespace Imms.WebManager.Filters
                 return;
             }
             if (!context.HttpContext.User.Identity.IsAuthenticated)
-            {
-                RedirectResult result = new RedirectResult("~/login");
-                context.Result = result;
+            {                
+                // RedirectResult result = new RedirectResult("~/login");                                
+                // context.Result = result;
+
+                context.Result = new UnauthorizedResult();
             }
         }
     }
