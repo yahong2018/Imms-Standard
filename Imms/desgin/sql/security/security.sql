@@ -13,7 +13,7 @@ CREATE TABLE system_user
   index IDX_SYSTEM_USER_0(user_code),
   index IDX_SYSTEM_USER_1(user_name),
   index IDX_SYSTEM_USER_2(user_status),
-  index IDX_SYSTEM_USER_3(online)
+  index IDX_SYSTEM_USER_3(is_online)
 );
 
 
