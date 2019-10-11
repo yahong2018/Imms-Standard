@@ -22,7 +22,7 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
             margin: '0 0 3 ',
             items: [
                 { name: "productionCode", xtype: "textfield", fieldLabel: "产品", allowBlank: false },
-                { name: "productionName", xtype: "textfield", margin: '0 20 0 5', flex: 0.8 },
+                { name: "productionName", xtype: "textfield", margin: '0 20 0 5', flex: 0.8,readOnly:true },
             ]
         },
         {

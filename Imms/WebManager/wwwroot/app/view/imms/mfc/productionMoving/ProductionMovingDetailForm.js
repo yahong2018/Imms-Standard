@@ -24,7 +24,7 @@ Ext.define("app.view.imms.mfc.productionMoving.ProductionMovingDetailForm", {
             margin: '0 0 3 ',
             items: [
                 { name: "productionCode", xtype: "textfield", fieldLabel: "交接产品", allowBlank: false},
-                { name: "productionName", xtype: "textfield", margin: '0 20 0 5',flex:0.8 },
+                { name: "productionName", xtype: "textfield", margin: '0 20 0 5',flex:0.8,readOnly:true },
             ]
         },
         {
@@ -52,7 +52,7 @@ Ext.define("app.view.imms.mfc.productionMoving.ProductionMovingDetailForm", {
             margin: '0 0 3 ',
             items: [
                 { name: "employeeId", xtype: "textfield", fieldLabel: "接收人", allowBlank: false },
-                { name: "employeeName", xtype: "textfield", margin: '0 20 0 5', flex: 0.8},
+                { name: "employeeName", xtype: "textfield", margin: '0 20 0 5', flex: 0.8,readOnly:true},
             ]
         },
         {
@@ -61,7 +61,7 @@ Ext.define("app.view.imms.mfc.productionMoving.ProductionMovingDetailForm", {
             margin: '0 0 3 ',
             items: [
                 { name: "workshopCode", xtype: "textfield", fieldLabel: "接收车间", allowBlank: false },
-                { name: "workshopName", xtype: "textfield", margin: '0 20 0 5',flex:0.8 },
+                { name: "workshopName", xtype: "textfield", margin: '0 20 0 5', flex: 0.8, readOnly: true},
             ]
         },
         {
@@ -70,7 +70,7 @@ Ext.define("app.view.imms.mfc.productionMoving.ProductionMovingDetailForm", {
             margin: '0 0 3 ',
             items: [
                 { name: "workstationCode", xtype: "textfield", fieldLabel: "接收工位", allowBlank: false },
-                { name: "workstationName", xtype: "textfield", margin: '0 20 0 5', flex: 0.8 },
+                { name: "workstationName", xtype: "textfield", margin: '0 20 0 5', flex: 0.8, readOnly: true },
             ]
         }
     ]
