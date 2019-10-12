@@ -31,7 +31,7 @@ Ext.define("app.view.imms.mfc.rfidCard.RfidCard", {
                 }
                 var strIdList = idList.join(",");
                 var encodedStr = Ext.util.Base64.encode(strIdList);
-                window.open("imms/mfc/rfidCard/printBarCode?idList=" + encodedStr, "_blank");
+                window.open("api/imms/mfc/rfidCard/printBarCode?idList=" + encodedStr, "_blank");
             }
         },
     ],
