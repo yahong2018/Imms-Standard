@@ -64,6 +64,8 @@ namespace Imms
 
         public const string JWT_SECRET_STRING="ZHXH_IMMS_SECURITY_V_2.0"; 
         public const string JWT_ISSURER_URL="http://localhost:5200";
+        public const string AUTHROIZATION_SESSION_KEY = "Authorization";
+
 
         //其他
         public static Imms.Data.IDbContextFactory DbContextFactory = null;

@@ -95,7 +95,7 @@ namespace Imms.WebManager
                         {
                             try
                             {
-                                byte[] buffer = context.HttpContext.Session.Get("Authorization");
+                                byte[] buffer = context.HttpContext.Session.Get(GlobalConstants.AUTHROIZATION_SESSION_KEY);
                                 string token = System.Text.Encoding.UTF8.GetString(buffer);
 
                                 context.Token = token;                                
@@ -108,6 +108,7 @@ namespace Imms.WebManager
 
                     }
                 };
+            }).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme,options=>{                             
             });
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();

@@ -8,6 +8,7 @@ using Imms.Security.Data;
 using Imms.Security.Data.Domain;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Imms.WebManager.Controllers
 {
@@ -36,7 +37,7 @@ namespace Imms.WebManager.Controllers
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var token = tokenHandler.CreateToken(tokenDescriptor);
                 var tokenString = tokenHandler.WriteToken(token);
-                HttpContext.Session.Set("Authorization", System.Text.Encoding.UTF8.GetBytes(tokenString));
+                HttpContext.Session.Set(GlobalConstants.AUTHROIZATION_SESSION_KEY, System.Text.Encoding.UTF8.GetBytes(tokenString));
 
                 return RedirectToAction("Index", "Home");
             }
@@ -86,7 +87,8 @@ namespace Imms.WebManager.Controllers
 
         public async Task<ActionResult> Logout()
         {
-            await HttpContext.SignOutAsync();
+            this.HttpContext.Session.Remove(GlobalConstants.AUTHROIZATION_SESSION_KEY);
+            await this.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Index", "Home");
         }
     }
