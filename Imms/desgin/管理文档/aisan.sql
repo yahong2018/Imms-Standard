@@ -163,7 +163,7 @@ create table rfid_card
             
     rfid_no                varchar(20)                 not null,
     card_type              int                         not null,       --  卡类别: 0. 工艺数量   1. 员工卡
-    card_status            int                         not null,        
+    card_status            int                         not null,       --  0.正常卡   1. 已报工的卡    255.已作废的卡
 
     production_id          bigint                      not null,       -- （工艺数量卡）所代表的产品
     production_code        varchar(20)                 not null,
