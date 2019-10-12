@@ -160,6 +160,8 @@ top:begin
   );
   /*TODO: 更新计划的最新生产车间，和最新的生产数量*/
   
+
+  /*TODO: 修改卡的状态为已报工*/
   commit;
 
   set Resp = CONCAT(Resp,'已报工[',qty,']');
