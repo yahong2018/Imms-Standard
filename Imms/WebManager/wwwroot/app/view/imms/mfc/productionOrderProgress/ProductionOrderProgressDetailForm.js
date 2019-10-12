@@ -2,7 +2,7 @@ Ext.define("app.view.imms.mfc.productionOrderProgress.ProductionOrderProgressDet
     extend: "app.ux.TrackableFormPanel",
     xtype: "imms_mfc_productionOrderProgress_ProductionOrderProgressDetailForm",
     padding: 5,
-    width: 850,
+    width: 750,
     layout: "anchor",
     defaults: {
         layout: "anchor",
@@ -45,8 +45,6 @@ Ext.define("app.view.imms.mfc.productionOrderProgress.ProductionOrderProgressDet
                 {
                     name: "workshopCode", fieldLabel: "车间编码", allowBlank: false, xtype: "textfield", width: 250, listeners: {
                         change: function (self, newValue, oldValue, eOpts) {
-                            debugger;
-
                             var form = this.up("imms_mfc_productionOrderProgress_ProductionOrderProgressDetailForm");
                             var record = form.workshopStore.findRecord("orgCode", newValue, 0, false, false, true);
                             if (record != null) {

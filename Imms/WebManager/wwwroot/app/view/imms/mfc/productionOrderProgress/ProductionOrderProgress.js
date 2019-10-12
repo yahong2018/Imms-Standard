@@ -38,7 +38,7 @@ Ext.define("app.view.imms.mfc.productionOrderProgress.ProductionOrderProgress", 
         var configBase = {
             store: Ext.create({ xtype: 'imms_mfc_ProductionOrderProgressStore' }),
             detailFormClass: 'imms_mfc_productionOrderProgress_ProductionOrderProgressDetailForm',
-            detailWindowTitle: '生产进度',
+            detailWindowTitle: '生产实绩',
         };
         Ext.applyIf(config, configBase);
 
