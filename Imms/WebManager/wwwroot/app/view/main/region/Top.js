@@ -39,10 +39,6 @@ Ext.define('app.view.main.region.Top', {
 		handler: 'changePassword'
 	},
 	{
-		glyph: 0xf06a,
-		text: '刷新',
-		handler: 'loadLinesRealtimeData'
-	}, {
 		text: '注销',
 		glyph: 0xf011,
 		handler: 'logout'
