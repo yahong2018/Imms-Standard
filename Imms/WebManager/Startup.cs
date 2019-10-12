@@ -18,6 +18,10 @@ using Newtonsoft.Json;
 using Microsoft.AspNetCore.Diagnostics;
 using System.Net.WebSockets;
 using System.Threading;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using IdentityModel;
+using System.Text;
 
 namespace Imms.WebManager
 {
@@ -42,7 +46,7 @@ namespace Imms.WebManager
             services.AddSession();
             services.AddMvc(config =>
             {
-                config.Filters.Add(new AuthenticationFilter());
+                // config.Filters.Add(new AuthenticationFilter());
                 config.Filters.Add(new ExtJsResponseBodyFilter());
             })
             .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
@@ -56,12 +60,56 @@ namespace Imms.WebManager
                 x.SerializerSettings.Formatting = Formatting.Indented;
             });
 
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
-                options=>{
-                    options.LoginPath = new PathString("/login");
-                    options.AccessDeniedPath = new PathString("/denied");
-                }                
-            );
+            // services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
+            //     options =>
+            //     {
+            //         options.LoginPath = new PathString("/login");
+            //         options.AccessDeniedPath = new PathString("/Denied");
+            //     }
+            // );
+
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(o =>
+            {
+                o.TokenValidationParameters = new TokenValidationParameters
+                {
+                    NameClaimType = JwtClaimTypes.Name,
+                    RoleClaimType = JwtClaimTypes.Role,
+
+                    ValidIssuer = GlobalConstants.JWT_ISSURER_URL,
+                    ValidAudience = "api",
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(GlobalConstants.JWT_SECRET_STRING)),
+
+                    ValidateAudience = false,
+                    ValidateIssuer = false,
+                };
+
+                o.Events = new JwtBearerEvents()
+                {
+                    OnMessageReceived = context =>
+                    {
+                        if (context.Token == null)
+                        {
+                            try
+                            {
+                                byte[] buffer = context.HttpContext.Session.Get("Authorization");
+                                string token = System.Text.Encoding.UTF8.GetString(buffer);
+
+                                context.Token = token;                                
+                            }
+                            catch
+                            {
+                            }
+                        }
+                        return Task.CompletedTask;
+
+                    }
+                };
+            });
+
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             GlobalConstants.DbContextFactory = new DbContextFactory();
@@ -70,8 +118,8 @@ namespace Imms.WebManager
 
             GlobalConstants.GetCurrentUserDelegate = Security.Data.SystemUserLogic.GetCurrentUser;
 
-            services.AddSignalR(); 
-           // services.AddSingleton<RealtimeDataPushTask,RealtimeDataPushTask>();          
+            services.AddSignalR();
+            // services.AddSingleton<RealtimeDataPushTask,RealtimeDataPushTask>();          
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -107,7 +155,7 @@ namespace Imms.WebManager
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-            
+
             app.UseErrorHandling();
             app.UseAuthentication();
 
@@ -116,8 +164,8 @@ namespace Imms.WebManager
             app.UseSignalR(routes =>
             {
                 routes.MapHub<KanbanRealtimeHub>("/kanbanHub/realtime");
-            });            
-            
+            });
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
@@ -125,8 +173,8 @@ namespace Imms.WebManager
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-           // RealtimeDataPushTask task = app.ApplicationServices.GetService<RealtimeDataPushTask>();
-          //  task.Start();
+            // RealtimeDataPushTask task = app.ApplicationServices.GetService<RealtimeDataPushTask>();
+            //  task.Start();
         }
     }
 

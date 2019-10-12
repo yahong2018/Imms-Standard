@@ -12,7 +12,7 @@ Ext.define('app.store.admin.SystemRoleStore', {
     loadRolePrivileges: function (role, callback) {
         var me = this;
         app.ux.Utils.ajaxRequest({
-            url: 'security/systemRole/rolePrivileges?roleId=' + role.get('recordId'),
+            url: 'api/security/systemRole/rolePrivileges?roleId=' + role.get('recordId'),
             successCallback: function (result, response, opts) {
                 if (callback) {
                     callback.apply(me, [role, result]);
@@ -24,7 +24,7 @@ Ext.define('app.store.admin.SystemRoleStore', {
         var me = this;
        
         app.ux.Utils.ajaxRequest({
-            url: 'security/systemRole/updatePrivileges?roleId=' + role.get('recordId'),
+            url: 'api/security/systemRole/updatePrivileges?roleId=' + role.get('recordId'),
             method: 'POST',
             jsonData: privilegeList,
             successCallback: function (result, response, opts) {

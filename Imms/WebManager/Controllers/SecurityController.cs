@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace Imms.WebManager
 {
-    [Route("security/systemUser")]
+    [Route("api/security/systemUser")]
     public class SystemUserController : SimpleCRUDController<SystemUser>
     {
         public SystemUserController() => this.Logic = new SystemUserLogic();
@@ -69,7 +69,7 @@ namespace Imms.WebManager
         }
     }
 
-    [Route("security/systemRole")]
+    [Route("api/security/systemRole")]
     public class SystemRoleController : SimpleCRUDController<SystemRole>
     {
         public SystemRoleController() => this.Logic = new SystemRoleLogic();

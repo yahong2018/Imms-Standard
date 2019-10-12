@@ -61,6 +61,10 @@ namespace Imms
         //树形编码
         public const string TYPE_CODE_TYPE_DEFECT = "TREE_CODE_TYPE_DEFECT";//缺陷代码
 
+
+        public const string JWT_SECRET_STRING="ZHXH_IMMS_SECURITY_V_2.0"; 
+        public const string JWT_ISSURER_URL="http://localhost:5200";
+
         //其他
         public static Imms.Data.IDbContextFactory DbContextFactory = null;
         public static Logger DefaultLogger = new Logger();

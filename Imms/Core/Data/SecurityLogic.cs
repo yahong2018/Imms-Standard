@@ -9,6 +9,9 @@ using Imms.Security.Data.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication;
 using System;
+using IdentityModel;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Imms.Security.Data
 {
@@ -16,28 +19,21 @@ namespace Imms.Security.Data
     {
         public static SystemUser GetCurrentUser()
         {
-            string userString = Imms.HttpContext.Current.User.Claims.First(x => x.Type == "CurrentUser").Value;
-            SystemUser currentUser = userString.ToObject<SystemUser>();            
-            return currentUser;
+            try
+            {
+                string userString = Imms.HttpContext.Current.User.Claims.First(x => x.Type == "CurrentUser").Value;
+                SystemUser currentUser = userString.ToObject<SystemUser>();
+                return currentUser;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
-        public static void Login(string userCode, string password,Microsoft.AspNetCore.Http.HttpContext httpContext){
-            SystemUser systemUser = SystemUserLogic.VerifyLoginAccount(userCode, password);
-            SystemUserLogic.Login(systemUser, httpContext);
-        }
-
-        public static async void Login(SystemUser systemUser, Microsoft.AspNetCore.Http.HttpContext httpContext)
+        public static async void Login(string userCode, string password, Microsoft.AspNetCore.Http.HttpContext httpContext)
         {
-            // var claims = new List<Claim>
-            //     {
-            //         new Claim("UserId",systemUser.RecordId.ToString()),
-            //         new Claim("UserCode", systemUser.UserCode),
-            //         new Claim("UserName",systemUser.UserName)
-            //     };
-            // foreach (RoleUser roleUser in systemUser.Roles)
-            // {
-            //     claims.Add(new Claim("RoleCode", roleUser.Role.RoleCode));
-            // }
+            SystemUser systemUser = SystemUserLogic.VerifyLoginAccount(userCode, password);
             var claims = new List<Claim>{
                 {
                     new Claim("CurrentUser",systemUser.ToJson())
@@ -47,10 +43,31 @@ namespace Imms.Security.Data
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             ClaimsPrincipal user = new ClaimsPrincipal(claimsIdentity);
             await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, user);
+        }
 
-            systemUser.LastLoginTime = DateTime.Now;
+        public static SecurityTokenDescriptor LoginWithApi(string userCode, string password, Microsoft.AspNetCore.Http.HttpContext httpContext)
+        {
+            SystemUser systemUser = SystemUserLogic.VerifyLoginAccount(userCode, password);
+            byte[] key = Encoding.ASCII.GetBytes(GlobalConstants.JWT_SECRET_STRING);
+            DateTime authTime = DateTime.UtcNow;
+            DateTime expiresAt = authTime.AddDays(7);
 
-            new SystemUserLogic().Update(systemUser);
+            SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(JwtClaimTypes.Audience,"api"),
+                    new Claim(JwtClaimTypes.Issuer,GlobalConstants.JWT_ISSURER_URL),
+                    new Claim(JwtClaimTypes.Id, systemUser.UserCode.ToString()),
+                    new Claim(JwtClaimTypes.Name, systemUser.UserName),
+                    new Claim(JwtClaimTypes.Email, systemUser.Email),
+                    // new Claim(JwtClaimTypes.PhoneNumber, systemUser.PhoneNumber),
+                    new Claim("CurrentUser",systemUser.ToJson())
+                }),
+                Expires = expiresAt,
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            return tokenDescriptor;
         }
 
 
@@ -74,6 +91,9 @@ namespace Imms.Security.Data
                 {
                     throw new BusinessException(GlobalConstants.EXCEPTION_CODE_CUSTOM, "账号已过期!");
                 }
+
+                result.LastLoginTime = DateTime.Now;
+                dbContext.SaveChanges();
             });
             return result;
         }
@@ -145,10 +165,12 @@ namespace Imms.Security.Data
             dbContext.SaveChanges();
         }
 
-        public int ChangeUserPassword(long userId, string old,string pwd1,string pwd2){
+        public int ChangeUserPassword(long userId, string old, string pwd1, string pwd2)
+        {
             string oldMd5 = GetMD5Hash(old);
-            SystemUser user = CommonRepository.AssureExistsByFilter<SystemUser>(x=>x.RecordId == userId);
-            if(string.Compare(user.Pwd, oldMd5, true) != 0){
+            SystemUser user = CommonRepository.AssureExistsByFilter<SystemUser>(x => x.RecordId == userId);
+            if (string.Compare(user.Pwd, oldMd5, true) != 0)
+            {
                 return -2;
             }
             string pwd1Md5 = GetMD5Hash(pwd1);
@@ -191,7 +213,7 @@ namespace Imms.Security.Data
             {
                 List<RolePrivilege> oldPrivileges = dbContext.Set<RolePrivilege>().Where(x => x.RoleId == roleId).ToList();
                 this.Revoke(oldPrivileges, currentPrivileges, dbContext);
-                this.AssignNew(roleId,oldPrivileges,currentPrivileges,dbContext);
+                this.AssignNew(roleId, oldPrivileges, currentPrivileges, dbContext);
 
                 dbContext.SaveChanges();
             });

@@ -4,10 +4,10 @@ Ext.define("app.store.imms.mfc.ProductionMovingStore",{
     alias:"widget.imms_mfc_ProductionMovingStore",
 
     dao:{
-        deleteUrl: 'imms/mfc/productionMoving/delete',
-        insertUrl: 'imms/mfc/productionMoving/create',
-        updateUrl: 'imms/mfc/productionMoving/update',
-        selectUrl: 'imms/mfc/productionMoving/getAll',
+        deleteUrl: 'imms/mfc/productionOrderMoving/delete',
+        insertUrl: 'imms/mfc/productionOrderMoving/create',
+        updateUrl: 'imms/mfc/productionOrderMoving/update',
+        selectUrl: 'imms/mfc/productionOrderMoving/getAll',
     }
 
 });

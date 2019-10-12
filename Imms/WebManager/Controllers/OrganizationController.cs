@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Imms.WebManager.Controllers
 {
-    [Route("imms/org/workshop")]
+    [Route("api/imms/org/workshop")]
     public class WorkshopController : SimpleCRUDController<Workshop>
     {
         public WorkshopController()
@@ -27,7 +27,7 @@ namespace Imms.WebManager.Controllers
         }
     }
 
-    [Route("imms/org/workstation")]
+    [Route("api/imms/org/workstation")]
     public class WorkstationController : SimpleCRUDController<Workstation>
     {
         public WorkstationController()
@@ -55,7 +55,7 @@ namespace Imms.WebManager.Controllers
         }
     }
 
-    [Route("imms/org/operator")]
+    [Route("api/imms/org/operator")]
     public class OperatorController : SimpleCRUDController<Operator>
     {
         public OperatorController() => this.Logic = new OperatorLogic();

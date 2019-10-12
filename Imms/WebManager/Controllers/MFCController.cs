@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Imms.WebManager.Controllers
 {
-    [Route("imms/mfc/rfidCard")]
+    [Route("api/imms/mfc/rfidCard")]
     public class RfidCardController : SimpleCRUDController<RfidCard>
     {
         public RfidCardController()
@@ -69,13 +69,13 @@ namespace Imms.WebManager.Controllers
         }
     }
 
-    [Route("imms/mfc/productionOrder")]
+    [Route("api/imms/mfc/productionOrder")]
     public class ProductionOrderController : SimpleCRUDController<ProductionOrder>
     {
         public ProductionOrderController() => this.Logic = new SimpleCRUDLogic<ProductionOrder>();
     }
 
-    [Route("imms/mfc/productionOrderProgress")]
+    [Route("api/imms/mfc/productionOrderProgress")]
     public class ProductionOrderProgressController : SimpleCRUDController<ProductionOrderProgress>
     {
         public ProductionOrderProgressController() => this.Logic = new SimpleCRUDLogic<ProductionOrderProgress>();
@@ -110,7 +110,7 @@ namespace Imms.WebManager.Controllers
         }
     }
 
-    [Route("imms/mfc/productionOrderMoving")]
+    [Route("api/imms/mfc/productionOrderMoving")]
     public class ProductionMovingController : SimpleCRUDController<ProductionMoving>
     {
         public ProductionMovingController() => this.Logic = new SimpleCRUDLogic<ProductionMoving>();
@@ -118,7 +118,7 @@ namespace Imms.WebManager.Controllers
 
     }
 
-    [Route("imms/mfc/qualityCheck")]
+    [Route("api/imms/mfc/qualityCheck")]
     public class QualityCheckController : SimpleCRUDController<QualityCheck>
     {
         public QualityCheckController() => this.Logic=new SimpleCRUDLogic<QualityCheck>();

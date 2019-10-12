@@ -24,12 +24,15 @@ Ext.define("app.view.imms.org.operator.OperatorDetailForm", {
             store: Ext.create({ xtype: "imms_org_WorkshopStore", autoLoad: true, pageSize: 0 }),
             listeners: {
                 change: function (self, newValue, oldValue, eOpts) {
-                    var record = self.getSelectedRecord();
                     var form = self.up("imms_org_operator_OperatorDetailForm");
                     var orgCode = form.down("[name='orgCode']");
                     var orgName = form.down("[name='orgName']");
-                    orgCode.setValue(record.get("orgCode"));
-                    orgName.setValue(record.get("orgName"));
+
+                    var record = self.getSelectedRecord();
+                    if (record != null) {
+                        orgCode.setValue(record.get("orgCode"));
+                        orgName.setValue(record.get("orgName"));
+                    }
                 }
             }
         }, {

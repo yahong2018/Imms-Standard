@@ -12,9 +12,11 @@ using Imms.Security.Data.Domain;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Imms.Security.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Imms.WebManager.Controllers
 {
+    [Authorize]
     [Route("/")]
     [Route("/home")]
     public class HomeController : Controller

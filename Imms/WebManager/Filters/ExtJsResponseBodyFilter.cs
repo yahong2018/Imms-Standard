@@ -1,3 +1,4 @@
+using Imms.WebManager.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -9,6 +10,9 @@ namespace Imms.WebManager.Filters
         {
             if (context.HttpContext.Request.Method != "POST")
             {
+                return;
+            }
+            if(context.Controller is LoginController){
                 return;
             }
 

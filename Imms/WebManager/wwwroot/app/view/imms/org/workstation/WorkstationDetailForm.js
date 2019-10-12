@@ -1,5 +1,5 @@
 Ext.define("app.view.imms.org.workstation.WorkstationDetailForm", {
-    extend: "Ext.form.Panel",
+    extend: "app.ux.TrackableFormPanel",
     xtype: "imms_org_workstation_WorkstationDetailForm",
 
     width: 400,
@@ -9,9 +9,6 @@ Ext.define("app.view.imms.org.workstation.WorkstationDetailForm", {
     },
     items: [
         {
-            name: 'recordId',
-            xtype: 'hidden',
-        }, {
             name: "parentId",
             xtype: "hidden"
         },{
@@ -46,7 +43,7 @@ Ext.define("app.view.imms.org.workstation.WorkstationDetailForm", {
             maxLength: 3,
             enforceMaxLength: true,
             width: 180
-        }, , {
+        }, {
             name: "rfidTerminatorId",
             xtype: "textfield",
             fieldLabel: "Rfid工位机编号",

@@ -44,7 +44,7 @@ Ext.define("app.view.imms.org.workshop.WorkshopDetailForm", {
                 autoLoad: false,
                 proxy: {
                     type: 'ajax',
-                    url: 'imms/org/workshop/getAll',
+                    url: 'api/imms/org/workshop/getAll',
                     reader: {
                         type: 'json',
                         rootProperty: "rootProperty"

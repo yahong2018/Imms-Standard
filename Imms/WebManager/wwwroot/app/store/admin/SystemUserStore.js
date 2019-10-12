@@ -13,7 +13,7 @@ Ext.define('app.store.admin.SystemUserStore', {
     restePassword: function (user) {
         var me = this;
         app.ux.Utils.ajaxRequest({
-            url: 'security/systemUser/resetPassword?userId=' + user.get('recordId'),
+            url: 'api/security/systemUser/resetPassword?userId=' + user.get('recordId'),
             successCallback: function (record, response, opts) {
                 Ext.Msg.alert('系统提示', '密码已重设为系统缺省密码!');
             }
@@ -22,7 +22,7 @@ Ext.define('app.store.admin.SystemUserStore', {
     startUser: function (user) {
         var me = this;
         app.ux.Utils.ajaxRequest({
-            url: 'security/systemUser/enable?userId=' + user.get('recordId'),
+            url: 'api/security/systemUser/enable?userId=' + user.get('recordId'),
             successCallback: function (record, response, opts) {
                 user.beginEdit();
                 user.set('userStatus', 0);
@@ -41,7 +41,7 @@ Ext.define('app.store.admin.SystemUserStore', {
     stopUser: function (user) {
         var me = this;
         app.ux.Utils.ajaxRequest({
-            url: 'security/systemUser/disable?userId=' + user.get('recordId'),
+            url: 'api/security/systemUser/disable?userId=' + user.get('recordId'),
             successCallback: function (record, response, opts) {
                 user.beginEdit();
                 user.set('userStatus', 1);
@@ -66,7 +66,7 @@ Ext.define('app.store.admin.SystemUserStore', {
         }
         
         app.ux.Utils.ajaxRequest({
-            url: 'security/systemUser/userRoles?userId=' + user.get('recordId'),
+            url: 'api/security/systemUser/userRoles?userId=' + user.get('recordId'),
             successCallback: function (result, response, opts) {
                 user.userRoles = [];
                 for (var i = 0; i < result.length; i++) {
@@ -86,7 +86,7 @@ Ext.define('app.store.admin.SystemUserStore', {
         }
 
         app.ux.Utils.ajaxRequest({
-            url: 'security/systemUser/updateUserRoles?userId=' + userId,
+            url: 'api/security/systemUser/updateUserRoles?userId=' + userId,
             method: 'POST',
             jsonData: userRoles,
             successCallback: function (result, response, opts) {

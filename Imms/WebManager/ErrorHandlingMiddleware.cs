@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace Imms.WebManager
@@ -36,7 +37,14 @@ namespace Imms.WebManager
                 var msg = "";
                 if (statusCode == 401)
                 {
-                    msg = "未授权";
+                    if (context.Request.Path.ToString() == "/" )
+                    {
+                        context.Response.Redirect("/login");
+                    }
+                    else
+                    {
+                        msg = "未授权";
+                    }
                 }
                 else if (statusCode == 404)
                 {

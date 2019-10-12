@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
 using Imms.Security.Data;
 using Imms.Security.Data.Domain;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Imms.WebManager.Controllers
 {
@@ -30,16 +32,52 @@ namespace Imms.WebManager.Controllers
             }
             try
             {
-               // SystemUser systemUser = SystemUserLogic.VerifyLogin(userCode, password);
-               // SystemUserLogic.Login(systemUser,HttpContext);
+                SecurityTokenDescriptor tokenDescriptor = SystemUserLogic.LoginWithApi(userCode, password, this.HttpContext);
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                var tokenString = tokenHandler.WriteToken(token);
+                HttpContext.Session.Set("Authorization", System.Text.Encoding.UTF8.GetBytes(tokenString));
 
-                SystemUserLogic.Login(userCode,password,this.HttpContext);
                 return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
             {
                 this.TempData[ID_ERROR_MESSAGE] = ex.Message;
                 return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        public ActionResult ApiLogin(string userCode, string password)
+        {
+            if (string.IsNullOrEmpty(userCode) || string.IsNullOrEmpty(password))
+            {
+                return Unauthorized("账号和密码没有输入!");
+            }
+            try
+            {
+                SecurityTokenDescriptor tokenDescriptor = SystemUserLogic.LoginWithApi(userCode, password, this.HttpContext);
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                var tokenString = tokenHandler.WriteToken(token);
+
+                HttpContext.Response.Headers.Add("Authorization", "Bearer " + tokenString);
+                return Ok(new
+                {
+                    access_token = tokenString,
+                    token_type = "Bearer",
+                    profile = new
+                    {
+                        sid = userCode,
+                        name = userCode,
+                        auth_time = new DateTimeOffset(tokenDescriptor.Expires.Value.AddDays(-7)).ToUnixTimeSeconds(),
+                        expires_at = new DateTimeOffset(tokenDescriptor.Expires.Value).ToUnixTimeSeconds()
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized(ex.Message);
             }
         }
 

@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Imms.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Imms
 {
+    [Authorize]
     public abstract class SimpleCRUDController<T> : Controller where T : class, IEntity
     {
         protected SimpleCRUDLogic<T> Logic { get; set; }
@@ -55,7 +57,7 @@ namespace Imms
             }
 
             string filterStr = this.GetFilterString();
-            ExtJsResult result = Logic.GetAll(page, start, limit, filterStr,this.GetDataSourceHandler,this.FilterDataSourceHandler);
+            ExtJsResult result = Logic.GetAll(page, start, limit, filterStr, this.GetDataSourceHandler, this.FilterDataSourceHandler);
 
             return result;
         }

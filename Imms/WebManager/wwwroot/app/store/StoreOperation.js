@@ -36,6 +36,7 @@ Ext.define("app.store.StoreOperation", {
         if (!isAbsolute) {
             url = url;
         }
+        url = "api/" + url;
         this.urlMeta.put(key, url);
     },
 

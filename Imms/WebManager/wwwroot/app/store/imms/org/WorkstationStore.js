@@ -16,7 +16,7 @@ Ext.define("app.store.imms.org.WorkstationStore", {
         }
 
         var workshopId = this.workshop.get("recordId");
-        this.getProxy().url = "imms/org/workstation/getStationByWorkshop?workshopId=" + workshopId;
+        this.getProxy().url = "api/imms/org/workstation/getStationByWorkshop?workshopId=" + workshopId;
 
         this.load();
     }

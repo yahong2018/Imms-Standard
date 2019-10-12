@@ -13,6 +13,7 @@ namespace Imms.Security.Data.Domain
         public string Pwd { get; set; }
         public byte UserStatus { get; set; }
         public string Email { get; set; }
+        public string PhoneNumber { get; set; }
         public bool IsOnline { get; set; }
         public DateTime? LastLoginTime { get; set; }
 
@@ -194,6 +195,7 @@ namespace Imms.Security.Data.Domain
             builder.Property(e => e.UserCode).IsRequired().HasColumnName("user_code").HasMaxLength(20).IsUnicode(false);
             builder.Property(e => e.UserName).IsRequired().HasColumnName("user_name").HasMaxLength(50).IsUnicode(false);
             builder.Property(e => e.UserStatus).HasColumnName("user_status").HasColumnType("tinyint(4)");
+            builder.Property(e=>e.PhoneNumber).HasColumnName("phone_number");
         }
     }
 }
