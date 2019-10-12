@@ -56,7 +56,10 @@ namespace Imms.WebManager.Controllers
             }
             try
             {
-                SecurityTokenDescriptor tokenDescriptor = SystemUserLogic.LoginWithApi(userCode, password, this.HttpContext);
+                byte[] buffer = Convert.FromBase64String(password);
+                string decodedPasswrod = System.Text.Encoding.ASCII.GetString(buffer);
+
+                SecurityTokenDescriptor tokenDescriptor = SystemUserLogic.LoginWithApi(userCode, decodedPasswrod, this.HttpContext);
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var token = tokenHandler.CreateToken(tokenDescriptor);
                 var tokenString = tokenHandler.WriteToken(token);

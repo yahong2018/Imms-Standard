@@ -37,7 +37,7 @@ namespace Imms.WebManager
                 var msg = "";
                 if (statusCode == 401)
                 {
-                    if (context.Request.Path.ToString() == "/" )
+                    if (context.Request.Path.ToString() == "/" || context.Request.Path.ToString() == "/home")
                     {
                         context.Response.Redirect("/login");
                     }
