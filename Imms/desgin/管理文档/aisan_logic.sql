@@ -107,15 +107,15 @@ end;
 -- 处理工位机数据:目前没有考虑脱机数据
 --
 create procedure MES_ProcessDeviceData(
-  IsNewData int,        
-	GID INT,
-	DID INT,
-	IsOffLineData INT, 		
-	DataType int, 				
-	DataGatherTime DATETIME,
-	DataMakeTime DATETIME,
-	StrPara1 varchar(200), 
-  Resp  varchar(200)     
+ in IsNewData int,        
+ in	GID INT,
+ in	DID INT,
+ in	IsOffLineData INT, 		
+ in	DataType int, 				
+ in	DataGatherTime DATETIME,
+ in	DataMakeTime DATETIME,
+ in	StrPara1 varchar(200), 
+ out Resp  varchar(200)     
 )
 top:begin  
   declare RfidNo varchar(20); 
