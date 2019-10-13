@@ -17,7 +17,7 @@ namespace Imms.Mes.Data.Domain
         // public string WorkshopCode { get; set; }
         // public string WorkshopName { get; set; }
 
-        public DateTime PlanProductDate { get; set; }  //计划生产日期
+        public DateTime PlanDate { get; set; }  //计划生产日期
 
         public int QtyPlanned { get; set; }
         public int QtyGood { get; set; }
@@ -252,7 +252,7 @@ namespace Imms.Mes.Data.Domain
             // builder.Property(e => e.WorkshopCode).HasColumnName("workshop_code");
             // builder.Property(e => e.WorkshopName).HasColumnName("workshop_name");
 
-            builder.Property(e => e.PlanProductDate).HasColumnName("plan_product_date");
+            builder.Property(e => e.PlanDate).HasColumnName("plan_date");
 
             builder.Property(e => e.QtyPlanned).HasColumnName("qty_planned").HasColumnType("int(11)");
             builder.Property(e => e.QtyGood).HasColumnName("qty_good").HasColumnType("int(11)");

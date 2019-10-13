@@ -13,7 +13,7 @@ Ext.define("app.view.imms.mfc.productionOrder.ProductionOrder",{
         // { dataIndex: "workshopCode", text: '车间编号', width: 150 },
         // { dataIndex: "workshopName", text: '车间名称', width: 150 },
 
-        { dataIndex: "planProductDate", text: '计划生产日期', width: 150 },
+        { dataIndex: "planDate", text: '计划生产日期', width: 150 },
         { dataIndex: "qtyPlanned", text: '计划数量', width: 150 },
         { dataIndex: "qtyGood", text: '完工数', width: 150 },
         { dataIndex: "qtyBad", text: '次品数', width: 150 },                

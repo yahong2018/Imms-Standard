@@ -76,7 +76,7 @@ end;
 --
 -- 获取某个产品的最后一道工艺车间
 --
-create procedure MESGetLastWorkshopId(
+create procedure MES_GetLastWorkshopId(
   in   WorkshopId bigint,
   out  RESULT     bigint
 )

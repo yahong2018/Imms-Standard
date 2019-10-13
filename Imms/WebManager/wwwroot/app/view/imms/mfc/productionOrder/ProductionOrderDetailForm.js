@@ -27,14 +27,14 @@ Ext.define("app.view.imms.mfc.productionOrder.ProductionOrderDetailForm", {
         },
         { name: "productionCode", xtype: "hidden" },
         { name: "productionName", xtype: "hidden" },
-        { name: "planProductDate", xtype: "textfield", fieldLabel: '计划生产日期', allowBlank: false, width: 350 },
+        { name: "planDate", xtype: "textfield", fieldLabel: '计划生产日期', allowBlank: false, width: 350 },
         { name: "qtyPlanned", xtype: "textfield", fieldLabel: '计划数量', allowBlank: false, width: 350 },
         { name: "qtyGood", xtype: "textfield", fieldLabel: '完工数', allowBlank: false, width: 250 },
         { name: "qtyBad", xtype: "textfield", fieldLabel: '次品数', allowBlank: false, width: 250 },
     ],
     onRecordLoad: function (config) {
         if (config.seq == app.ux.data.DataOperationSeq.BEFORE && config.dataMode == app.ux.data.DataMode.INSERT) {
-            config.record.data.planProductDate = Ext.Date.format(new Date(), 'Y-m-d');
+            config.record.data.planDate = Ext.Date.format(new Date(), 'Y-m-d');
         }
     }
 });

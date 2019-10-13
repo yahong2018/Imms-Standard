@@ -6,7 +6,7 @@ Ext.define("app.model.imms.mfc.ProductionOrderModel",{
         { name: "productionCode", type: "string" },
         { name: "productionName", type: "string" },
 
-        { name: "planProductDate", type: 'zhxhDate', dateFormat: 'Y-m-d'},
+        { name: "planDate", type: 'zhxhDate', dateFormat: 'Y-m-d'},
 
         // { name: "workshopId", type: "int" },
         // { name: "workshopCode", type: "string" },

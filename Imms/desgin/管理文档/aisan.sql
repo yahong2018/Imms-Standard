@@ -211,7 +211,7 @@ create table production_order
     -- workshop_code          varchar(20)                 not null,
     -- workshop_name          varchar(50)                 not null,
 
-    plan_product_date      datetime                    not null,
+    plan_date              datetime                    not null,
 
     qty_planned            int                         not null,
     qty_actual             int                         not null, -- 实际生产
