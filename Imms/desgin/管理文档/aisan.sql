@@ -137,6 +137,9 @@ create table material
     material_name          varchar(50)                 not null,
     description            varchar(250)                null,
 
+    first_workshop_id      bigint                      not null,
+    first_workshop_code    varchar(20)                 not null,
+    first_workshop_name    varchar(50)                 not null,
 
     create_by_id           bigint                      not null,
     create_by_code         varchar(20)                 not null,
@@ -211,6 +214,8 @@ create table production_order
     plan_product_date      datetime                    not null,
 
     qty_planned            int                         not null,
+    qty_actual             int                         not null, -- 实际生产
+    qty_store              int                         not null, -- 入库数
     qty_good               int                         null,
     qty_bad                int                         null,
 
@@ -386,28 +391,27 @@ create table quality_check
 --
 -- 员工在工位机上的登录表
 --
-create table Workstation_login
+create table workstation_login
 (
-  record_id             bigint     auto_increment   not null,
-  rfid_terminator_id    int                         not null,
-  rfid_controller_group_id   int                    not null,
-  rfid_card_no          varchar(20)                 not null,
-  login_time            datetime                    not null,  
+  record_id                      bigint     auto_increment   not null,
+  
+  rfid_terminator_id             int                         not null,
+  rfid_controller_group_id       int                         not null,  
+  rfid_card_no                   varchar(20)                 not null,
+  operator_id                    bigint                      not null,  
+  employee_id                    varchar(20)                 not null,
+  employee_name                  varchar(50)                 not null,
+  login_time                     datetime                    not null,    
 
-  rfid_controller_id    int                      not null, 
-  workstation_id        bigint                      not null,
-  rfid_card_id          bigint                      not null,
-  operator_id           bigint                      not null,
+  workstation_id                 bigint                      not null,
+  workstation_code               varchar(20)                 not null,
+  workstation_name               varchar(50)                 not null,
 
-  PRIMARY KEY(record_id),
-  index idx_Workstation_login_0(rfid_card_no),
-  index idx_Workstation_login_1(login_time),
-  index idx_Workstation_login_2(rfid_terminator_id),
-  index idx_Workstation_login_3(rfid_controller_group_id),
-  index idx_Workstation_login_4(workstation_id),
-  index idx_Workstation_login_5(rfid_card_id),
-  index idx_Workstation_login_6(operator_id),
-  index idx_Workstation_login_7(rfid_controller_id)
+  workshop_id                    bigint                      not null,
+  workshop_code                  varchar(20)                 not null,
+  workshop_name                  varchar(50)                 not null,
+
+  PRIMARY KEY(record_id)
 );
 
 
