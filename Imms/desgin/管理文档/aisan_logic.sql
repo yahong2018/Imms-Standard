@@ -27,21 +27,31 @@ begin
 end;
 
 --
--- 判断卡是否是正确的卡
+-- 判断卡的类别
 --
-create procedure CardNoIsValid(
-  card_no   varchar(20),   -- 卡号
-  RESULT    bigint output  -- 记录号
+create procedure GetCardType(
+  card_no     varchar(20),   -- 卡号
+  card_type   int    output, -- 卡的类别
+  card_id     bigint output  -- 记录号  
 )
 begin
-   set RESULT = ifnull((
+   set card_type = 1;
+   set card_id = ifnull((
        select record_id 
          from rfid_card
          where rfid_no = card_no
           and card_status = 0
    ),-1);
-end;
 
+   if(card_id == -1) then  
+      set card_id = ifnull(
+        select record_id
+          from opertor
+         where employee_card_no = card_no
+      ),-10);
+      set card_type = 10;    
+   end if;           
+end;
 
 --
 -- 根据产品编号获取生产计划
@@ -92,26 +102,30 @@ end;
 --
 -- 刷数量卡：进行整数报工或者移库
 --
-create procedure ReportProductionOrder(
-    rfid_no          varchar(20),
+create procedure ReportProductionOrder(    
     GID              int,
     DID              int,
     GatherTime       datetime, 
+    DataType         int,
+    StrParam         varchar(20),
     Resp             varchar(500) output
 )
 top:begin  
   declare login_record_id,rfid_id,production_order_id,workshop_id,workstation_id,production_id,operator_id bigint;
   declare production_order_no,workshop_code,workstation_code,production_code,employee_id varchar(20);
   declare production_name,workshop_name,workstation_name,employee_name varchar(50);  
-  declare report_qty int;
+  declare report_qty,surplus_qty int;
   declare login_workshop_id,login_workstation_id bigint;
   declare login_workshop_code,login_workstation_code varchar(20);
   declare login_workshop_name,login_workstation_name  varchar(50);
   declare last_workshop_id,first_workshop_id  bigint;
-  declare is_move,card_status int;
-   
+  declare is_move,card_status,card_type int;
+  declare surplus_record_id bigint;
+  declare rfid_no varchar(20)
+     
   set Resp='|2|1|1';
-  set is_move = 0;
+  set is_move = 0,surplus_qty=0;
+  set rfid_no = StrParam;
 
   declare exit handler for sqlexception
   begin
@@ -125,24 +139,15 @@ top:begin
     leave top;
   end;  
 
-  /*判断工位是否已登录(现在先不进行身份判断)*/
-  -- call WorkstationIsLogin(GID,DID,GatherTime,login_record_id);
-  -- if(login_record_id = -1) then    
-  --   set Resp = CONCAT(Resp,'在报工之前，请先刷工卡登录!');
-  --   leave top;
-  -- end if;
- 
-  -- select login_workshop_id = l.workshop_id,login_workshop_code = l.workshop_code,login_workshop_name = l.workshop_name,
-  --        login_workstation_id = l.workstation_id,login_workstation_code = l.workstation_code,login_worksation_name = l.workstation_name,
-  --        operator_id = l.operator_id,employee_id = l.employee_id,employee_name = l.employee_name
-  --   from workstation_login l
-  -- where record_id = login_record_id;
- 
+  
   /*卡校验*/
-  call CardNoIsValid(rfid_no,rfid_id);
+  call GetCardType(rfid_no,card_type,rfid_id);
   if(rfid_id = -1) then
     set Resp = CONCAT(Resp,'非法卡，请联系系统管理员注册卡:',rfid_no);
     leave top;
+  end if;
+  
+  if(card_type = 10) then /*如果是员工卡，则进行尾数输入*/
   end if;
   
   /*车间校验*/
@@ -151,9 +156,6 @@ top:begin
          card_status = c.card_status
     from rfid_card c
    where record_id = rfid_id;
-
-   -- 判断是否是尾数
-   
 
   select workstation_id = w.record_id, workstation_code =  w.org_code, workstation_name = w.org_name, 
         login_workshop_id = w.parent_id,login_workshop_code = w.parent_code, login_workshop_name = w.parent_name
@@ -171,7 +173,7 @@ top:begin
          leave top;
       end if
   end if;
-  
+
   /*检查生产计划*/
   call GetProductionOrder(production_id,GatherTime,prodution_order_id);
   if(production_order_id == -1) then
@@ -270,10 +272,22 @@ end;
 
 
 /*
- 刷员工卡： 进行尾数报工
-     流程:
+ 刷员工卡： 输入尾数
+      总流程:
           1. 刷工卡
           2. 输入尾数数量
           3. 刷数量卡
           4. 结果表示： 数量卡上的数量 = 原卡数量 - 尾数数量
 */
+
+create procedure ReportSurplus
+(
+    rfid_no          varchar(20),
+    GID              int,
+    DID              int,
+    GatherTime       datetime, 
+    Resp             varchar(500) output
+)
+top:begin
+   
+end;

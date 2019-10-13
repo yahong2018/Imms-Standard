@@ -382,8 +382,8 @@ create table quality_check
   update_by_code                 varchar(20)               null,
   update_by_name                 varchar(50)               null,
   update_time                    datetime                  null,
-      
-  opt_flag                       int                       not null default 0, 
+     
+  opt_flag                       int                       not null default 0,  -- 0. 正常报工记录    64. 尾数新记录  65.尾数已输入数量的记录
 
   PRIMARY KEY(record_id)  
 );
