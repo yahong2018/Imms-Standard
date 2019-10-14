@@ -18,10 +18,7 @@ create table system_parameter
     parameter_name     varchar(120)             not null,
     parameter_value    varchar(255)             not null,
 
-    PRIMARY KEY (record_id),
-    index IDX_SYSTEM_PARAMETER_0(parameter_code),
-    index IDX_SYSTEM_PARAMETER_1(parameter_name),
-    index IDX_SYSTEM_PARAMETER_2(parameter_class_id)
+    PRIMARY KEY (record_id)
 );
 
 
@@ -33,13 +30,11 @@ CREATE TABLE system_logs
   record_id                bigint  AUTO_INCREMENT      not null,
   user_id                  bigint                      not null,
   log_time                 datetime                    not null,
-  log_type                 int                         not null,
+  log_type                 varchar(20)                 not null,
+  log_level                int                         not null,
   log_value                varchar(500)                not null,
 
-  PRIMARY KEY(record_id),
-  index IDX_SYSTEM_LOGS_0(user_id),
-  index IDX_SYSTEM_LOGS_1(log_time),
-  index IDX_SYSTEM_LOGS_2(log_type)                   
+  PRIMARY KEY(record_id)                
 );
 
 --
