@@ -5,7 +5,12 @@ Ext.define("app.view.imms.material.material.MaterialDetailForm", {
     defaults: {
         labelWidth: 70
     },
+    workshopStore: Ext.create({ xtype: 'imms_org_WorkshopStore', autoLoad: true, pageSize: 0 }),
     items: [
+        {
+            xtype:"hidden",
+            name:"firstWorkshopId"
+        },
         {
             name: "materialCode",
             fieldLabel: "产品编码",
@@ -24,6 +29,19 @@ Ext.define("app.view.imms.material.material.MaterialDetailForm", {
             enforceMaxLength: true,
             width: 380,
         },
+        {
+            name: "firstWorkshopCode", fieldLabel: "首工序编码", allowBlank: false, xtype: "textfield", width: 250, listeners: {
+                change: function (self, newValue, oldValue, eOpts) {
+                    var form = this.up("app_view_imms_material_material_MaterialDetailForm");
+                    var record = form.workshopStore.findRecord("orgCode", newValue, 0, false, false, true);
+                    if (record != null) {
+                        form.down("[name='firstWorkshopId']").setValue(record.get("recordId"));                                
+                        form.down("[name='firstWorkshopName']").setValue(record.get("orgName"));
+                    }
+                }
+            }
+        },
+        { name: "workshopName", fieldLabel: "车间名称", allowBlank: false, xtype: "textfield", width:380, readOnly: true },
         {
             name: "description",
             xtype: "textarea",            

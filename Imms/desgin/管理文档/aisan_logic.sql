@@ -35,7 +35,7 @@ create procedure  MES_GetCardType(
  out CardId     bigint
 )
 begin
-   set CardType = 1;
+   set CardType = 1; -- 数量卡
    set CardId = ifnull((
        select record_id 
          from rfid_card
@@ -44,7 +44,7 @@ begin
         limit 1
    ),-1);
 
-   if(CardId = -1) then  
+   if(CardId = -1) then   -- 员工卡
       set CardId = ifnull((
         select record_id
           from operator
@@ -65,11 +65,16 @@ create procedure MES_GetProductionOrder(
   out RESULT         bigint   -- 记录编号
 )
 begin   
+   declare PlanDateBegin,PlanDateEnd date;
+   set PlanDateBegin = DATE_FORMAT(PlanDate,'%Y/%m/%d');
+   set PlanDateEnd = DATE_ADD(PlanDateBegin,interval 1 day);
+
    set RESULT = ifnull((
      select record_id
        from production_order po
        where po.production_id = ProductionId
-         and po.plan_date = PlanDate       
+         and po.plan_date >= PlanDateBegin
+         and po.plan_date < PlanDateEnd
    ),-1);
 end;
 
@@ -82,25 +87,33 @@ create procedure MES_GetLastWorkshopId(
 )
 begin
     declare LAST_RESULT bigint;
+    declare MAX_TIME,CUR_TIME int;
 
     set RESULT = WorkshopId;
     set LAST_RESULT = RESULT;
+    set MAX_TIME = 1000,CUR_TIME=0;
     
     set RESULT = ifnull(( select w.next_workshop_id
                      from work_organization_unit w
-                    where w.workshop_id = WorkshopId
+                    where w.record_id = WorkshopId
     ),-1);
 		
-    while (RESULT <> -1) do
+    while ((RESULT <> -1) and (CUR_TIME < MAX_TIME)) do
       set LAST_RESULT = RESULT;
 
       set RESULT = ifnull(( select w.next_workshop_id
                         from work_organization_unit w
-                        where w.workshop_id = RESULT
-      ),-1);         
+                        where w.record_id = RESULT
+      ),-1);     
+
+      set CUR_TIME = CUR_TIME + 1;    
     end while;
 
     set RESULT = LAST_RESULT;    
+
+    if(CUR_TIME >= MAX_TIME) then
+       set RESULT = -10;
+    end if;
 end;
 
 --

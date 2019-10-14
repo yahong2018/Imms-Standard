@@ -99,8 +99,8 @@ Ext.define("app.view.imms.mfc.productionMoving.ProductionMovingDetailForm", {
                             var form = this.up("imms_mfc_productionMoving_ProductionMovingDetailForm");
                             var record = form.workshopStore.findRecord("orgCode", newValue, 0, false, false, true);
                             if (record != null) {
-                                form.down("[name='workshopId']").setValue(record.get("workshopId"));
-                                form.down("[name='workshopName']").setValue(record.get("workshopName"));
+                                form.down("[name='workshopId']").setValue(record.get("recordId"));
+                                form.down("[name='workshopName']").setValue(record.get("orgName"));
                             }
                         }
                     }
