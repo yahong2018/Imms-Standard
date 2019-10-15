@@ -60,22 +60,24 @@ end;
 -- 根据产品编号获取生产计划
 --
 create procedure MES_GetProductionOrder(
-  in  ProductionId   bigint,  -- 产品编号
-  in  PlanDate       date,    -- 计划日期
-  out RESULT         bigint   -- 记录编号
+  in  ProductionId              bigint,  -- 产品编号
+  in  PlanDate                  date,    -- 计划日期
+  out ProductionOrderId         bigint,   -- 记录Id
+  out ProductionOrderNo         varchar(20) -- 计划单号
 )
 begin   
    declare PlanDateBegin,PlanDateEnd date;
    set PlanDateBegin = DATE_FORMAT(PlanDate,'%Y/%m/%d');
    set PlanDateEnd = DATE_ADD(PlanDateBegin,interval 1 day);
+   
+   select record_id,production_order_no into ProductionOrderId,ProductionOrderNo
+    from production_order po
+   where po.production_id = ProductionId
+     and po.plan_date >= PlanDateBegin
+     and po.plan_date < PlanDateEnd;
 
-   set RESULT = ifnull((
-     select record_id
-       from production_order po
-       where po.production_id = ProductionId
-         and po.plan_date >= PlanDateBegin
-         and po.plan_date < PlanDateEnd
-   ),-1);
+   set ProductionOrderId = ifnull(ProductionOrderId,-1);
+   set ProductionOrderNo = ifnull(ProductionOrderNo,'');
 end;
 
 --
@@ -195,11 +197,11 @@ top:begin
 									
            insert into production_order_progress(production_order_id,production_order_no,production_id,production_code,production_name,
 					        workshop_id,workshop_code,workshop_name,workstation_id,workstation_code,workstation_name,rfid_terminator_id,rfid_controller_id,									
-									report_time,report_qty,rfid_card_no,report_type,good_qty,bad_qty,operator_id,employee_id,employee_name,
+									report_time,report_qty,rfid_card_no,report_type,good_qty,bad_qty,card_qty,operator_id,employee_id,employee_name,
                   create_by_id,create_by_code,create_by_name,create_time,opt_flag)
             values(-1,'',-1,'','',
 						       WorkshopId,WorkshopCode,WorkshopName,WorkstationId,WorkstationCode,WorkstationName,DID,GID,                   
-									 DataGatherTime,-1,'',1,-1,-1,OperatorId,EmployeeId,EmployeeName,
+									 DataGatherTime,-1,'',1,-1,-1,0,OperatorId,EmployeeId,EmployeeName,
                    OperatorId,EmployeeId,EmployeeName,Now(),64);
         end if;
 
@@ -209,6 +211,7 @@ top:begin
         call MES_Debug('数量卡');
 
         call MES_ReportProductionOrder(GID,DID,GatherTime,RfidNo,Resp);
+        set Resp = CONCAT(Resp,'210|255|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次    
     end if;
   elseif(DataType = 3) then -- 如果是键盘输入 , 则进行尾数报工
         call MES_Debug('键盘输入');
@@ -222,7 +225,7 @@ top:begin
                  opt_flag = 65
            where opt_flag = 64 and rfid_terminator_id = DID  and rfid_controller_id = GID;
 
-          set Resp = CONCAT(Resp,'|1|已报[',ReportQty,']');                    
+          set Resp = CONCAT(Resp,'|1|已报尾数[',ReportQty,']个,请刷数量卡.');
         end if;
 
         set Resp = CONCAT(Resp,'210|255|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次    
@@ -241,10 +244,10 @@ create procedure MES_ReportProductionOrder(
     in GatherTime       datetime,     
     out Resp            varchar(500))
 top:begin
-  declare LoginRecordId,ProductionOrderId,WorkshopId,WorkstationId,ProductionId,OperatorId bigint;
+  declare LoginRecordId,ProductionOrderId,WorkshopId,WorkstationId,ProductionId,OperatorId,SurplusRecordId bigint;
   declare ProductionOrderNo,WorkshopCode,WorkstationCode,ProductionCode,EmployeeId varchar(20);
   declare ProductionName,WorkshopName,WorkstationName,EmployeeName varchar(50);  
-  declare ReportQty int;
+  declare ReportQty,SurplusQty,CardQty int;
   declare LoginWorkshopId,LoginWorkstationId bigint;
   declare LoginWorkshopCode,LoginWorkstationCode varchar(20);
   declare LoginWorkshopName,LoginWorkstationName  varchar(50);
@@ -266,15 +269,14 @@ top:begin
 	
 	set IsMove = 0;	
 
-  /*车间校验*/
-  select ProductionId = c.production_id, ProductionCode = c.production_code, ProductionName = c.production_name,
-         ReportQty = c.qty, WorkshopId = c.workshop_id,WorkshopCode = c.workshop_code,WorkshopName = c.workshop_name,
-         CardStatus = c.card_status
+  /*验证刷的数量卡是否是属于当前车间的卡*/
+  select c.production_id, c.production_code, c.production_name, c.qty, c.workshop_id, c.workshop_code, c.workshop_name,c.card_status
+    into ProductionId,ProductionCode,ProductionName,CardQty,WorkshopId,WorkshopCode,WorkshopName,CardStatus
     from rfid_card c
    where record_id = RfidId;
-
-  select WorkstationId = w.record_id, WorkstationCode =  w.org_code, WorkstationName = w.org_name, 
-        LoginWorkshopId = w.parent_id,LoginWorkshopCode = w.parent_code, LoginWorkshopName = w.parent_name
+  
+  select w.record_id, w.org_code, w.org_name, w.parent_id,w.parent_code, w.parent_name
+    into WorkstationId,WorkstationCode,WorkstationName,LoginWorkshopId,LoginWorkshopCode,LoginWorkshopName
     from work_organization_unit w
     where w.org_type = 'ORG_WORK_STATION'
       and w.rfid_controller_id = GID
@@ -291,22 +293,27 @@ top:begin
   end if;
 
   /*检查生产计划*/
-  call MES_GetProductionOrder(ProductionId,GatherTime,ProdutionOrderId);
+  call MES_GetProductionOrder(ProductionId,GatherTime,ProdutionOrderId,ProductionOrderNo);
   if(ProductionOrderId = -1) then
      set Resp = CONCAT('没有下达日期为[', DATE_FORMAT(GatherTime,'%Y/%m/%d'),']的生产计划');
      leave top;
   end if;
-  /*获取生产计划信息*/
-  select ProductionOrderNo = po.order_no 
-     from production_order po
-    where record_id = ProductionOrderId;
 
   /*进行报工或者处理,开始事务*/
   start transaction;
   set InTran = 1;
  
   if( IsMove = 1 /*进行报工处理*/) then  
-    /*生产进度*/
+    /*获取尾数*/
+    select record_id,report_qty into SurplusRecordId,SurplusQty 
+      from production_order_progress
+     order by create_time desc
+      limit 1;
+    set SurplusRecordId = ifnull(SurplusRecordId,-1);
+    set SurplusQty = ifnull(SurplusQty,0);
+    set ReportQty = CardQty - SurplusQty;
+
+    /*生产进度*/    
     insert into production_order_progress(
       production_order_id,production_order_no,production_id,production_code,production_name,
       workshop_id,workshop_code,workshop_name,
@@ -316,7 +323,7 @@ top:begin
       operator_id,employee_id,employee_name,
       create_by_id,create_by_code,create_by_name,create_time,
       update_by_id,update_by_code,update_by_name,update_time,opt_flag,
-      report_time,good_qty,bad_qty,report_qty    
+      report_time,good_qty,bad_qty,report_qty,card_qty    
     ) values (
       ProductionOrderId,ProductionOrderNo,ProductionId,ProductionCode,ProductionName,
       WorkshopId,WorkshopCode,WorkshopName,
@@ -325,8 +332,8 @@ top:begin
       FfidNo,0,
       OperatorId,EmployeeId,EmployeeName,
       OperatorId,EmployeeId,EmployeeName,Now(),
-      null,null,null,null,0,
-      DataGatherTime,ReportQty,0,ReportQty
+      null,null,null,null,if(SurplusRecordId = -1, 0,127),
+      DataGatherTime,ReportQty,0,ReportQty,
     );
 
     /*更新实际生产数量*/
@@ -352,7 +359,19 @@ top:begin
       set card_status = 1
       where record_id = RfidId;
 
+    /*修改尾数报工记录的状态*/
+    update production_order_progress
+       set opt_flag = 65
+      where record_id = SurplusRecordId;      
+
   else /*进行移库处理*/
+     select report_qty into ReportQty
+       from production_order_progress
+      where rfid_card_no = RfidNo
+      order by create_time desc
+      limit 1;    
+     set ReportQty = ifnull(ReportQty,0);
+     
      /*移库记录*/ 
      insert into production_order_moving(
        production_order_id,production_order_no,production_id,production_code,production_name,

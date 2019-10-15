@@ -201,7 +201,6 @@ insert into production_order(record_id,order_no,order_status,production_id,produ
 );
 
 -- 系统参数
-
 insert into system_parameter(parameter_class_id,parameter_code,parameter_name,parameter_value)
                  values(0,'LOG_LEVEL','日志级别','DEBUG');
 								 

@@ -255,13 +255,14 @@ create table production_order_progress
     rfid_terminator_id     int                       not null, -- 机器号
     rfid_controller_id     int                       not null, -- 组号
     
-    report_time            datetime                  not null, -- 报告时间
-    report_qty             int                       not null, -- 数量
-    rfid_card_no           varchar(20)               null, -- RFID卡号，如果是尾数，则为空
+    report_time            datetime                  not null, -- 报告时间    
+    rfid_card_no           varchar(20)               not null, -- RFID卡号，如果是尾数，则为为''
     report_type            int                       not null, -- 数量类型：0. 整数刷卡申报  1.尾数       
+    report_qty             int                       not null, -- 报工数量
+    good_qty               int                       not null, -- 良品数
+    bad_qty                int                       not null, -- 不良品数
+    card_qty               int                       not null, -- 卡的数量:正常情况，卡的数量 = 报工数量，但是有尾数的时候，报工数量=卡的数量-尾数的数量
 
-    good_qty               int                       not null,
-    bad_qty                int                       not null,
 
     operator_id            bigint                    not null,
     employee_id            varchar(20)               not null,
@@ -279,7 +280,7 @@ create table production_order_progress
     update_by_name         varchar(50)               null,
     update_time            datetime                  null,
     
-    opt_flag               int                       not null default 0, -- 0. 正常报工记录    64. 尾数新记录  65.尾数已输入数量的记录
+    opt_flag               int                       not null default 0, -- 0. 正常报工记录    64. 尾数新记录  65.尾数已输入数量的记录 66.尾数已处理的记录  127.已包含尾数的刷卡报工记录
     
     primary key(record_id)
 );
