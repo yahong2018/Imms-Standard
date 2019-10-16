@@ -1,3 +1,12 @@
+/*
+truncate table operator;
+truncate table rfid_card;
+truncate table work_organization_unit;
+truncate table material;
+truncate table production_order;
+truncate table system_parameter;
+*/
+
 -- 初始化人员数据
 insert into operator(record_id,employee_id,employee_name,employee_card_no,org_id,org_code,org_name,
    create_by_id,create_by_code,create_by_name,create_time,update_by_id,update_by_code,update_by_name,update_time,opt_flag
@@ -202,7 +211,7 @@ insert into production_order(record_id,order_no,order_status,production_id,produ
 
 -- 系统参数
 insert into system_parameter(parameter_class_id,parameter_code,parameter_name,parameter_value)
-                 values(0,'LOG_LEVEL','日志级别','DEBUG');
+                 values(0,'LOG_LEVEL','日志级别','5');  -- 5. Debug  4. Info  3. Warn  2. Error 1 Fatal
 								 
 
 
@@ -237,4 +246,39 @@ set @IsNewData=1,
 call MES_ProcessDeviceData(@IsNewData,@GID,@DID,@IsOffLineData,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
 select @Resp;
 select log_value from system_logs;
+
+
+-- 报工
+truncate system_logs;
+set @IsNewData=1,        
+		@GID=1, -- 压铸
+		@DID=1,
+		@IsOffLineData=0, 		
+		@DataType=1, --  刷卡输入 				
+		@DataGatherTime='2019/10/14 08:30:59',
+		@DataMakeTime='2019/10/14 08:31:02',
+		@StrPara1='K0001',  -- 数量卡
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@IsNewData,@GID,@DID,@IsOffLineData,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+select log_value from system_logs;
+
+
+-- 移库
+truncate system_logs;
+set @IsNewData=1,        
+		@GID=2, -- MC加工
+		@DID=1,
+		@IsOffLineData=0, 		
+		@DataType=1, --  刷卡输入 				
+		@DataGatherTime='2019/10/14 08:30:59',
+		@DataMakeTime='2019/10/14 08:31:02',
+		@StrPara1='K0001',  -- 数量卡
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@IsNewData,@GID,@DID,@IsOffLineData,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+select log_value from system_logs;
+
 */
