@@ -204,7 +204,7 @@ insert into production_order(record_id,order_no,order_status,production_id,produ
    plan_date,qty_planned,qty_actual,qty_store,qty_good,qty_bad,
    create_by_id,create_by_code,create_by_name,create_time,update_by_id,update_by_code,update_by_name,update_time,opt_flag
 )values(
-    2,'PO.000002',0,2,'A-0002','产品1',
+    2,'PO.000002',0,2,'A-0002','产品2',
     '2019/10/14',550,0,0,0,0,
     1,'C00001','刘永红',Now(),null,null,null,null,0
 );

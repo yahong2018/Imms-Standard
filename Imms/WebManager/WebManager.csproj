@@ -5,14 +5,14 @@
     <RootNamespace>Imms.WebManager</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="wwwroot\app\**"/>
+    <!-- <Compile Remove="wwwroot\app\**"/>
     <Compile Remove="wwwroot\ext\**"/>
     <Content Remove="wwwroot\app\**"/>
     <Content Remove="wwwroot\ext\**"/>
     <EmbeddedResource Remove="wwwroot\app\**"/>
     <EmbeddedResource Remove="wwwroot\ext\**"/>
     <None Remove="wwwroot\app\**"/>
-    <None Remove="wwwroot\ext\**"/>
+    <None Remove="wwwroot\ext\**"/> -->
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App"/>

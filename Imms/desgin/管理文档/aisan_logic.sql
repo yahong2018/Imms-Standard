@@ -40,7 +40,7 @@ begin
        select record_id 
          from rfid_card
          where rfid_no = CardNo
-          and card_status = 0
+          and (card_status = 0 or card_status = 1) -- 未报工或者已报工的卡
         limit 1
    ),-1);
 
@@ -61,7 +61,7 @@ end;
 --
 create procedure MES_GetProductionOrder(
   in  ProductionId              bigint,  -- 产品编号
-  in  PlanDate                  date,    -- 计划日期
+  in  PlanDate                  datetime,    -- 计划日期
   out ProductionOrderId         bigint,   -- 记录Id
   out ProductionOrderNo         varchar(20) -- 计划单号
 )
@@ -70,7 +70,7 @@ begin
    set PlanDateBegin = DATE_FORMAT(PlanDate,'%Y/%m/%d');
    set PlanDateEnd = DATE_ADD(PlanDateBegin,interval 1 day);
    
-   select record_id,production_order_no into ProductionOrderId,ProductionOrderNo
+   select record_id,order_no into ProductionOrderId,ProductionOrderNo
     from production_order po
    where po.production_id = ProductionId
      and po.plan_date >= PlanDateBegin
@@ -233,7 +233,7 @@ create procedure MES_ReportProductionOrder(
     out Resp            varchar(500)
 )
 top:begin
-  declare LoginRecordId,ProductionOrderId,WorkshopId,WorkstationId,ProductionId,OperatorId,SurplusRecordId bigint;
+  declare LoginRecordId,ProductionOrderId,WorkshopId,WorkstationId,ProductionId,OperatorId,SurplusRecordId,PrevProgressRecordId bigint;
   declare ProductionOrderNo,WorkshopCode,WorkstationCode,ProductionCode,EmployeeId varchar(20);
   declare ProductionName,WorkshopName,WorkstationName,EmployeeName varchar(50);  
   declare ReportQty,SurplusQty,CardQty int;
@@ -358,13 +358,13 @@ top:begin
 
   else -- 进行移库处理	   
 		 set OperatorId = -1,EmployeeId = '',EmployeeName = '';
-     select report_qty into ReportQty
+     select report_qty,record_id into ReportQty,PrevProgressRecordId
        from production_order_progress
       where rfid_card_no = RfidNo
       order by create_time desc
       limit 1;    
      set ReportQty = ifnull(ReportQty,0);
-     
+		      
      -- 移库记录
      insert into production_moving(
        production_order_id,production_order_no,production_id,production_code,production_name,
@@ -372,14 +372,14 @@ top:begin
        operator_id,employee_id,employee_name,moving_time,
        workstation_id,workstation_code,workstation_name,workshop_id,workshop_code,workshop_name,
        create_by_id,create_by_code,create_by_name,create_time,
-       update_by_id,update_by_code,update_by_name,update_time,opt_flag
+       update_by_id,update_by_code,update_by_name,update_time,opt_flag,prev_progress_record_id
      )values(
        ProductionOrderId,ProductionOrderNo,ProductionId,ProductionCode,ProductionName,
        RfidNo,RfidId,DID,GID,ReportQty,
        OperatorId,EmployeeId,EmployeeName,GatherTime,
        WorkstationId,WorkstationCode,WorkstationName,WorkshopId,WorkshopCode,WorkshopName,
        OperatorId,EmployeeId,EmployeeName,Now(),
-       null,null,null,null,0
+       null,null,null,null,0,PrevProgressRecordId
      );
 
      -- 修改卡的状态为未报工的状态
