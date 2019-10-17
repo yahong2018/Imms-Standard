@@ -54,7 +54,8 @@ namespace Imms.WebManager.Controllers
                 foreach (var item in dataList)
                 {
                     string json = item.ToJson();
-                    string base64String = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(json), Base64FormattingOptions.None);
+                    string base64String = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(json), Base64FormattingOptions.None)
+                       .Replace("+","$_$_$_$_$");
                     imgDataList.Add(base64String);
 
                     System.Tuple<string, string, int, string> tuple = Tuple.Create<string, string, int, string>

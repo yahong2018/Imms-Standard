@@ -2,7 +2,8 @@ Ext.define("app.view.imms.material.material.Material", {
     extend: "app.ux.dbgrid.DbGrid",
     xtype: "app_view_imms_material_material_Material",
 
-    requires: ["app.store.imms.material.MaterialStore", "app.model.imms.material.MaterialModel"],
+    requires: ["app.store.imms.material.MaterialStore", "app.model.imms.material.MaterialModel",
+       "app.model.imms.org.WorkshopModel","app.store.imms.org.WorkshopStore"],
     uses: ["app.view.imms.material.material.MaterialDetailForm"],
 
     columns: [

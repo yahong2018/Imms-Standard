@@ -2,8 +2,9 @@ Ext.define("app.view.imms.material.material.MaterialDetailForm", {
     extend: "app.ux.TrackableFormPanel",
     xtype: "app_view_imms_material_material_MaterialDetailForm",
     padding:10,
+    width:420,
     defaults: {
-        labelWidth: 70
+        labelWidth: 100
     },
     workshopStore: Ext.create({ xtype: 'imms_org_WorkshopStore', autoLoad: true, pageSize: 0 }),
     items: [
@@ -41,7 +42,7 @@ Ext.define("app.view.imms.material.material.MaterialDetailForm", {
                 }
             }
         },
-        { name: "workshopName", fieldLabel: "车间名称", allowBlank: false, xtype: "textfield", width:380, readOnly: true },
+        { name: "firstWorkshopName", fieldLabel: "车间名称", allowBlank: false, xtype: "textfield", width:380, readOnly: true },
         {
             name: "description",
             xtype: "textarea",            

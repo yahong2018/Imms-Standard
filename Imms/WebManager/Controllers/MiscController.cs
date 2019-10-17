@@ -12,7 +12,7 @@ namespace Imms.WebManager.Controllers
         {
             Response.ContentType = "image/jpeg";
 
-            string content = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(base64Content));
+            string content = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(base64Content.Replace("$_$_$_$_$","+")));
 
             var bitmap = Imms.Core.QRCoder.GetQRCode(content, pixel);
             MemoryStream ms = new MemoryStream();

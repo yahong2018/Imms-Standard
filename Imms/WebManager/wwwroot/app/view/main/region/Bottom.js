@@ -6,9 +6,9 @@ Ext.define('app.view.main.region.Bottom', {
 		xtype: 'buttontransparent'
 	},
 	style: 'background-color : #f6f5ec;padding-top:0px;',
-	height:30,
+	height: 30,
 
-	initComponent:function(){		
+	initComponent: function () {
 		this.up('app-main').getController().loadCurrentUser();
 		this.callParent(arguments);
 	},
@@ -17,25 +17,24 @@ Ext.define('app.view.main.region.Bottom', {
 			text: '使用单位:{user.company}'
 		},
 		glyph: 0xf0f7,
-		handler:function(){	
+		handler: function () {
 		}
 	}, {
 		bind: {
 			text: '用户:{user.name}'
-		},		
-		glyph: 0xf007,
-		handler:function(){
-			 
-		}
-	},{
-		id:'system-time',	 
-		glyph:0xf017,
-		html:'<div system-time-div></div>'
-	},  '->', {
-		bind: {
-			text: '{service.company}'
 		},
-		glyph: 0xf059
+		glyph: 0xf007,
+		handler: function () {
+
+		}
+	}, {
+		id: 'system-time',
+		glyph: 0xf017,
+		html: '<div system-time-div></div>'
+	}, '->', {
+		bind: {
+			text: '©{service.company}'
+		},
 
 	}, {
 		bind: {
@@ -52,9 +51,5 @@ Ext.define('app.view.main.region.Bottom', {
 			text: '{service.email}'
 		},
 		glyph: 0xf003
-	}, {
-		bind: {
-			text: '©{service.copyright}'
-		}
 	}]
 });
