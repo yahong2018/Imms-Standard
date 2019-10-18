@@ -7,6 +7,7 @@ Ext.define("app.view.imms.mfc.rfidCard.RfidCard", {
         "app.model.imms.org.WorkshopModel", "app.store.imms.org.WorkshopStore"
     ],
     columns: [
+        { dataIndex: "kanbanNo", text: '看板编号', width: 100 },
         { dataIndex: "rfidNo", text: '卡号', width: 100 },
         // { dataIndex: "cardStatus", text: '状态', width: 100 },
         { dataIndex: "workshopCode", text: '车间编号', width: 100 },
@@ -39,7 +40,7 @@ Ext.define("app.view.imms.mfc.rfidCard.RfidCard", {
         var configBase = {
             store: Ext.create({ xtype: 'imms_mfc_RfidCardStore' }),
             detailFormClass: 'imms_mfc_rfidCard_RfidCardDetailForm',
-            detailWindowTitle: 'RFID卡',
+            detailWindowTitle: '看板RFID卡',
         };
         Ext.applyIf(config, configBase);
 

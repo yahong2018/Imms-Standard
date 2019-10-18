@@ -42,6 +42,7 @@ namespace Imms.Security.Data.Domain
         public int ShowOrder { get; set; }
         public string Parameters { get; set; }
         public string ParentId { get; set; }
+        public int ProgramStatus{get;set;}
 
         public virtual void Assign(BaseProgram other)
         {
@@ -162,6 +163,7 @@ namespace Imms.Security.Data.Domain
             builder.Property(e => e.ProgramName).IsRequired().HasColumnName("program_name").HasMaxLength(120).IsUnicode(false);
             builder.Property(e => e.ShowOrder).HasColumnName("show_order").HasColumnType("int(11)");
             builder.Property(e => e.Url).IsRequired().HasColumnName("url").HasMaxLength(255).IsUnicode(false);
+            builder.Property(e=>e.ProgramStatus).HasColumnName("program_status");
 
             builder.HasMany(e => e.Children).WithOne(e => e.Parent).HasForeignKey(e => e.ParentId).HasConstraintName("parent_id").HasPrincipalKey(x => x.RecordId);
         }

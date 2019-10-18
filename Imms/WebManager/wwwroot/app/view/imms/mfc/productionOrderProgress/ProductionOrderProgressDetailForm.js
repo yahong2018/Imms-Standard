@@ -11,32 +11,32 @@ Ext.define("app.view.imms.mfc.productionOrderProgress.ProductionOrderProgressDet
     workshopStore: Ext.create({ xtype: 'imms_org_WorkshopStore', autoLoad: true, pageSize: 0 }),
     workstationStore: Ext.create({ xtype: 'imms_org_WorkstationStore', autoLoad: true, pageSize: 0 }),
     operatorStore: Ext.create({ xtype: 'imms_org_OperatorStore', autoLoad: true, pageSize: 0 }),
-    productionOrderStore: Ext.create({ xtype: "imms_mfc_ProductionOrderStore", autoLoad: false }),
+    // productionOrderStore: Ext.create({ xtype: "imms_mfc_ProductionOrderStore", autoLoad: false }),
     // rfidCardStore: Ext.create({ xtype: "imms_mfc_RfidCardStore", autoLoad: false }),
     items: [
-        { name: "productionOrderId", xtype: "hidden" },
+        // { name: "productionOrderId", xtype: "hidden" },
         { name: "workshopId", xtype: "hidden" },
         { name: "workstationId", xtype: "hidden" },
         { name: "productionId", xtype: "hidden" },
         { name: "operatorId", xtype: "hidden" },
-        {
-            name: "productionOrderNo", fieldLabel: "计划单号", allowBlank: false, xtype: "textfield", width: 250, listeners: {
-                change: function (elf, newValue, oldValue, eOpts) {
-                    var form = this.up("imms_mfc_productionOrderProgress_ProductionOrderProgressDetailForm");
-                    form.productionOrderStore.clearCustomFilter();
-                    form.productionOrderStore.addCustomFilter({ L: "orderNo", O: "=", "R": newValue });
-                    form.productionOrderStore.buildFilterUrl();
-                    form.productionOrderStore.load(function (records, operation, success) {
-                        if (records.length == 0) {
-                            return;
-                        }
-                        form.down("[name='productionId']").setValue(records[0].get("productionId"));
-                        form.down("[name='productionCode']").setValue(records[0].get("productionCode"));
-                        form.down("[name='productionName']").setValue(records[0].get("productionName"));
-                    });
-                }
-            }
-        },
+        // {
+        //     name: "productionOrderNo", fieldLabel: "计划单号", allowBlank: false, xtype: "textfield", width: 250, listeners: {
+        //         change: function (elf, newValue, oldValue, eOpts) {
+        //             var form = this.up("imms_mfc_productionOrderProgress_ProductionOrderProgressDetailForm");
+        //             form.productionOrderStore.clearCustomFilter();
+        //             form.productionOrderStore.addCustomFilter({ L: "orderNo", O: "=", "R": newValue });
+        //             form.productionOrderStore.buildFilterUrl();
+        //             form.productionOrderStore.load(function (records, operation, success) {
+        //                 if (records.length == 0) {
+        //                     return;
+        //                 }
+        //                 form.down("[name='productionId']").setValue(records[0].get("productionId"));
+        //                 form.down("[name='productionCode']").setValue(records[0].get("productionCode"));
+        //                 form.down("[name='productionName']").setValue(records[0].get("productionName"));
+        //             });
+        //         }
+        //     }
+        // },
         {
             xtype: "container",
             layout: "hbox",
@@ -145,6 +145,14 @@ Ext.define("app.view.imms.mfc.productionOrderProgress.ProductionOrderProgressDet
         },
 
         { name: "remark", xtype: "textarea", fieldLabel: "备注", flex: 1 },
+    ],
+    showHiddenItems: [
+        {
+            name: "recordId",
+            xtype: "textfield",
+            fieldLabel: "业务流水号",
+            readOnly: true,
+        }
     ],
     onRecordLoad: function (config) {
         if (config.seq == app.ux.data.DataOperationSeq.BEFORE && config.dataMode == app.ux.data.DataMode.INSERT) {

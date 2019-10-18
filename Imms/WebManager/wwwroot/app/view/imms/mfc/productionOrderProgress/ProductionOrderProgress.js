@@ -11,8 +11,8 @@ Ext.define("app.view.imms.mfc.productionOrderProgress.ProductionOrderProgress", 
     ],
     uses: ["app.view.imms.mfc.productionOrderProgress.ProductionOrderProgressDetailForm"],
     columns: [
-        { dataIndex: "productionOrderNo", text: "计划订单",width:150 },
-
+        // { dataIndex: "productionOrderNo", text: "计划订单",width:150 },
+        { dataIndex: "recordId", text: "业务流水" },
         { dataIndex: "workshopCode", text: "车间编码" },
         { dataIndex: "workshopName", text: "车间名称" },
 
@@ -38,7 +38,7 @@ Ext.define("app.view.imms.mfc.productionOrderProgress.ProductionOrderProgress", 
         var configBase = {
             store: Ext.create({ xtype: 'imms_mfc_ProductionOrderProgressStore' }),
             detailFormClass: 'imms_mfc_productionOrderProgress_ProductionOrderProgressDetailForm',
-            detailWindowTitle: '生产实绩',
+            detailWindowTitle: '生产报工',
         };
         Ext.applyIf(config, configBase);
 

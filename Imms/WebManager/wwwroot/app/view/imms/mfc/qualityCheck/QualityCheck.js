@@ -12,8 +12,8 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheck", {
     ],
     uses: ["app.view.imms.mfc.qualityCheck.QualityCheckDetailForm"],
     columns: [
-        { dataIndex: "productionOrderNo", text: "计划单号", width: 100 },
-
+        // { dataIndex: "productionOrderNo", text: "计划单号", width: 100 },
+        { dataIndex: "recordId", text: "业务流水" },
         { dataIndex: "productionCode", text: "产品代码", width: 100 },
         { dataIndex: "productionName", text: "产品名称", width: 200 },
         { dataIndex: "qty", text: "缺陷数量", width: 100 },

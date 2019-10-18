@@ -45,6 +45,7 @@ namespace Imms.WebManager.Controllers
                                    where p.RecordId == rp.ProgramId
                                       && rp.RoleId == r.RoleId
                                       && r.UserId == userId
+                                      && p.ProgramStatus == 0
                                    select p
                 ).Include(x => x.Privielges)
                 .ToList();

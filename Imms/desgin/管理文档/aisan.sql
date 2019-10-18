@@ -158,7 +158,8 @@ create table material
 create table rfid_card
 (
     record_id              bigint  auto_increment      not null,
-            
+
+    kanban_no              varchar(20)                 not null,        
     rfid_no                varchar(20)                 not null,
     card_type              int                         not null,       --  卡类别: 0. 工艺数量   1. 员工卡
     card_status            int                         not null,       --  0.正常卡   1. 已报工的卡    255.已作废的卡

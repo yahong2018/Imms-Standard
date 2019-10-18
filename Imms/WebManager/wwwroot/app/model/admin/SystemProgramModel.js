@@ -13,6 +13,7 @@ Ext.define('app.model.admin.SystemProgramModel', {
           {name:"status",type:"string"},
           {name:"glyph",type:"string"},
           {name:"parent",type:"string"},
+          {name:"programStatus",type:"int"}
     ],
     idProperty: 'recordId'
 });

@@ -31,6 +31,7 @@ namespace Imms.Mes.Data.Domain
 
     public class RfidCard : TrackableEntity<long>
     {
+        public string KanbanNo{get;set;}
         public string RfidNo{get;set;}
         public int CardType{get;set;}
         public int CardStatus{get;set;}
@@ -71,6 +72,7 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.WorkshopName).HasColumnName("workshop_name");
 
             builder.Property(e => e.Qty).HasColumnName("qty");
+            builder.Property(e=>e.KanbanNo).HasColumnName("kanban_no");
             
             builder.HasOne(e=>e.Production).WithMany().HasForeignKey(e=>e.ProductionId).HasConstraintName("production_id");            
             builder.HasOne(e=>e.Workshop).WithMany().HasForeignKey(e=>e.WorkshopId).HasConstraintName("workshop_id");

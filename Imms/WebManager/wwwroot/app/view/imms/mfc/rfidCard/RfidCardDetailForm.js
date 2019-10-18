@@ -13,7 +13,27 @@ Ext.define("app.view.imms.mfc.rfidCard.RfidCardDetailForm", {
         {
             name: "workshopName",
             xtype: "hidden"
+        }, {
+            name: "productionCode",
+            xtype: "hidden"
         },
+        {
+            name: "productionName",
+            xtype: "hidden"
+        }, {
+            name: "kanbanNo",
+            xtype: "textfield",
+            fieldLabel: "看板编号",
+            allowBlank: false,
+            width: 380,
+        }, 
+        {
+            name: "rfidNo",
+            xtype: "textfield",
+            fieldLabel: "RFID卡号",
+            allowBlank: false,
+            width: 380,
+        }, 
         {
             name: "workshopId",
             xtype: "combobox",
@@ -34,14 +54,7 @@ Ext.define("app.view.imms.mfc.rfidCard.RfidCardDetailForm", {
                 }
             }
         },
-        {
-            name: "productionCode", 
-            xtype: "hidden"
-        },
-        {
-            name: "productionName",
-            xtype: "hidden"
-        },        
+     
         {
             name: "productionId",
             xtype: "combobox",
@@ -67,13 +80,6 @@ Ext.define("app.view.imms.mfc.rfidCard.RfidCardDetailForm", {
             name: "qty",
             xtype: "textfield",
             fieldLabel: "数量",
-            allowBlank: false,
-            width: 380,
-        },
-        {
-            name: "rfidNo",
-            xtype: "textfield",
-            fieldLabel: "卡号",
             allowBlank: false,
             width: 380,
         }

@@ -35,7 +35,7 @@ Ext.define('app.ux.TrackableFormPanel', {
             name: "optFlag",
         }];
 
-        for (var i = 0; i < tempItems.length; i++) {
+        for (var i = tempItems.length-1; i >=0; i--) {
             var exists = false;
             for (var j = 0; j < this.items.length; j++) {
                 if (tempItems[i].name == this.items[j].name) {
@@ -44,7 +44,21 @@ Ext.define('app.ux.TrackableFormPanel', {
                 }
             }
             if (!exists) {
-                this.items.push(tempItems[i]);
+                this.items.unshift(tempItems[i]);
+            }
+        }
+       
+        if (this.showHiddenItems && this.showHiddenItems.length > 0) {
+            for (var i = 0; i < this.showHiddenItems.length; i++) {
+                var theHiddenItem = this.showHiddenItems[i];
+                for (var j = 0; j < this.items.length; j++) {
+                    if (this.items[j].name == theHiddenItem.name && this.items[j].xtype == "hidden") {
+                        this.items[j].xtype = theHiddenItem.xtype;
+                        this.items[j].fieldLabel = theHiddenItem.fieldLabel;
+                        this.items[j].readOnly = theHiddenItem.readOnly;
+                        break;
+                    }
+                }
             }
         }
 
