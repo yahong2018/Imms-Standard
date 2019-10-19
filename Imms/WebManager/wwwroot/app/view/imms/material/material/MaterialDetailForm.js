@@ -42,7 +42,7 @@ Ext.define("app.view.imms.material.material.MaterialDetailForm", {
                 }
             }
         },
-        { name: "firstWorkshopName", fieldLabel: "车间名称", allowBlank: false, xtype: "textfield", width:380, readOnly: true },
+        { name: "firstWorkshopName", fieldLabel: "首工序名称", allowBlank: false, xtype: "textfield", width:380, readOnly: true },
         {
             name: "description",
             xtype: "textarea",            

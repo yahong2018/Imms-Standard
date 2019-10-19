@@ -100,36 +100,29 @@ namespace Imms.WebManager.Controllers
             return loginText;
         }
 
-        [Route("todayProductSummary"), HttpGet]
+        [Route("getTodayProductSummary"), HttpGet]
         public ActionResult<string> GetTodayProductSummary()
         {
             string result = null;
             CommonRepository.UseDbContext(dbContext =>
             {
-                var list = from item in dbContext.Set<ProductionOrderProgress>()
-                           where item.ReportTime >= DateTime.Today
-                               && item.ReportTime < DateTime.Today.AddDays(1)
-                               && item.ReportType == 0                               
-                           group item by new
-                           {
-                               item.ProductionId,
-                               item.ProductionCode,
-                               item.ProductionName,
-                               item.WorkshopId,
-                               item.WorkshopCode,
-                               item.WorkshopName
-                           } into t1
-                           select new
-                           {
-                               t1.Key.ProductionId,
-                               t1.Key.ProductionCode,
-                               t1.Key.ProductionName,
-                               t1.Key.WorkshopId,
-                               t1.Key.WorkshopCode,
-                               t1.Key.WorkshopName,
-                               Qty = t1.Sum(x => x.ReportQty)
-                           };
-                result = list.ToJson();
+                var theList = dbContext.Set<ProductionOrderProgress>()
+                    .Where(x => x.ReportTime >= DateTime.Today
+                                && x.ReportTime < DateTime.Today.AddDays(1)
+                                && x.ReportType == 0
+                    ).ToList()
+                   .GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopId, x.WorkshopCode, x.WorkshopName })
+                   .Select(group => new
+                   {
+                       group.Key.ProductionId,
+                       group.Key.ProductionCode,
+                       group.Key.ProductionName,
+                       group.Key.WorkshopId,
+                       group.Key.WorkshopCode,
+                       group.Key.WorkshopName,
+                       Qty = group.Sum(x => x.ReportQty)
+                   }).ToList();
+                result = theList.ToJson();
             });
 
             return result;

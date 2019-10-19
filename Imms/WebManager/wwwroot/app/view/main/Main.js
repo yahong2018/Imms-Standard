@@ -2,58 +2,68 @@ Ext.define('app.view.main.Main', {
 	extend: 'Ext.container.Container',
 	xtype: 'app-main',
 	requires: [
-		'app.view.main.MainController', 'app.view.main.MainModel'
+		'app.view.main.MainController', 'app.view.main.MainModel',
 	],
 
 	uses: ['app.view.main.region.Center', 'app.view.main.region.Top',
-		'app.view.main.region.Bottom', 'app.view.main.menu.MainMenuTree'
+		'app.view.main.region.Bottom', 'app.view.main.menu.MainMenuTree',
+		"app.model.imms.mfc.ProductSummaryModel", "app.store.imms.mfc.ProductSummaryStore"
 	],
 
 	controller: {
-	//	id: 'main-controller',
+		//	id: 'main-controller',
 		type: 'main'
 	},
 	viewModel: {
 		type: 'main'
-	}, 
+	},
+	layout: "border",
 
 	initComponent: function () {
 		Ext.setGlyphFontFamily('FontAwesome');
-	
-		this.callParent();
+		
+
+		this.callParent(arguments);
 	},
 
-	layout: {
-		type: 'border'
+	startTask: function () {
+		var mainView = this;
+		mainView.getViewModel().set('system.name', "爱三(佛山)汽车配件有限公司智能制造平台");
+
+		Ext.TaskManager.start({
+			interval: 1000,
+			run: function () {
+				var the_div = Ext.query('div[system-time-div]')[0];
+				var msg = '北京时间 ' + Ext.util.Format.date(new Date(), "Y-m-d H:i:s");
+				Ext.getDom(the_div).innerText = msg;
+			}
+		});
+
+		var runner = mainView.getViewModel().get('system.taskRunner');
+		var interval = mainView.getViewModel().get('system.autoRefreshInterval') * 1000 * 60;
+		var task = runner.newTask({
+			interval: interval,
+			run: function () {
+				console.log('start refresh:' + Ext.util.Format.date(new Date(), "Y-m-d H:i:s"));
+			}
+		});
+		mainView.getViewModel().set('system.autoRefreshTask', task);
+		task.start();
 	},
+
+
 
 	listeners: {
 		resize: function (container) {
 			container.getController().onMainResize();
 		},
 		afterrender: function () {
-			var mainView = this;
-			mainView.getViewModel().set('system.name', "爱三(佛山)汽车配件有限公司智能制造平台");
+			this.startTask();
 
-			Ext.TaskManager.start({
-				interval: 1000,
-				run: function () {
-					var the_div = Ext.query('div[system-time-div]')[0];
-					var msg = '北京时间 ' + Ext.util.Format.date(new Date(), "Y-m-d H:i:s");
-					Ext.getDom(the_div).innerText = msg;
-				}
-			});
-
-			var runner = mainView.getViewModel().get('system.taskRunner');
-			var interval = mainView.getViewModel().get('system.autoRefreshInterval') * 1000 * 60;
-			var task = runner.newTask({
-				interval: interval,
-				run: function () {
-					console.log('start refresh:' + Ext.util.Format.date(new Date(), "Y-m-d H:i:s"));
-				}
-			});
-			mainView.getViewModel().set('system.autoRefreshTask', task);
-			task.start();
+			var summaryGrid = this.down("maincenter");
+			summaryGrid = summaryGrid.down("gridpanel")
+			var summaryStore = Ext.create({ xtype: "imms_mfc_ProductSummaryStore", autoLoad: false });
+			summaryGrid.store.loadReportData(summaryStore);
 		}
 	},
 

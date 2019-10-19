@@ -1,4 +1,4 @@
-Ext.define("app.model.mfc.ProductSummaryModel", {
+Ext.define("app.model.imms.mfc.ProductSummaryModel", {
     extend: "Ext.data.Model",
     fields: [
         { name: "productionId", type: "int" },
