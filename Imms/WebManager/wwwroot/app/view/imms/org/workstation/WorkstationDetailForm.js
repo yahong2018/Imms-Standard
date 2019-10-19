@@ -24,9 +24,9 @@ Ext.define("app.view.imms.org.workstation.WorkstationDetailForm", {
             xtype: "textfield",
             fieldLabel: "工位代码",
             allowBlank: false,
-            maxLength: 6,
+            maxLength: 20,
             enforceMaxLength: true,
-            width: 180
+            width: 250
         }, {
             name: "orgName",
             xtype: "textfield",
