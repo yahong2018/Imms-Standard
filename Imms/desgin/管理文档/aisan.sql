@@ -71,10 +71,6 @@ create table work_organization_unit
     parent_code            varchar(50)                 null,
     parent_name            varchar(50)                 null,
 
-    next_workshop_id       bigint                      null,
-    next_workshop_code     varchar(50)                 null,
-    next_workshop_name     varchar(50)                 null,
-
     rfid_controller_id     int                         not null default 0,
     rfid_terminator_id     int                         not null default 0,
 

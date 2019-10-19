@@ -17,14 +17,6 @@ namespace Imms.WebManager.Controllers
         {
             this.Logic = new SimpleCRUDLogic<Workshop>();
         }
-
-        protected override void Verify(Workshop item, int operation)
-        {
-            if (item.NextWorkshopId == item.RecordId && item.NextWorkshopId != 0)
-            {
-                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_PARAMETER_INVALID, "下一车间不可以与本车间等同！");
-            }
-        }
     }
 
     [Route("api/imms/org/workstation")]

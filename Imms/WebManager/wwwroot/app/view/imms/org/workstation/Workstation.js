@@ -9,7 +9,7 @@ Ext.define("app.view.imms.org.workstation.Workstation", {
     
     columns: [
         { dataIndex: "orgCode", text: "工位代码", width: 100 },
-        { dataIndex: "orgName", text: "工位名称", width: 100 },
+        { dataIndex: "orgName", text: "工位名称", width: 200 },
         { dataIndex: "rfidControllerId", text: "Rfid控制器编号", width: 150 },
         { dataIndex: "rfidTerminatorId", text: "Rfid工位机编号", width: 150 },
         { dataIndex: "description", text: "备注", flex: 1 }

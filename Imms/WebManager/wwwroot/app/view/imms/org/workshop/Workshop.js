@@ -9,8 +9,6 @@ Ext.define("app.view.imms.org.workshop.Workshop", {
     columns: [
         { dataIndex: "orgCode", text: "车间代码", width: 100 },
         { dataIndex: "orgName", text: "车间名称", width: 100 },
-        { dataIndex: "nextWorkshopCode", text: "下一车间代码", width: 100, disableSearch:true },
-        { dataIndex: "nextWorkshopName", text: "下一车间名称", width: 100, disableSearch:true},
     ],
     constructor: function (config) {
         var configBase = {

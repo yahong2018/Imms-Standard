@@ -12,12 +12,6 @@ namespace Imms.Mes.Data.Domain
     {
         public string WorkshopCode { get { return base.OrgCode; } set { base.OrgCode = value; } }
         public string WorkshopName { get { return base.OrgName; } set { base.OrgName = value; } }
-
-        public long NextWorkshopId { get; set; }
-        public string NextWorkshopCode { get; set; }
-        public string NextWorkshopName { get; set; }
-
-        public virtual Workshop NextWorkshop { get; set; }
     }
 
     public class Workstation : WorkOrganizationUnit
@@ -111,12 +105,6 @@ namespace Imms.Mes.Data.Domain
             ImmsDbContext.RegisterEntityTable<Workshop>("work_organization_unit");
             builder.Ignore(e => e.WorkshopCode);
             builder.Ignore(e => e.WorkshopName);
-
-            builder.Property(e => e.NextWorkshopId).HasColumnName("next_workshop_id");
-            builder.Property(e=>e.NextWorkshopCode).HasColumnName("next_workshop_code");
-            builder.Property(e=>e.NextWorkshopName).HasColumnName("next_workshop_name");
-
-            builder.HasOne(e => e.NextWorkshop).WithMany().HasForeignKey(e => e.NextWorkshopId).HasConstraintName("next_workshop_id");
         }
     }
 

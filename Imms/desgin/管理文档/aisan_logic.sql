@@ -270,28 +270,35 @@ top:begin
     where w.org_type = 'ORG_WORK_STATION'
       and w.rfid_controller_id = GID
       and w.rfid_terminator_id = DID; 
-			
+	
+  -- 如果卡工序不是登录工序
   if(WorkshopId <> LoginWorkshopId) then	    
-      if ((CardStatus = 1 /*已经报工*/) and  ((select w.next_workshop_id from work_organization_unit w
-        where w.record_id = WorkshopId) = LoginWorkshopId)) then
-          set IsMove = 1; -- 如果刷卡工序是卡的下一道工序，则说明本次刷卡是移库
+      if (CardStatus = 1 ) then
+           set IsMove = 1; -- 如果刷卡已经报工，则说明本次操作是移库，否则，不能刷其他地方刷卡
       else         
          set Resp = CONCAT('当前工位是[',LoginWorkshopName,']','不能刷属于[',WorkshopName,']的卡!');
          leave top;
       end if;
+  elseif(CardStatus = 1 ) -- 如果卡已经报工，则不能重复报工
+      set Resp = CONCAT('本看板已经报工，必须移库以后才可以继续报工！');
+      leave top;     
   end if;
 
-  -- 检查生产计划	
-  call MES_GetProductionOrder(ProductionId,GatherTime,ProductionOrderId,ProductionOrderNo);
-  if(ProductionOrderId = -1) then
-     set Resp = CONCAT('没有下达日期为[', DATE_FORMAT(GatherTime,'%Y/%m/%d'),']的生产计划');
-     leave top;
-  end if;
+  --
+  -- 2019.10.18 决定不使用生产计划
+  -- -- 检查生产计划	
+  -- call MES_GetProductionOrder(ProductionId,GatherTime,ProductionOrderId,ProductionOrderNo);
+  -- if(ProductionOrderId = -1) then
+  --    set Resp = CONCAT('没有下达日期为[', DATE_FORMAT(GatherTime,'%Y/%m/%d'),']的生产计划');
+  --    leave top;
+  -- end if;
+  --
+  set ProductionOrderId = -1,ProductionOrderNo='';
 	
 	-- 进行报工或者处理,开始事务
   start transaction;
   set InTran = 1;
-		
+	
   if(IsMove = 0) then   -- 进行报工处理	  
     -- 获取尾数
     select record_id,report_qty,operator_id,employee_id,employee_name 

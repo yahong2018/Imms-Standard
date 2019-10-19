@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Imms.Security.Data;
 using Microsoft.AspNetCore.Authorization;
+using Imms.Mes.Data.Domain;
 
 namespace Imms.WebManager.Controllers
 {
@@ -72,7 +73,7 @@ namespace Imms.WebManager.Controllers
         [Route("currentLogin"), HttpGet]
         public ActionResult<string> GetCurrentLogin()
         {
-            SystemUser currentUser = (SystemUser) GlobalConstants.GetCurrentUser();
+            SystemUser currentUser = (SystemUser)GlobalConstants.GetCurrentUser();
             string loginText = null;
 
             CommonRepository.UseDbContext(dbContext =>
@@ -97,6 +98,41 @@ namespace Imms.WebManager.Controllers
                            + "}";
             });
             return loginText;
+        }
+
+        [Route("todayProductSummary"), HttpGet]
+        public ActionResult<string> GetTodayProductSummary()
+        {
+            string result = null;
+            CommonRepository.UseDbContext(dbContext =>
+            {
+                var list = from item in dbContext.Set<ProductionOrderProgress>()
+                           where item.ReportTime >= DateTime.Today
+                               && item.ReportTime < DateTime.Today.AddDays(1)
+                               && item.ReportType == 0                               
+                           group item by new
+                           {
+                               item.ProductionId,
+                               item.ProductionCode,
+                               item.ProductionName,
+                               item.WorkshopId,
+                               item.WorkshopCode,
+                               item.WorkshopName
+                           } into t1
+                           select new
+                           {
+                               t1.Key.ProductionId,
+                               t1.Key.ProductionCode,
+                               t1.Key.ProductionName,
+                               t1.Key.WorkshopId,
+                               t1.Key.WorkshopCode,
+                               t1.Key.WorkshopName,
+                               Qty = t1.Sum(x => x.ReportQty)
+                           };
+                result = list.ToJson();
+            });
+
+            return result;
         }
     }
 }
