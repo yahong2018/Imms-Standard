@@ -128,11 +128,11 @@ INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUE
 
 -- --------------------------------------------------------------------------------------------------------------------
 INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph)VALUES ('SYS05','SYS05', '模拟器', '', 4, '',  '', '0xf02f');
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS05_01', 'SYS05_01', '压铸', 'app.view.imms.mfc.simulator.yz.LineYZ', 1, '', 'SYS05', '0xf1ec');
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS05_02', 'SYS05_02', '粗加工', 'app.view.imms.mfc.simulator.cjg.LineCJG', 2, '', 'SYS05', '0xf1b3');
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS05_03', 'SYS05_03', 'M/C加工', 'app.view.imms.mfc.simulator.mc.LineMC', 3, '', 'SYS05', '0xf207');
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS05_04', 'SYS05_04', 'THR', 'app.view.imms.mfc.simulator.thr.LineTHR', 4, '', 'SYS05', '0xf1ce');
-INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS05_05', 'SYS05_05', '仓库(THR)', 'app.view.imms.mfc.simulator.ck.LineCK_THR', 5, '', 'SYS05', '0xf11d');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS05_01', 'SYS05_01', '压铸', 'app.view.imms.mfc.simulator.LineYZ', 1, '', 'SYS05', '0xf1ec');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS05_02', 'SYS05_02', '粗加工', 'app.view.imms.mfc.simulator.LineCJG', 2, '', 'SYS05', '0xf1b3');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS05_03', 'SYS05_03', 'M/C加工', 'app.view.imms.mfc.simulator.LineMC', 3, '', 'SYS05', '0xf207');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS05_04', 'SYS05_04', 'THR', 'app.view.imms.mfc.simulator.LineTHR', 4, '', 'SYS05', '0xf1ce');
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS05_05', 'SYS05_05', '仓库(THR)', 'app.view.imms.mfc.simulator.LineCK_THR', 5, '', 'SYS05', '0xf11d');
 
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS05', 'RUN', '运行');
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS05_01', 'RUN', '运行');

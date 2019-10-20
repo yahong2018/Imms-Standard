@@ -35,8 +35,7 @@ Ext.define("app.view.imms.mfc.simulator.RfidTerminator", {
                                 click: function () {
                                     var panel = this.up("imms_mfc_simulator_RfidTerminator");
                                     var cardNo = panel.down("[name='cardNo']");
-                                    debugger;
-
+                                    
                                     var reportItem ={
                                         isNewData:1,
                                         GID:panel.GID,
@@ -79,7 +78,25 @@ Ext.define("app.view.imms.mfc.simulator.RfidTerminator", {
                                     var panel = this.up("imms_mfc_simulator_RfidTerminator");
                                     var keyboard = panel.down("[name='keyboard']");
 
-                                    alert("keyboard:" + keyboard.value);
+                                    var reportItem = {
+                                        isNewData: 1,
+                                        GID: panel.GID,
+                                        DID: panel.DID,
+                                        isOffLineData: 0,
+                                        dataType: 3,
+                                        dataGatherTime: '2019/10/20 16:46:15',
+                                        dataMakeTime: '2019/10/20 16:46:15',
+                                        strPara1: keyboard.value
+                                    };
+
+                                    app.ux.Utils.ajaxRequest({
+                                        url: "api/imms/mfc/productionOrderProgress/reportProgress",
+                                        method: "POST",
+                                        jsonData: reportItem,
+                                        successCallback: function (result, response, opts) {
+                                            panel.down("[name='screen']").setValue(result.data);
+                                        }
+                                    });
                                 }
                             }
                         }

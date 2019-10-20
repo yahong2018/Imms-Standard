@@ -155,11 +155,9 @@ top:begin
     set RfidNo = StrPara1;
     call MES_GetCardType(RfidNo,CardType,CardId);		
 
-		call MES_Debug(CONCAT('卡的类型是:[',CardType,']'));
-
-    if(CardId = -1) then
+    if((CardId = -1) or (CardId = -10)) then
       set Resp = CONCAT(Resp,'|1|非法卡，请联系系统管理员注册卡:',RfidNo);      
-      set Resp = CONCAT(Resp,'210|255|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次
+      set Resp = CONCAT(Resp,'|210|255|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次
       leave top;
     end if;    
 
@@ -202,7 +200,7 @@ top:begin
         set Resp = CONCAT(Resp,'|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 打开键盘，将键盘的模式设置为多键输入，发声一次
     elseif(CardType = 1) then  -- 如果是数量卡    
         call MES_ReportProductionOrder(RfidNo,CardId,GID,DID,DataGatherTime,Resp);
-        set Resp = CONCAT(Resp,'210|255|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次    
+        set Resp = CONCAT(Resp,'|210|255|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次    
     end if;
   elseif(DataType = 3) then -- 如果是键盘输入 , 则进行尾数报工
         if ((select count(*) from production_order_progress  where opt_flag = 64 and rfid_terminator_id = DID  and rfid_controller_id = GID) = 0) then
@@ -217,7 +215,7 @@ top:begin
           set Resp = CONCAT(Resp,'|1|已报尾数[',ReportQty,']个,请刷数量卡.');
         end if;
 
-        set Resp = CONCAT(Resp,'210|255|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次    
+        set Resp = CONCAT(Resp,'|210|255|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次    
   end if;
 end;
 
@@ -230,7 +228,7 @@ create procedure MES_ReportProductionOrder(
     in GID              int,
     in DID              int,
     in GatherTime       datetime,     
-    out Resp            varchar(500)
+    out Resp            varchar(4000)
 )
 top:begin
   declare LoginRecordId,ProductionOrderId,WorkshopId,WorkstationId,ProductionId,OperatorId,SurplusRecordId,PrevProgressRecordId bigint;

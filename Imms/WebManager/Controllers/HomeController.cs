@@ -109,7 +109,7 @@ namespace Imms.WebManager.Controllers
                 var theList = dbContext.Set<ProductionOrderProgress>()
                     .Where(x => x.ReportTime >= DateTime.Today
                                 && x.ReportTime < DateTime.Today.AddDays(1)
-                                && x.ReportType == 0
+                                && (x.ReportType == 0 || x.ReportType ==127)
                     ).ToList()
                    .GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopId, x.WorkshopCode, x.WorkshopName })
                    .Select(group => new

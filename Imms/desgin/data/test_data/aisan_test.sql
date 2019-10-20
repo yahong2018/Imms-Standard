@@ -71,8 +71,6 @@ insert into rfid_card(record_id,rfid_no,card_type,card_status,production_id,prod
 -- );
 
 
-
-
 -- 初始化产品
 
 insert into material(record_id,material_code,material_name,description,first_workshop_id,first_workshop_code,first_workshop_name,
