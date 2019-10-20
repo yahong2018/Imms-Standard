@@ -279,7 +279,7 @@ top:begin
          set Resp = CONCAT('当前工位是[',LoginWorkshopName,']','不能刷属于[',WorkshopName,']的卡!');
          leave top;
       end if;
-  elseif(CardStatus = 1 ) -- 如果卡已经报工，则不能重复报工
+  elseif(CardStatus = 1 ) then -- 如果卡已经报工，则不能重复报工
       set Resp = CONCAT('本看板已经报工，必须移库以后才可以继续报工！');
       leave top;     
   end if;
@@ -304,6 +304,8 @@ top:begin
     select record_id,report_qty,operator_id,employee_id,employee_name 
 		  into SurplusRecordId,SurplusQty,OperatorId,EmployeeId,EmployeeName
       from production_order_progress
+    where report_type = 1 and opt_flag = 65
+        and workstation_id = WorkstationId
      order by create_time desc
       limit 1;
     set SurplusRecordId = ifnull(SurplusRecordId,-1);
@@ -335,24 +337,6 @@ top:begin
       GatherTime,ReportQty,0,ReportQty,CardQty
     );
 
-    -- 更新实际生产数量
-    select p.first_workshop_id into FirstWorkshopId
-      from material p
-      where p.record_id = ProductionId; 
-    if(FirstWorkshopId = WorkshopId) then
-        update production_order
-          set qty_actual = ifnull(qty_actual,0) + ReportQty
-        where record_id = ProductionOrderId ;
-    end if;
-    
-    -- 更新完工数量
-    call MES_GetLastWorkshopId(FirstWorkshopId,LastWorkshopId);
-    if (WorkshopId = LastWorkshopId) then
-        update production_order
-          set qty_good = ifnull(qty_good,0) + ReportQty
-        where record_id = ProductionOrderId ;       
-    end if;
-
     -- 修改卡的状态为已报工
     update rfid_card
       set card_status = 1
@@ -360,7 +344,7 @@ top:begin
 
     -- 修改尾数报工记录的状态
     update production_order_progress
-       set opt_flag = 65
+       set opt_flag = 66
       where record_id = SurplusRecordId;      
 
   else -- 进行移库处理	   

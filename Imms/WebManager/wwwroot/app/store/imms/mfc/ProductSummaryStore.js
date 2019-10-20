@@ -38,7 +38,7 @@ Ext.define("app.store.imms.mfc.ProductSummaryReportStore", {
     loadReportData: function (innerStore) {
         var theReportStore = this;
         innerStore.load(function (records, operation, success) {
-            debugger;
+            // debugger;
             
             theReportStore.removeAll();
             theReportStore.commitChanges();

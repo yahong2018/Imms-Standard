@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
+using System.Text;
 using Imms.Data;
 using Imms.Mes.Data.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Imms.WebManager.Controllers
 {
@@ -55,7 +58,7 @@ namespace Imms.WebManager.Controllers
                 {
                     string json = item.ToJson();
                     string base64String = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(json), Base64FormattingOptions.None)
-                       .Replace("+","$_$_$_$_$");
+                       .Replace("+", "$_$_$_$_$");
                     imgDataList.Add(base64String);
 
                     System.Tuple<string, string, int, string> tuple = Tuple.Create<string, string, int, string>
@@ -80,6 +83,110 @@ namespace Imms.WebManager.Controllers
     public class ProductionOrderProgressController : SimpleCRUDController<ProductionOrderProgress>
     {
         public ProductionOrderProgressController() => this.Logic = new SimpleCRUDLogic<ProductionOrderProgress>();
+
+        [Route("reportProgress")]
+        public string ReportProgress([FromBody]ProgressReportItem item)
+        {
+            StringBuilder resultBuilder = new StringBuilder();
+            
+            CommonRepository.UseDbContext(dbContext =>
+            {
+                using (DbConnection connection = dbContext.Database.GetDbConnection())
+                {
+                    connection.Open();
+                    using (DbCommand cmd = connection.CreateCommand())
+                    {
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.CommandText = "MES_ProcessDeviceData";
+
+                        DbParameter parameter = cmd.CreateParameter();
+                        parameter.ParameterName = "IsNewData";
+                        parameter.DbType = System.Data.DbType.Int32;
+                        parameter.Direction = System.Data.ParameterDirection.Input;
+                        parameter.Value = item.IsNewData;
+                        cmd.Parameters.Add(parameter);
+
+                        parameter = cmd.CreateParameter();
+                        parameter.ParameterName = "GID";
+                        parameter.DbType = System.Data.DbType.Int32;
+                        parameter.Direction = System.Data.ParameterDirection.Input;
+                        parameter.Value = item.GID;
+                        cmd.Parameters.Add(parameter);
+
+                        parameter = cmd.CreateParameter();
+                        parameter.ParameterName = "DID";
+                        parameter.DbType = System.Data.DbType.Int32;
+                        parameter.Direction = System.Data.ParameterDirection.Input;
+                        parameter.Value = item.DID;
+                        cmd.Parameters.Add(parameter);
+
+                        parameter = cmd.CreateParameter();
+                        parameter.ParameterName = "IsOffLineData";
+                        parameter.DbType = System.Data.DbType.Int32;
+                        parameter.Direction = System.Data.ParameterDirection.Input;
+                        parameter.Value = item.IsOffLineData;
+                        cmd.Parameters.Add(parameter);
+
+                        parameter = cmd.CreateParameter();
+                        parameter.ParameterName = "DataType";
+                        parameter.DbType = System.Data.DbType.Int32;
+                        parameter.Direction = System.Data.ParameterDirection.Input;
+                        parameter.Value = item.DataType;
+                        cmd.Parameters.Add(parameter);
+
+                        parameter = cmd.CreateParameter();
+                        parameter.ParameterName = "DataGatherTime";
+                        parameter.DbType = System.Data.DbType.DateTime;
+                        parameter.Direction = System.Data.ParameterDirection.Input;
+                        parameter.Value = item.DataGatherTime;
+                        cmd.Parameters.Add(parameter);
+
+                        parameter = cmd.CreateParameter();
+                        parameter.ParameterName = "DataMakeTime";
+                        parameter.DbType = System.Data.DbType.DateTime;
+                        parameter.Direction = System.Data.ParameterDirection.Input;
+                        parameter.Value = item.DataMakeTime;
+                        cmd.Parameters.Add(parameter);
+
+                        parameter = cmd.CreateParameter();
+                        parameter.ParameterName = "StrPara1";
+                        parameter.DbType = System.Data.DbType.AnsiString;
+                        parameter.Direction = System.Data.ParameterDirection.Input;
+                        parameter.Value = item.StrPara1;
+                        parameter.Size = 200;
+                        cmd.Parameters.Add(parameter);
+
+                        parameter = cmd.CreateParameter();
+                        parameter.ParameterName = "Resp";
+                        parameter.DbType = System.Data.DbType.AnsiString;
+                        parameter.Direction = System.Data.ParameterDirection.Output;
+                        parameter.Size = 4000;
+                        cmd.Parameters.Add(parameter);    
+
+                        cmd.ExecuteNonQuery();                    
+
+                        // using (DbDataReader dataReader = cmd.ExecuteReader())
+                        // {
+                        //     resultBuilder.Append("\"Contents\":[");
+                        //     while (dataReader.Read())
+                        //     {                              
+                        //         resultBuilder.Append("\"");
+                        //         resultBuilder.Append(dataReader["Content"].ToString());                                
+                        //         resultBuilder.Append("\",");
+                        //     }
+                        //     resultBuilder.Append("]");
+                        // }
+
+                        resultBuilder.Append("\"Resp\":\"");
+                        resultBuilder.Append(parameter.Value.ToString());
+                        resultBuilder.Append("\"");
+                    }
+                }
+            });            
+
+            return resultBuilder.ToString();
+        }
+
 
         protected override void Verify(ProductionOrderProgress item, int operation)
         {
@@ -122,6 +229,19 @@ namespace Imms.WebManager.Controllers
     [Route("api/imms/mfc/qualityCheck")]
     public class QualityCheckController : SimpleCRUDController<QualityCheck>
     {
-        public QualityCheckController() => this.Logic=new SimpleCRUDLogic<QualityCheck>();
+        public QualityCheckController() => this.Logic = new SimpleCRUDLogic<QualityCheck>();
+    }
+
+
+    public class ProgressReportItem
+    {
+        public int IsNewData { get; set; }
+        public int GID { get; set; }
+        public int DID { get; set; }
+        public int IsOffLineData { get; set; }
+        public int DataType { get; set; }
+        public DateTime DataGatherTime { get; set; }
+        public DateTime DataMakeTime { get; set; }
+        public string StrPara1 { get; set; }
     }
 }
