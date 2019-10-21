@@ -35,6 +35,7 @@ Ext.define("app.view.imms.mfc.simulator.RfidTerminator", {
                                 click: function () {
                                     var panel = this.up("imms_mfc_simulator_RfidTerminator");
                                     var cardNo = panel.down("[name='cardNo']");
+                                    var createTime = Ext.util.Format.date(new Date(), "Y-m-d H:i:s");
                                     
                                     var reportItem ={
                                         isNewData:1,
@@ -42,8 +43,8 @@ Ext.define("app.view.imms.mfc.simulator.RfidTerminator", {
                                         DID:panel.DID,
                                         isOffLineData:0,
                                         dataType:1,
-                                        dataGatherTime:'2019/10/20 16:46:15',
-                                        dataMakeTime:'2019/10/20 16:46:15',
+                                        dataGatherTime: createTime,
+                                        dataMakeTime: createTime,
                                         strPara1:cardNo.value
                                     };
 
@@ -77,6 +78,7 @@ Ext.define("app.view.imms.mfc.simulator.RfidTerminator", {
                                 click: function () {
                                     var panel = this.up("imms_mfc_simulator_RfidTerminator");
                                     var keyboard = panel.down("[name='keyboard']");
+                                    var createTime = Ext.util.Format.date(new Date(),"Y-m-d H:i:s");
 
                                     var reportItem = {
                                         isNewData: 1,
@@ -84,8 +86,8 @@ Ext.define("app.view.imms.mfc.simulator.RfidTerminator", {
                                         DID: panel.DID,
                                         isOffLineData: 0,
                                         dataType: 3,
-                                        dataGatherTime: '2019/10/20 16:46:15',
-                                        dataMakeTime: '2019/10/20 16:46:15',
+                                        dataGatherTime: createTime,
+                                        dataMakeTime: createTime,
                                         strPara1: keyboard.value
                                     };
 
@@ -102,30 +104,30 @@ Ext.define("app.view.imms.mfc.simulator.RfidTerminator", {
                         }
                     ]
                 },
-                {
-                    xtype: "fieldcontainer",
-                    layout: "hbox",
-                    items: [
-                        {
-                            xtype: "textfield",
-                            name: "lightIR",
-                            width: 100,
-                            flex: 0.8
-                        }, {
-                            xtype: "button",
-                            text: "光电",
-                            width: 50,
-                            listeners: {
-                                click: function () {
-                                    var panel = this.up("imms_mfc_simulator_RfidTerminator");
-                                    var lightIR = panel.down("[name='lightIR']");
+                // {
+                //     xtype: "fieldcontainer",
+                //     layout: "hbox",
+                //     items: [
+                //         {
+                //             xtype: "textfield",
+                //             name: "lightIR",
+                //             width: 100,
+                //             flex: 0.8
+                //         }, {
+                //             xtype: "button",
+                //             text: "光电",
+                //             width: 50,
+                //             listeners: {
+                //                 click: function () {
+                //                     var panel = this.up("imms_mfc_simulator_RfidTerminator");
+                //                     var lightIR = panel.down("[name='lightIR']");
 
-                                    alert("lightIR:" + lightIR.value);
-                                }
-                            }
-                        }
-                    ]
-                }
+                //                     alert("lightIR:" + lightIR.value);
+                //                 }
+                //             }
+                //         }
+                //     ]
+                // }
             ]
         }
     ],

@@ -282,15 +282,6 @@ top:begin
       leave top;     
   end if;
 
-  --
-  -- 2019.10.18 决定不使用生产计划
-  -- -- 检查生产计划	
-  -- call MES_GetProductionOrder(ProductionId,GatherTime,ProductionOrderId,ProductionOrderNo);
-  -- if(ProductionOrderId = -1) then
-  --    set Resp = CONCAT('没有下达日期为[', DATE_FORMAT(GatherTime,'%Y/%m/%d'),']的生产计划');
-  --    leave top;
-  -- end if;
-  --
   set ProductionOrderId = -1,ProductionOrderNo='';
 	
 	-- 进行报工或者处理,开始事务
@@ -366,7 +357,7 @@ top:begin
        ProductionOrderId,ProductionOrderNo,ProductionId,ProductionCode,ProductionName,
        RfidNo,RfidId,DID,GID,ReportQty,
        OperatorId,EmployeeId,EmployeeName,GatherTime,
-       WorkstationId,WorkstationCode,WorkstationName,WorkshopId,WorkshopCode,WorkshopName,
+       WorkstationId,WorkstationCode,WorkstationName,LoginWorkshopId,LoginWorkshopCode,LoginWorkshopName,
        OperatorId,EmployeeId,EmployeeName,Now(),
        null,null,null,null,0,PrevProgressRecordId
      );

@@ -106,11 +106,16 @@ namespace Imms.WebManager.Controllers
             string result = null;
             CommonRepository.UseDbContext(dbContext =>
             {
-                var theList = dbContext.Set<ProductionOrderProgress>()
-                    .Where(x => x.ReportTime >= DateTime.Today
-                                && x.ReportTime < DateTime.Today.AddDays(1)
-                                && (x.ReportType == 0 || x.ReportType ==127)
-                    ).ToList()
+                DateTime beginDate = DateTime.Today;
+                DateTime endDate = beginDate.AddDays(1);
+
+                var progressList = dbContext.Set<ProductionOrderProgress>()
+                    .Where(x => x.ReportTime >= beginDate
+                                && x.ReportTime < endDate
+                                && (x.ReportType == 0 || x.ReportType == 127)
+                    ).ToList();
+
+                var resultList = progressList
                    .GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopId, x.WorkshopCode, x.WorkshopName })
                    .Select(group => new
                    {
@@ -120,9 +125,28 @@ namespace Imms.WebManager.Controllers
                        group.Key.WorkshopId,
                        group.Key.WorkshopCode,
                        group.Key.WorkshopName,
-                       Qty = group.Sum(x => x.ReportQty)
+                       Qty = group.Sum(x => x.ReportQty),
+                       DataType = 2
                    }).ToList();
-                result = theList.ToJson();
+
+                var movingList = dbContext.Set<ProductionMoving>()
+                          .Where(x => x.MovingTime >= beginDate && x.MovingTime < endDate)
+                          .ToList();
+                var movingGroupList = movingList.GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopId, x.WorkshopCode, x.WorkshopName })
+                   .Select(group => new
+                   {
+                       group.Key.ProductionId,
+                       group.Key.ProductionCode,
+                       group.Key.ProductionName,
+                       group.Key.WorkshopId,
+                       group.Key.WorkshopCode,
+                       group.Key.WorkshopName,
+                       Qty = group.Sum(x => x.Qty),
+                       DataType = 1
+                   }).ToList();
+
+                resultList.AddRange(movingGroupList);
+                result = resultList.ToJson();
             });
 
             return result;

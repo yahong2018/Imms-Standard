@@ -7,6 +7,7 @@ Ext.define("app.model.imms.mfc.ProductSummaryModel", {
         { name: "workshopId", type: "int" },
         { name: "workshopCode", type: "string" },
         { name: "workshopName", type: "string" },
-        { name: "qty", type: "int" }
+        { name: "qty", type: "string" },
+        { name: "dataType", type: "int" },
     ]
 });
