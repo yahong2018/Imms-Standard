@@ -44,10 +44,12 @@ Ext.define("app.view.imms.mfc.rfidCard.ExcelImportWindow", {
                         me.store.load();
                     },
                     failure: function (form, action) {
-                        var message = action.response.responseText.trim().replace("\n", "<br>");
+                        debugger;
+
+                        var message = Ext.decode(action.response.responseText.trim());
                         Ext.MessageBox.show({
                             title: '系统提示',
-                            msg: message,
+                            msg: message.data.message,
                             buttons: Ext.MessageBox.OK,
                             icon: Ext.MessageBox.ERROR,
                         });

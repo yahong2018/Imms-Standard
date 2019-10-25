@@ -23,7 +23,7 @@ namespace Imms.Core
 
     public class ExcelHelper
     {
-        public void ImportExcel(string fileName, string worksheetName, int firstRowNum, int lastRowNum, ExcelRowProcessHandler rowHandler)
+        public static void ImportExcel(string fileName, string worksheetName, int firstRowNum, int lastRowNum, ExcelRowProcessHandler rowHandler)
         {
             if (rowHandler == null)
             {
@@ -33,12 +33,12 @@ namespace Imms.Core
             using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read))
             {
                 string fileType = Path.GetExtension(fileName).ToLower();
-                this.ImportExcel(fs, fileType, worksheetName, firstRowNum, lastRowNum, rowHandler);
+                ExcelHelper.ImportExcel(fs, fileType, worksheetName, firstRowNum, lastRowNum, rowHandler);
                 fs.Close();
             }
         }
 
-        public void ImportExcel(FileStream fs, string fileType, string worksheetName, int firstRowNum, int lastRowNum, ExcelRowProcessHandler rowHandler)
+        public static void ImportExcel(FileStream fs, string fileType, string worksheetName, int firstRowNum, int lastRowNum, ExcelRowProcessHandler rowHandler)
         {
             IWorkbook workbook;
             if (fileType == ".xlsx") { workbook = new XSSFWorkbook(fs); } else if (fileType == ".xls") { workbook = new HSSFWorkbook(fs); } else { workbook = null; }
@@ -47,20 +47,20 @@ namespace Imms.Core
                 return;
             }
 
-            this.ImportExcel(workbook, worksheetName, firstRowNum, lastRowNum, rowHandler);
+            ExcelHelper.ImportExcel(workbook, worksheetName, firstRowNum, lastRowNum, rowHandler);
         }
 
-        public void ImportExcel(IWorkbook workbook, string worksheetName, int firstRowNum, int lastRowNum, ExcelRowProcessHandler rowHandler)
+        public static void ImportExcel(IWorkbook workbook, string worksheetName, int firstRowNum, int lastRowNum, ExcelRowProcessHandler rowHandler)
         {
             ISheet sheet = workbook.GetSheet(worksheetName);
             if (sheet == null)
             {
                 return;
             }
-            this.ImportExcel(sheet,firstRowNum,lastRowNum,rowHandler);
+            ExcelHelper.ImportExcel(sheet, firstRowNum, lastRowNum, rowHandler);
         }
 
-        public void ImportExcel(ISheet sheet, int firstRowNum, int lastRowNum, ExcelRowProcessHandler rowHandler)
+        public static void ImportExcel(ISheet sheet, int firstRowNum, int lastRowNum, ExcelRowProcessHandler rowHandler)
         {
             if (firstRowNum == -1)
             {
@@ -77,7 +77,26 @@ namespace Imms.Core
                 rowHandler(row);
             }
         }
+
+        public static object GetCellValue(IRow row, int column,bool isDate=false)
+        {
+            ICell cell = row.GetCell(column);
+            CellType cellType = cell.CellType;
+
+            switch (cellType)
+            {
+                case CellType.Boolean: return cell.BooleanCellValue;
+                case CellType.Numeric:
+                  if(isDate) return cell.DateCellValue; else return cell.NumericCellValue;
+                case CellType.String: return cell.StringCellValue;                
+                default: return "";
+            }
+        }
+
     }
 
     public delegate void ExcelRowProcessHandler(IRow row);
 }
+
+
+ 

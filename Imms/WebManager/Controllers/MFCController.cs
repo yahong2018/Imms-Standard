@@ -45,42 +45,59 @@ namespace Imms.WebManager.Controllers
             {
                 file.CopyTo(stream);
                 stream.Seek(0, System.IO.SeekOrigin.Begin);
-                ExcelHelper helper = new ExcelHelper();
-                helper.ImportExcel(stream, ext, "Sheet1", 2, -1, (IRow row) =>
+               
+                CommonRepository.UseDbContext(dbContext =>
                 {
-                    string productionCode = row.GetCell(0).StringCellValue;
-                    string productionName = row.GetCell(1).StringCellValue;
-                    int qty = 0;
-                    int kanbanNo = (int)row.GetCell(3).NumericCellValue;
-                    string workshopCode = row.GetCell(4).StringCellValue;
+                    ExcelHelper.ImportExcel(stream, ext, "Sheet1", 2, -1, (IRow row) =>
+                    {
+                        // string productionCode = row.GetCell(0).StringCellValue;
+                        // string productionName = row.GetCell(1).StringCellValue;
+                        // int qty = 0;
+                        // int kanbanNo = (int)row.GetCell(3).NumericCellValue;
+                        // string workshopCode = row.GetCell(4).StringCellValue;
+                        // int rfidNo = (int)row.GetCell(5).NumericCellValue;
 
-                    try
-                    {
-                        qty = (int)row.GetCell(2).NumericCellValue;
-                    }
-                    catch
-                    {
-                        string strQty = row.GetCell(2).StringCellValue;
-                        if (!int.TryParse(strQty, out qty))
-                        {
-                            throw new BusinessException(GlobalConstants.EXCEPTION_CODE_PARAMETER_INVALID, $"第{row.RowNum}行的\"收容数量\":\"{strQty}\"无法被识别为数字！");
+                        // try
+                        // {
+                        //     qty = (int)row.GetCell(2).NumericCellValue;
+                        // }
+                        // catch
+                        // {
+                        //     string strQty = row.GetCell(2).StringCellValue;
+                        //     if (!int.TryParse(strQty, out qty))
+                        //     {
+                        //         throw new BusinessException(GlobalConstants.EXCEPTION_CODE_PARAMETER_INVALID, $"第{row.RowNum}行的\"收容数量\":\"{strQty}\"无法被识别为数字！");
+                        //     }
+                        // }
+
+                        string productionCode = ExcelHelper.GetCellValue(row,0).ToString();
+                        string productionName = ExcelHelper.GetCellValue(row,1).ToString();
+                        int qty = (int)((double)ExcelHelper.GetCellValue(row,2));
+                        string kanbanNo = ExcelHelper.GetCellValue(row,3).ToString();
+                        string workshopCode = ExcelHelper.GetCellValue(row,4).ToString();
+                        string rfidNo = ExcelHelper.GetCellValue(row,5).ToString();
+                        DateTime dateTime =(DateTime) ExcelHelper.GetCellValue(row,6,true);
+
+                        RfidCard card = new RfidCard();
+                        card.KanbanNo = kanbanNo.ToString();
+                        card.RfidNo = rfidNo.ToString().PadLeft(10, '0');
+                        card.CardStatus = 0;
+                        card.CardType = 0;
+                        card.ProductionId = -1;
+                        card.Qty = qty;
+                        card.ProductionCode = productionCode;
+                        card.ProductionName = productionName;
+
+                        Workshop workshop = dbContext.Set<Workshop>().FirstOrDefault(x=>x.OrgCode == workshopCode);
+                        if(workshop==null){
+                            throw new BusinessException(GlobalConstants.EXCEPTION_CODE_PARAMETER_INVALID, $"第{row.RowNum}行的'车间':'{workshopCode}'错误！");
                         }
-                    }
+                        card.WorkshopId = workshop.RecordId;
+                        card.WorkshopCode = workshopCode;
+                        card.WorkshopName = workshop.WorkshopName;
 
-                    RfidCard card = new RfidCard();
-                    card.KanbanNo = kanbanNo.ToString();
-                    card.RfidNo = "";
-                    card.CardStatus = 0;
-                    card.CardType = 0;
-                    card.ProductionId = -1;
-                    card.Qty = qty;
-                    card.ProductionCode = productionCode;
-                    card.ProductionName = productionName;
-                    card.WorkshopId = -1;
-                    card.WorkshopCode = workshopCode;
-                    card.WorkshopName = workshopCode;
-
-                    cardList.Add(card);
+                        cardList.Add(card);
+                    });
                 });
             }
             foreach (RfidCard card in cardList)
