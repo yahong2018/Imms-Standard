@@ -74,7 +74,7 @@ namespace Imms.Data
             this.AfterDelete(items, dbContext);
         }
 
-        public T GetByOne(string filterStr, GetDataSourceDelegate<T> getDataSourceHandler = null, FilterDataSourceDelegate<T> filterHandler = null)
+        public T GetByOne(FilterExpression[] filterList, GetDataSourceDelegate<T> getDataSourceHandler = null, FilterDataSourceDelegate<T> filterHandler = null)
         {
             GetDataSourceDelegate<T> getDataSource = getDataSourceHandler;
             if (getDataSource == null)
@@ -86,7 +86,7 @@ namespace Imms.Data
             {
                 filter = this.FilterDataSource;
             }
-            FilterExpression[] filterList = filterStr.ToObject<FilterExpression[]>();
+            
             T result = null;
             CommonRepository.UseDbContext(dbContext =>
             {

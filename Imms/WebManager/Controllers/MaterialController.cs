@@ -1,3 +1,4 @@
+using Imms.Data;
 using Imms.Mes.Data.Domain;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,8 +13,8 @@ namespace Imms.WebManager.Controllers
         [Route("syncByErp"), HttpPost]
         public int SyncByErp([FromBody] MaterialSyncItem syncItem)
         {
-            if(syncItem.DataType!="INSERT" || syncItem.DataType!="UPDATE" || syncItem.DataType!="DELETE"){
-                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_PARAMETER_INVALID,"记录类型DataType错误，必须是'INSERT'、'UPDATE'、'DELETE'三者之一");
+            if(syncItem.DataType!= 0 && syncItem.DataType!=1 && syncItem.DataType!=2){
+                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_PARAMETER_INVALID,"记录类型DataType错误，必须是'0(新增)'、'1(修改)'、'2(删除)'三者之一");
             }
 
             Material material = new Material()
@@ -26,14 +27,17 @@ namespace Imms.WebManager.Controllers
                 WorkshopName = ""
             };
 
-            if (syncItem.DataType == "INSERT")
+            if (syncItem.DataType == 0)
             {
                 this.Logic.Create(material);
             }
             else
             {
-                string filter = "{materialCode ==\"" + material.MaterialCode + "\"}";
-                Material old = this.Logic.GetByOne(filter);                
+                FilterExpression[] filterExpressions=new FilterExpression[]{
+                    new FilterExpression(){L="materialCode",O="=",R=material.MaterialCode}
+                };
+                
+                Material old = this.Logic.GetByOne(filterExpressions);                
                 if (old == null)
                 {
                     throw new BusinessException(GlobalConstants.EXCEPTION_CODE_DATA_NOT_FOUND, $"系统不存在materialCode=\"{material.MaterialCode}\"的产品或物料!");
@@ -41,11 +45,11 @@ namespace Imms.WebManager.Controllers
                 old.MaterialCode = material.MaterialCode;
                 old.MaterialName =material.MaterialName;
 
-                if (syncItem.DataType == "UPDATE")
+                if (syncItem.DataType == 1)
                 {
                     this.Logic.Update(old);
                 }
-                else if (syncItem.DataType == "DELETE")
+                else if (syncItem.DataType == 2)
                 {
                     this.Logic.Delete(new long[]{old.RecordId});                   
                 }
@@ -60,6 +64,6 @@ namespace Imms.WebManager.Controllers
         public string MaterialCode { get; set; }
         public string MaterialName { get; set; }
         public string Description { get; set; }
-        public string DataType { get; set; }
+        public int DataType { get; set; }
     }
 }

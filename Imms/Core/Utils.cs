@@ -23,33 +23,61 @@ namespace Imms.Core
 
     public class ExcelHelper
     {
-        public void ImportExcel(string fileName, string worksheetName,int[] columns, int firstRowNum,int lastRowNum)
+        public void ImportExcel(string fileName, string worksheetName, int firstRowNum, int lastRowNum, ExcelRowProcessHandler rowHandler)
         {
-            IWorkbook workbook;
-            string fileExt = Path.GetExtension(fileName).ToLower();
-            using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+            if (rowHandler == null)
             {
-                //XSSFWorkbook 适用XLSX格式，HSSFWorkbook 适用XLS格式
-                if (fileExt == ".xlsx") { workbook = new XSSFWorkbook(fs); } else if (fileExt == ".xls") { workbook = new HSSFWorkbook(fs); } else { workbook = null; }
-                if (workbook == null)
-                {
-                    return;
-                }
-                ISheet sheet = workbook.GetSheet(worksheetName);
-                if (sheet == null)
-                {
-                    return;
-                }
-                if(firstRowNum==-1){
-                    firstRowNum = sheet.FirstRowNum;
-                }
-                if(lastRowNum ==-1){
-                    lastRowNum = sheet.LastRowNum;
-                }
-                
-                IRow header = sheet.GetRow(firstRowNum);
+                return;
             }
 
+            using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+            {
+                string fileType = Path.GetExtension(fileName).ToLower();
+                this.ImportExcel(fs, fileType, worksheetName, firstRowNum, lastRowNum, rowHandler);
+                fs.Close();
+            }
+        }
+
+        public void ImportExcel(FileStream fs, string fileType, string worksheetName, int firstRowNum, int lastRowNum, ExcelRowProcessHandler rowHandler)
+        {
+            IWorkbook workbook;
+            if (fileType == ".xlsx") { workbook = new XSSFWorkbook(fs); } else if (fileType == ".xls") { workbook = new HSSFWorkbook(fs); } else { workbook = null; }
+            if (workbook == null)
+            {
+                return;
+            }
+
+            this.ImportExcel(workbook, worksheetName, firstRowNum, lastRowNum, rowHandler);
+        }
+
+        public void ImportExcel(IWorkbook workbook, string worksheetName, int firstRowNum, int lastRowNum, ExcelRowProcessHandler rowHandler)
+        {
+            ISheet sheet = workbook.GetSheet(worksheetName);
+            if (sheet == null)
+            {
+                return;
+            }
+            this.ImportExcel(sheet,firstRowNum,lastRowNum,rowHandler);
+        }
+
+        public void ImportExcel(ISheet sheet, int firstRowNum, int lastRowNum, ExcelRowProcessHandler rowHandler)
+        {
+            if (firstRowNum == -1)
+            {
+                firstRowNum = sheet.FirstRowNum;
+            }
+            if (lastRowNum == -1)
+            {
+                lastRowNum = sheet.LastRowNum;
+            }
+
+            for (int i = firstRowNum; i < lastRowNum; i++)
+            {
+                IRow row = sheet.GetRow(i);
+                rowHandler(row);
+            }
         }
     }
+
+    public delegate void ExcelRowProcessHandler(IRow row);
 }

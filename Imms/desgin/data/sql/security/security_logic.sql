@@ -84,7 +84,7 @@ INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUE
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_02', 'INSERT', '新增');
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_02', 'UPDATE', '修改');
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_02', 'DELETE', '删除');
-INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_02', 'PRINT', '打印条码');
+INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_02', 'ExcelImport', '导入看板');
 
 -- INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_03', 'RUN', '运行');
 -- INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_03', 'INSERT', '新增');
@@ -121,7 +121,7 @@ INSERT INTO system_program (record_id,program_code, program_name, url, show_orde
 INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS04_02', 'SYS04_02', '品质分析表', 'app.view.imms.rpt.rptQuality.RptQuality', 2, '', 'SYS04', '0xf200');
 
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS04_01', 'RUN', '运行');
-INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS04_01', 'PRINT', '打印');
+INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS04_01', 'PRINT','打印');
 
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS04_02', 'RUN', '运行');
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS04_02', 'PRINT', '打印');

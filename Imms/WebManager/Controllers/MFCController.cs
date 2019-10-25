@@ -3,19 +3,24 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using System.Text;
+using Imms.Core;
 using Imms.Data;
 using Imms.Mes.Data.Domain;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using NPOI.SS.UserModel;
 
 namespace Imms.WebManager.Controllers
 {
     [Route("api/imms/mfc/rfidCard")]
     public class RfidCardController : SimpleCRUDController<RfidCard>
     {
-        public RfidCardController()
+        private readonly IHostingEnvironment host = null;
+        public RfidCardController(IHostingEnvironment host)
         {
+            this.host = host;
             this.Logic = new Data.SimpleCRUDLogic<RfidCard>();
         }
 
@@ -25,6 +30,67 @@ namespace Imms.WebManager.Controllers
             // 验证Production、Workshop
             //
         }
+
+        [Route("importExcel")]
+        public int ImportExcel()
+        {
+            var file = this.Request.Form.Files[0];
+            string ContentType = file.ContentType;
+            string webRootPath = this.host.WebRootPath;
+            string ext = System.IO.Path.GetExtension(file.FileName).ToLower();
+            string name = System.IO.Path.GetFileNameWithoutExtension(file.FileName);
+            string filePath = System.IO.Path.Combine(webRootPath, "upload/excel/kanban/") + Guid.NewGuid().ToString() + "(" + name + ")" + ext;
+            List<RfidCard> cardList = new List<RfidCard>();
+            using (var stream = System.IO.File.Create(filePath))
+            {
+                file.CopyTo(stream);
+                stream.Seek(0, System.IO.SeekOrigin.Begin);
+                ExcelHelper helper = new ExcelHelper();
+                helper.ImportExcel(stream, ext, "Sheet1", 2, -1, (IRow row) =>
+                {
+                    string productionCode = row.GetCell(0).StringCellValue;
+                    string productionName = row.GetCell(1).StringCellValue;
+                    int qty = 0;
+                    int kanbanNo = (int)row.GetCell(3).NumericCellValue;
+                    string workshopCode = row.GetCell(4).StringCellValue;
+
+                    try
+                    {
+                        qty = (int)row.GetCell(2).NumericCellValue;
+                    }
+                    catch
+                    {
+                        string strQty = row.GetCell(2).StringCellValue;
+                        if (!int.TryParse(strQty, out qty))
+                        {
+                            throw new BusinessException(GlobalConstants.EXCEPTION_CODE_PARAMETER_INVALID, $"第{row.RowNum}行的\"收容数量\":\"{strQty}\"无法被识别为数字！");
+                        }
+                    }
+
+                    RfidCard card = new RfidCard();
+                    card.KanbanNo = kanbanNo.ToString();
+                    card.RfidNo = "";
+                    card.CardStatus = 0;
+                    card.CardType = 0;
+                    card.ProductionId = -1;
+                    card.Qty = qty;
+                    card.ProductionCode = productionCode;
+                    card.ProductionName = productionName;
+                    card.WorkshopId = -1;
+                    card.WorkshopCode = workshopCode;
+                    card.WorkshopName = workshopCode;
+
+                    cardList.Add(card);
+                });
+            }
+            foreach (RfidCard card in cardList)
+            {
+                this.Logic.Create(card);
+            }
+
+            return cardList.Count;
+        }
+
 
         [Route("printBarCode")]
         public IActionResult PrintBarCode(string idList)
@@ -86,6 +152,8 @@ namespace Imms.WebManager.Controllers
         public string ProductionName { get; set; }
         public string StoreNo { get; set; }
         public string StoreName { get; set; }
+        public string operatorCode { get; set; }
+        public string operatorName { get; set; }
         public int Qty { get; set; }
         public string MovingTime { get; set; }
     }
@@ -101,13 +169,17 @@ namespace Imms.WebManager.Controllers
         {
             SimpleCRUDLogic<ProductionMoving> movingLogic = new SimpleCRUDLogic<ProductionMoving>();
             SimpleCRUDLogic<RfidCard> cardLogic = new SimpleCRUDLogic<RfidCard>();
-            RfidCard card = cardLogic.GetByOne("{kanbanNo==\"" + instoreItem.KanbanNo + "\"");
+            FilterExpression[] filterExpressions = new FilterExpression[]{
+                    new FilterExpression(){L="kanbanNo",O="=",R=instoreItem.KanbanNo}
+                };
+            RfidCard card = cardLogic.GetByOne(filterExpressions);
             if (card == null)
             {
                 throw new BusinessException(GlobalConstants.EXCEPTION_CODE_DATA_NOT_FOUND, $"看板编号(KanbanNo)='{instoreItem.KanbanNo}'的看板还没有发卡！");
             }
-            if(card.CardStatus !=1){
-                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_PARAMETER_INVALID,$"看板编号(KanbanNo)='{instoreItem.KanbanNo}'的看板还没有报工，不可以执行移库动作！");
+            if (card.CardStatus != 1)
+            {
+                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_PARAMETER_INVALID, $"看板编号(KanbanNo)='{instoreItem.KanbanNo}'的看板还没有报工，不可以执行移库动作！");
             }
             ProductionMoving movingItem = new ProductionMoving();
             movingItem.RfidCardId = card.RecordId;
@@ -119,10 +191,18 @@ namespace Imms.WebManager.Controllers
             movingItem.ProductionId = card.ProductionId;
             movingItem.ProductionCode = card.ProductionCode;
             movingItem.ProductionName = card.ProductionName;
-            
-            movingItem.OperatorId  =  -1;
-            movingItem.EmployeeId ="";
-            movingItem.EmployeeName = "";
+
+            movingItem.ProductionOrderId = -1;
+            movingItem.ProductionOrderNo = "";
+            movingItem.PrevProgressRecordId = -1;
+
+            movingItem.WorkstationId = -1;
+            movingItem.WorkstationCode = "";
+            movingItem.WorkstationName = "";
+
+            movingItem.OperatorId = -1;
+            movingItem.EmployeeId = instoreItem.operatorCode;
+            movingItem.EmployeeName = instoreItem.operatorName;
 
             movingLogic.Create(movingItem);
 
