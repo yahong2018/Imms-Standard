@@ -21,5 +21,9 @@ namespace Imms
         }
 
         public int ExceptionCode { get; set; }
+
+        public override string ToString(){
+            return $"\"exceptionCode\":{this.ExceptionCode},\"message\":\"{this.Message}\"";
+        }
     }
 }

@@ -79,16 +79,61 @@ namespace Imms.WebManager.Controllers
         public ProductionOrderController() => this.Logic = new SimpleCRUDLogic<ProductionOrder>();
     }
 
+    public class InstoreItem
+    {
+        public string KanbanNo { get; set; }
+        public string ProductionCode { get; set; }
+        public string ProductionName { get; set; }
+        public string StoreNo { get; set; }
+        public string StoreName { get; set; }
+        public int Qty { get; set; }
+        public string MovingTime { get; set; }
+    }
+
+
     [Route("api/imms/mfc/productionOrderProgress")]
     public class ProductionOrderProgressController : SimpleCRUDController<ProductionOrderProgress>
     {
         public ProductionOrderProgressController() => this.Logic = new SimpleCRUDLogic<ProductionOrderProgress>();
 
+        [Route("reportInstroeByErp"), HttpPost]
+        public int ReportInstoreByERP([FromBody] InstoreItem instoreItem)
+        {
+            SimpleCRUDLogic<ProductionMoving> movingLogic = new SimpleCRUDLogic<ProductionMoving>();
+            SimpleCRUDLogic<RfidCard> cardLogic = new SimpleCRUDLogic<RfidCard>();
+            RfidCard card = cardLogic.GetByOne("{kanbanNo==\"" + instoreItem.KanbanNo + "\"");
+            if (card == null)
+            {
+                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_DATA_NOT_FOUND, $"看板编号(KanbanNo)='{instoreItem.KanbanNo}'的看板还没有发卡！");
+            }
+            if(card.CardStatus !=1){
+                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_PARAMETER_INVALID,$"看板编号(KanbanNo)='{instoreItem.KanbanNo}'的看板还没有报工，不可以执行移库动作！");
+            }
+            ProductionMoving movingItem = new ProductionMoving();
+            movingItem.RfidCardId = card.RecordId;
+            movingItem.RfidNo = card.RfidNo;
+            movingItem.WorkshopId = card.WorkshopId;
+            movingItem.WorkshopCode = card.WorkshopCode;
+            movingItem.WorkshopName = card.WorkshopName;
+            movingItem.Qty = instoreItem.Qty;
+            movingItem.ProductionId = card.ProductionId;
+            movingItem.ProductionCode = card.ProductionCode;
+            movingItem.ProductionName = card.ProductionName;
+            
+            movingItem.OperatorId  =  -1;
+            movingItem.EmployeeId ="";
+            movingItem.EmployeeName = "";
+
+            movingLogic.Create(movingItem);
+
+            return GlobalConstants.EXCEPTION_CODE_NO_ERROR;
+        }
+
         [Route("reportProgress")]
         public string ReportProgress([FromBody]ProgressReportItem item)
         {
             StringBuilder resultBuilder = new StringBuilder();
-            
+
             CommonRepository.UseDbContext(dbContext =>
             {
                 using (DbConnection connection = dbContext.Database.GetDbConnection())
@@ -161,9 +206,9 @@ namespace Imms.WebManager.Controllers
                         parameter.DbType = System.Data.DbType.AnsiString;
                         parameter.Direction = System.Data.ParameterDirection.Output;
                         parameter.Size = 4000;
-                        cmd.Parameters.Add(parameter);    
+                        cmd.Parameters.Add(parameter);
 
-                        cmd.ExecuteNonQuery();                    
+                        cmd.ExecuteNonQuery();
 
                         // using (DbDataReader dataReader = cmd.ExecuteReader())
                         // {
@@ -182,7 +227,7 @@ namespace Imms.WebManager.Controllers
                         resultBuilder.Append("\"");
                     }
                 }
-            });            
+            });
 
             return resultBuilder.ToString();
         }

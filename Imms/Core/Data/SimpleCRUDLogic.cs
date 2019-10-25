@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Imms.Data
 {
- 
+
     public class SimpleCRUDLogic<T> where T : class, IEntity
     {
         public T Create(T item)
@@ -74,14 +74,36 @@ namespace Imms.Data
             this.AfterDelete(items, dbContext);
         }
 
+        public T GetByOne(string filterStr, GetDataSourceDelegate<T> getDataSourceHandler = null, FilterDataSourceDelegate<T> filterHandler = null)
+        {
+            GetDataSourceDelegate<T> getDataSource = getDataSourceHandler;
+            if (getDataSource == null)
+            {
+                getDataSource = this.GetDataSource;
+            }
+            FilterDataSourceDelegate<T> filter = filterHandler;
+            if (filter == null)
+            {
+                filter = this.FilterDataSource;
+            }
+            FilterExpression[] filterList = filterStr.ToObject<FilterExpression[]>();
+            T result = null;
+            CommonRepository.UseDbContext(dbContext =>
+            {
+                IQueryable<T> dataSource = filter(getDataSource(dbContext), filterList);
+                result = dataSource.FirstOrDefault();               
+            });
+            return result;
+        }
+
 
         public ExtJsResult GetAll(int page, int start, int limit, string filterStr, GetDataSourceDelegate<T> getDataSourceHandler = null, FilterDataSourceDelegate<T> filterHandler = null)
         {
             FilterExpression[] filterList = filterStr.ToObject<FilterExpression[]>();
-            return this.GetAll(page,start, limit, filterList, getDataSourceHandler, filterHandler);
+            return this.GetAll(page, start, limit, filterList, getDataSourceHandler, filterHandler);
         }
 
-        public ExtJsResult GetAll(int page,int start, int limit, FilterExpression[] filterList, GetDataSourceDelegate<T> getDataSourceHandler = null, FilterDataSourceDelegate<T> filterHandler = null)
+        public ExtJsResult GetAll(int page, int start, int limit, FilterExpression[] filterList, GetDataSourceDelegate<T> getDataSourceHandler = null, FilterDataSourceDelegate<T> filterHandler = null)
         {
             GetDataSourceDelegate<T> getDataSource = getDataSourceHandler;
             if (getDataSource == null)

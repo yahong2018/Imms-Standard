@@ -29,7 +29,7 @@ namespace Imms.WebManager
                 {
                     statusCode = 200;
                 }
-                await HandleExceptionAsync(context, statusCode, ex.Message);
+                await HandleExceptionAsync(context, ex,statusCode);
             }
             finally
             {
@@ -68,10 +68,24 @@ namespace Imms.WebManager
                 }
             }
         }
-        //异常错误信息捕获，将错误信息用Json方式返回
+
         private static Task HandleExceptionAsync(Microsoft.AspNetCore.Http.HttpContext context, int statusCode, string msg)
         {
-            var result = JsonConvert.SerializeObject(new ApiResult() { Success = false, Msg = msg, Type = statusCode.ToString() });
+            var result = JsonConvert.SerializeObject(new ApiResult() { Success = false, Data = new ApiResultData() { ExceptionCode = statusCode, Message = msg } });
+            context.Response.ContentType = "application/json;charset=utf-8";
+            return context.Response.WriteAsync(result);
+        }
+
+        //异常错误信息捕获，将错误信息用Json方式返回
+        private static Task HandleExceptionAsync(Microsoft.AspNetCore.Http.HttpContext context, Exception ex, int statusCode)
+        {
+            ApiResult apiResult = new ApiResult() { Success = false, Data = new ApiResultData() { Message = ex.Message, ExceptionCode = statusCode } };
+            if (ex is BusinessException)
+            {
+                apiResult.Data.ExceptionCode = (ex as BusinessException).ExceptionCode;
+            }
+
+            var result = JsonConvert.SerializeObject(apiResult);
             context.Response.ContentType = "application/json;charset=utf-8";
             return context.Response.WriteAsync(result);
         }
@@ -88,9 +102,12 @@ namespace Imms.WebManager
     public class ApiResult
     {
         public bool Success { get; set; } = true;
-        public string Msg { get; set; } = "";
-        public string Type { get; set; } = "";
-        public object Data { get; set; } = "";
-        public object DataExt { get; set; } = "";
+        public ApiResultData Data { get; set; }
+    }
+
+    public class ApiResultData
+    {
+        public int ExceptionCode { get; set; } = 0;
+        public string Message { get; set; }
     }
 }
