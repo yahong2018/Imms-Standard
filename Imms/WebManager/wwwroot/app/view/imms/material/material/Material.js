@@ -9,8 +9,6 @@ Ext.define("app.view.imms.material.material.Material", {
     columns: [
         { dataIndex: "materialCode", text: '产品编码', width: 150 },
         { dataIndex: "materialName", text: '产品名称', width: 150 },
-        { dataIndex: "firstWorkshopCode", text: "首工序代码", width: 150 },
-        { dataIndex: "firstWorkshopName", text: "首工序名称", width: 200 },
         { dataIndex: "description", text: '产品描述', flex: 1 }
     ],
 

@@ -4,8 +4,5 @@ Ext.define('app.model.imms.material.MaterialModel', {
         { name: "materialCode", type: "string" },
         { name: "materialName", type: "string" },
         { name: "description", type: "string" },
-        { name: "firstWorkshopId", type: "int" },
-        { name: "firstWorkshopCode", type: "string" },
-        { name: "firstWorkshopName", type: "string" }
     ]
 });

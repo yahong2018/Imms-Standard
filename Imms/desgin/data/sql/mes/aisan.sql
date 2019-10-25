@@ -64,13 +64,16 @@ create table work_organization_unit
     record_id              bigint    auto_increment    not null,
     org_code               varchar(50)                 not null,
     org_name               varchar(50)                 not null,
-    org_type               varchar(50)                 not null,
+    org_type               varchar(50)                 not null,    
     description            varchar(250)                null,
 
     parent_id              bigint                      null,
     parent_code            varchar(50)                 null,
     parent_name            varchar(50)                 null,
 
+    operation_index        int                         not null default 0,
+    prev_operation_index   int                         not null default 0,
+    
     rfid_controller_id     int                         not null default 0,
     rfid_terminator_id     int                         not null default 0,
 
@@ -127,10 +130,6 @@ create table material
     material_code          varchar(20)                 not null,
     material_name          varchar(50)                 not null,
     description            varchar(250)                null,
-
-    first_workshop_id      bigint                      not null,
-    first_workshop_code    varchar(20)                 not null,
-    first_workshop_name    varchar(50)                 not null,
 
     create_by_id           bigint                      not null,
     create_by_code         varchar(20)                 not null,

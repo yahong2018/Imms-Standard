@@ -12,6 +12,9 @@ namespace Imms.Mes.Data.Domain
     {
         public string WorkshopCode { get { return base.OrgCode; } set { base.OrgCode = value; } }
         public string WorkshopName { get { return base.OrgName; } set { base.OrgName = value; } }
+
+        public int OperationIndex { get; set; }
+        public int PrevOperationIndex { get; set; }
     }
 
     public class Workstation : WorkOrganizationUnit
@@ -26,18 +29,18 @@ namespace Imms.Mes.Data.Domain
     }
 
     public partial class Operator : TrackableEntity<long>
-    {        
+    {
         public string EmployeeId { get; set; }
         public string EmployeeName { get; set; }
         public string EmployeeCardNo { get; set; }
 
-        public long orgId{get;set;}
+        public long orgId { get; set; }
         public string orgCode { get; set; }
-        public string orgName{get;set;}
+        public string orgName { get; set; }
 
         public static readonly string ROLE_WORKSHOP_OPERATOR = "WORKSHOP_OPERATOR";
     }
-    
+
 
     public class WorkstationLogin : Entity<long>
     {
@@ -105,6 +108,9 @@ namespace Imms.Mes.Data.Domain
             ImmsDbContext.RegisterEntityTable<Workshop>("work_organization_unit");
             builder.Ignore(e => e.WorkshopCode);
             builder.Ignore(e => e.WorkshopName);
+
+            builder.Property(e=>e.OperationIndex).HasColumnName("operation_index");
+            builder.Property(e=>e.PrevOperationIndex).HasColumnName("prev_operation_index");
         }
     }
 

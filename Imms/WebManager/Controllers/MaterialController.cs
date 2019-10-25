@@ -22,9 +22,6 @@ namespace Imms.WebManager.Controllers
                 MaterialCode = syncItem.MaterialCode,
                 MaterialName = syncItem.MaterialName,
                 Description = "",
-                WorkshopCode = "",
-                WorkshopId = -1,
-                WorkshopName = ""
             };
 
             if (syncItem.DataType == 0)

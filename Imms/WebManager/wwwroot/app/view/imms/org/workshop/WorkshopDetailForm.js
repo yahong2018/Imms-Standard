@@ -11,7 +11,7 @@ Ext.define("app.view.imms.org.workshop.WorkshopDetailForm", {
          {
             name: "orgCode",
             xtype: "textfield",
-            fieldLabel: "工艺代码",
+            fieldLabel: "车间代码",
             allowBlank: false,
             maxLength: 20,
             enforceMaxLength: true,
@@ -19,11 +19,23 @@ Ext.define("app.view.imms.org.workshop.WorkshopDetailForm", {
         }, {
             name: "orgName",
             xtype: "textfield",
-            fieldLabel: "工艺名称",
+            fieldLabel: "车间名称",
             allowBlank: false,
             maxLength: 50,
             enforceMaxLength: true,
             width: 380
+        },
+        {
+            name:"operationIndex",
+            xtype:"textfield",
+            fieldLabel:"本工序",
+            width:380,
+        },
+        {
+            name: "prevOperationIndex",
+            xtype: "textfield",
+            fieldLabel: "上工序",
+            width: 380,
         },
          {
             name: "description",
