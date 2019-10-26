@@ -145,9 +145,13 @@ top:begin
   begin
     get diagnostics condition 1 code = returned_sqlstate, msg = message_text;
 		
-    set Resp = '|2|1|2';
-    set Resp = CONCAT(Resp,'|1|系统出现异常:',msg,'[',code,'],请联系系统管理员。');
+    set Resp = '|2|1';
+    set Resp = CONCAT(Resp,'|4');
     set Resp = CONCAT(Resp,'|210|255|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次    
+    set Resp = CONCAT(Resp,'|1|系统异常,请联系管理员:');
+    set Resp = CONCAT(Resp,'|2|[',code,']');
+    set Resp = CONCAT(Resp,'|3|',msg);
+    
   end;      
 	
 	set Resp = '|2|1|2';
@@ -156,8 +160,9 @@ top:begin
     call MES_GetCardType(RfidNo,CardType,CardId);		
 
     if((CardId = -1) or (CardId = -10)) then
-      set Resp = CONCAT(Resp,'|1|非法卡，请联系系统管理员注册卡:',RfidNo);      
       set Resp = CONCAT(Resp,'|210|255|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次
+      set Resp = CONCAT(Resp,'|1|非法卡:',RfidNo);      
+
       leave top;
     end if;    
 
@@ -196,13 +201,15 @@ top:begin
                    OperatorId,EmployeeId,EmployeeName,Now(),64);
         end if;
 
-        set Resp = CONCAT(Resp,'|1|请输入尾数数量');      
         set Resp = CONCAT(Resp,'|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 打开键盘，将键盘的模式设置为多键输入，发声一次
+        set Resp = CONCAT(Resp,'|1|请输入尾数数量');
+
     elseif(CardType = 1) then  -- 如果是数量卡    
-        call MES_ReportProductionOrder(RfidNo,CardId,GID,DID,DataGatherTime,Resp);
         set Resp = CONCAT(Resp,'|210|255|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次    
+        call MES_ReportProductionOrder(RfidNo,CardId,GID,DID,DataGatherTime,Resp);        
     end if;
   elseif(DataType = 3) then -- 如果是键盘输入 , 则进行尾数报工
+        set Resp = CONCAT(Resp,'|210|255|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次    
         if ((select count(*) from production_order_progress  where opt_flag = 64 and rfid_terminator_id = DID  and rfid_controller_id = GID) = 0) then
           set Resp = CONCAT(Resp,'|1|请先刷员工卡');          
         else
@@ -213,9 +220,7 @@ top:begin
            where opt_flag = 64 and rfid_terminator_id = DID  and rfid_controller_id = GID;
 
           set Resp = CONCAT(Resp,'|1|已报尾数[',ReportQty,']个,请刷数量卡.');
-        end if;
-
-        set Resp = CONCAT(Resp,'|210|255|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次    
+        end if;        
   end if;
 end;
 
@@ -228,7 +233,7 @@ create procedure MES_ReportProductionOrder(
     in GID              int,
     in DID              int,
     in GatherTime       datetime,     
-    out Resp            varchar(4000)
+    inout Resp          varchar(4000)
 )
 top:begin
   declare LoginRecordId,ProductionOrderId,WorkshopId,WorkstationId,ProductionId,OperatorId,SurplusRecordId,PrevProgressRecordId bigint;
@@ -247,7 +252,13 @@ top:begin
   declare exit handler for sqlexception
   begin			
     get diagnostics condition 1 ErrorCode = returned_sqlstate, Msg = message_text;		
-    set Resp = CONCAT('系统出现异常:',ifnull(Msg,'NULL'),'[',ifnull(ErrorCode,'00000'),'],请联系系统管理员。');
+    
+    set Resp = '|2|1';
+    set Resp = CONCAT(Resp,'|4');
+    set Resp = CONCAT(Resp,'|210|255|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次    
+    set Resp = CONCAT(Resp,'|1|系统异常,请联系管理员:');
+    set Resp = CONCAT(Resp,'|2|[',code,']');
+    set Resp = CONCAT(Resp,'|3|',msg);
 		
     if (InTran = 1) then		
       rollback;   
@@ -293,8 +304,7 @@ top:begin
     select record_id,report_qty,operator_id,employee_id,employee_name 
 		  into SurplusRecordId,SurplusQty,OperatorId,EmployeeId,EmployeeName
       from production_order_progress
-    where report_type = 1 and opt_flag = 65
-        and workstation_id = WorkstationId
+    where report_type = 1 and opt_flag = 65  and workstation_id = WorkstationId
      order by create_time desc
       limit 1;
     set SurplusRecordId = ifnull(SurplusRecordId,-1);

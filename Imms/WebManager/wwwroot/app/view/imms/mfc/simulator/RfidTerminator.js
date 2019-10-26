@@ -49,7 +49,7 @@ Ext.define("app.view.imms.mfc.simulator.RfidTerminator", {
                                     };
 
                                     app.ux.Utils.ajaxRequest({
-                                        url: "api/imms/mfc/productionOrderProgress/reportProgress",
+                                        url: "api/imms/mfc/productionOrderProgress/reportProgress?dc=" + new Date().getTime(),
                                         method:"POST",
                                         jsonData:reportItem,
                                         successCallback:function(result, response, opts){
@@ -92,7 +92,7 @@ Ext.define("app.view.imms.mfc.simulator.RfidTerminator", {
                                     };
 
                                     app.ux.Utils.ajaxRequest({
-                                        url: "api/imms/mfc/productionOrderProgress/reportProgress",
+                                        url: "api/imms/mfc/productionOrderProgress/reportProgress?dc=" + new Date().getTime(),
                                         method: "POST",
                                         jsonData: reportItem,
                                         successCallback: function (result, response, opts) {

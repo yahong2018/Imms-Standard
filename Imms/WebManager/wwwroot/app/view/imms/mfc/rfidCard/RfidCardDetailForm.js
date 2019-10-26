@@ -44,7 +44,7 @@ Ext.define("app.view.imms.mfc.rfidCard.RfidCardDetailForm", {
         {
             name: "workshopId",
             xtype: "combobox",
-            fieldLabel: "工艺",
+            fieldLabel: "车间",
             allowBlank: false,
             width: 380,
             valueField: "recordId",

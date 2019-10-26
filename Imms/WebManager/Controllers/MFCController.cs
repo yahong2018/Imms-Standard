@@ -223,6 +223,9 @@ namespace Imms.WebManager.Controllers
 
             movingLogic.Create(movingItem);
 
+            card.CardStatus = 0;
+            cardLogic.Update(card);
+
             return GlobalConstants.EXCEPTION_CODE_NO_ERROR;
         }
 
