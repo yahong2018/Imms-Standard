@@ -98,7 +98,7 @@ namespace Imms.WebManager
                                 byte[] buffer = context.HttpContext.Session.Get(GlobalConstants.AUTHROIZATION_SESSION_KEY);
                                 string token = System.Text.Encoding.UTF8.GetString(buffer);
 
-                                context.Token = token;                                
+                                context.Token = token;
                             }
                             catch
                             {
@@ -108,7 +108,8 @@ namespace Imms.WebManager
 
                     }
                 };
-            }).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme,options=>{                             
+            }).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+            {
             });
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -120,7 +121,10 @@ namespace Imms.WebManager
             GlobalConstants.GetCurrentUserDelegate = Security.Data.SystemUserLogic.GetCurrentUser;
 
             services.AddSignalR();
-            // services.AddSingleton<RealtimeDataPushTask,RealtimeDataPushTask>();          
+            // services.AddSingleton<RealtimeDataPushTask,RealtimeDataPushTask>();    
+
+            services.AddHttpClient();
+            services.AddSingleton<Sync4WDBService, Sync4WDBService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

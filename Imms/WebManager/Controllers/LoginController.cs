@@ -68,7 +68,7 @@ namespace Imms.WebManager.Controllers
                 HttpContext.Response.Headers.Add("Authorization", "Bearer " + tokenString);
                 return Ok(new
                 {
-                    access_token = tokenString,
+                    access_token = tokenString, 
                     token_type = "Bearer",
                     profile = new
                     {

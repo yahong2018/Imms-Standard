@@ -3,22 +3,18 @@ Ext.define('app.view.admin.systemParameter.SystemParameter', {
     xtype: 'admin_systemParameter_SystemParameter',
     items: [
         {
-            xtype: 'fieldset',
-            title: '与ERP的接口',            
-            defaults: {
-                labelWidth: 90,
-                anchor: '100%',
-                //layout: 'hbox'
-            },
-            items:[
-                {
-                    name: 'recordId',
-                    xtype: 'hidden',                    
-                },{
-                    name: 'parameter_class',
-                    xtype: 'hidden',    
-                }
-            ]
+           xtype:"button",
+           text:"同步",
+           handler:function(){
+               app.ux.Utils.ajaxRequest({
+                   url:"api/system/parameter/sync_wdb",
+                   method:"GET",
+                   successCallback: function (result, response, opts){
+                       debugger;
+                       alert(result);
+                   }
+               })
+           }
         }
     ]
 });

@@ -65,7 +65,7 @@ namespace Imms.Security.Data
                     new Claim("CurrentUser",systemUser.ToJson())
                 }),
                 Expires = expiresAt,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
             return tokenDescriptor;
         }
