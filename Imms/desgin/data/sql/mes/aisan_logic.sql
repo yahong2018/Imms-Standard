@@ -133,7 +133,7 @@ end;
 -- 处理工位机数据:目前没有考虑脱机数据
 --
 create procedure MES_ProcessDeviceData(
-in IsNewData int,        
+ in IsNewData int,        
  in	GID INT,
  in	DID INT,
  in	IsOffLineData INT, 		
@@ -143,11 +143,10 @@ in IsNewData int,
  in	StrPara1 varchar(200), 
  out Resp  varchar(4000)     
 )
-top:begin  
-  declare RfidNo varchar(20); 
+top:begin    
   declare CardType,ReportQty int;
   declare CardId,OperatorId,WorkshopId,WorkStationId,ProductionId bigint;
-  declare EmployeeId,WorkshopCode,WorkstationCode,ProductionCode varchar(20);
+  declare RfidNo,WocgCode,EmployeeId,WorkshopCode,WorkstationCode,ProductionCode varchar(20);
   declare EmployeeName,WorkstationName,WorkshopName,ProductionName varchar(50);
 	declare code varchar(5) default '00000';
   declare msg text;
@@ -196,19 +195,19 @@ top:begin
             and rfid_terminator_id = DID
             and rfid_controller_id = GID ;
         else
-					 select record_id,org_code,org_name,parent_id,parent_code,parent_name 
-					         into WorkstationId,WorkstationCode,WorkstationName,WorkshopId,WorkshopCode,WorkshopName
+					 select record_id,org_code,org_name,parent_id,parent_code,parent_name,wocg_code
+					         into WorkstationId,WorkstationCode,WorkstationName,WorkshopId,WorkshopCode,WorkshopName,WocgCode
 						  from work_organization_unit w
 							  where w.rfid_controller_id = GID
 								  and w.rfid_terminator_id = DID;
 									
            insert into production_order_progress(production_order_id,production_order_no,production_id,production_code,production_name,
-					        workshop_id,workshop_code,workshop_name,workstation_id,workstation_code,workstation_name,rfid_terminator_id,rfid_controller_id,									
-									report_time,report_qty,rfid_card_no,report_type,good_qty,bad_qty,card_qty,operator_id,employee_id,employee_name,
+					        workshop_id,workshop_code,workshop_name,workstation_id,workstation_code,workstation_name,wocg_code,rfid_terminator_id,rfid_controller_id,									
+									time_of_origin,qty,rfid_card_no,report_type,card_qty,operator_id,employee_id,employee_name,
                   create_by_id,create_by_code,create_by_name,create_time,opt_flag)
             values(-1,'',-1,'','',
-						       WorkshopId,WorkshopCode,WorkshopName,WorkstationId,WorkstationCode,WorkstationName,DID,GID,                   
-									 DataGatherTime,-1,'',1,-1,-1,0,OperatorId,EmployeeId,EmployeeName,
+						       WorkshopId,WorkshopCode,WorkshopName,WorkstationId,WorkstationCode,WorkstationName,WocgCode,DID,GID,                   
+									 DataGatherTime,0,'',1,0,OperatorId,EmployeeId,EmployeeName,
                    OperatorId,EmployeeId,EmployeeName,Now(),64);
         end if;
 
@@ -226,7 +225,7 @@ top:begin
         else
           set ReportQty = cast(StrPara1 as unsigned);
           update production_order_progress
-             set report_qty = ReportQty,
+             set qty = ReportQty,
                  opt_flag = 65
            where opt_flag = 64 and rfid_terminator_id = DID  and rfid_controller_id = GID;
 
@@ -247,13 +246,13 @@ create procedure MES_ReportProductionOrder(
     inout Resp          varchar(4000)
 )
 top:begin
-  declare LoginRecordId,ProductionOrderId,WorkshopId,WorkstationId,ProductionId,OperatorId,SurplusRecordId,PrevProgressRecordId bigint;
-  declare ProductionOrderNo,WorkshopCode,WorkstationCode,ProductionCode,EmployeeId varchar(20);
+  declare WorkshopIdFrom,LoginRecordId,ProductionOrderId,WorkshopId,WorkstationId,ProductionId,OperatorId,SurplusRecordId,PrevProgressRecordId bigint;
+  declare ProductionOrderNo,WorkshopCode,WorkstationCode,ProductionCode,EmployeeId,WocgCode varchar(20);
   declare ProductionName,WorkshopName,WorkstationName,EmployeeName varchar(50);  
   declare ReportQty,SurplusQty,CardQty int;
   declare LoginWorkshopId,LoginWorkstationId bigint;
-  declare LoginWorkshopCode,LoginWorkstationCode varchar(20);
-  declare LoginWorkshopName,LoginWorkstationName  varchar(50);
+  declare LoginWorkshopCode,LoginWorkstationCode,WorkshopCodeFrom varchar(20);
+  declare LoginWorkshopName,LoginWorkstationName,WorkshopNameFrom  varchar(50);
   declare LastWorkshopId,FirstWorkshopId  bigint;
   declare IsMove,CardStatus int;  
 	declare ErrorCode varchar(5) default '00000';
@@ -268,7 +267,7 @@ top:begin
     set Resp = CONCAT(Resp,'|4');
     set Resp = CONCAT(Resp,'|210|255|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次    
     set Resp = CONCAT(Resp,'|1|系统异常,请联系管理员:');
-    set Resp = CONCAT(Resp,'|2|[',code,']');
+    set Resp = CONCAT(Resp,'|2|[',ErrorCode,']');
     set Resp = CONCAT(Resp,'|3|',msg);
 		
     if (InTran = 1) then		
@@ -284,8 +283,8 @@ top:begin
     from rfid_card c
    where record_id = RfidId;
   
-  select w.record_id, w.org_code, w.org_name, w.parent_id,w.parent_code, w.parent_name
-    into WorkstationId,WorkstationCode,WorkstationName,LoginWorkshopId,LoginWorkshopCode,LoginWorkshopName
+  select w.record_id, w.org_code, w.org_name, w.parent_id,w.parent_code, w.parent_name,wocg_code
+    into WorkstationId,WorkstationCode,WorkstationName,LoginWorkshopId,LoginWorkshopCode,LoginWorkshopName,WocgCode
     from work_organization_unit w
     where w.org_type = 'ORG_WORK_STATION'
       and w.rfid_controller_id = GID
@@ -312,7 +311,7 @@ top:begin
 	
   if(IsMove = 0) then   -- 进行报工处理	  
     -- 获取尾数
-    select record_id,report_qty,operator_id,employee_id,employee_name 
+    select record_id,qty,operator_id,employee_id,employee_name 
 		  into SurplusRecordId,SurplusQty,OperatorId,EmployeeId,EmployeeName
       from production_order_progress
     where report_type = 1 and opt_flag = 65  and workstation_id = WorkstationId
@@ -328,23 +327,23 @@ top:begin
     insert into production_order_progress(
       production_order_id,production_order_no,production_id,production_code,production_name,
       workshop_id,workshop_code,workshop_name,
-      workstation_id,workstation_code,workstation_name,			
+      workstation_id,workstation_code,workstation_name,	wocg_code,		
       rfid_terminator_id,rfid_controller_id,			
       rfid_card_no,report_type,			
       operator_id,employee_id,employee_name,			
       create_by_id,create_by_code,create_by_name,create_time,			
       update_by_id,update_by_code,update_by_name,update_time,opt_flag,
-      report_time,good_qty,bad_qty,report_qty,card_qty    
+      time_of_origin,qty,card_qty    
     ) values (
       ProductionOrderId,ProductionOrderNo,ProductionId,ProductionCode,ProductionName,
       WorkshopId,WorkshopCode,WorkshopName,			
-      WorkstationId,WorkstationCode,WorkstationName,			
+      WorkstationId,WorkstationCode,WorkstationName,WocgCode,
       DID,GID,			
       RfidNo,0,			
       OperatorId,EmployeeId,EmployeeName,			
       OperatorId,EmployeeId,EmployeeName,Now(),			
       null,null,null,null,if(SurplusRecordId = -1, 0,127),
-      GatherTime,ReportQty,0,ReportQty,CardQty
+      GatherTime,ReportQty,CardQty
     );
 
     -- 修改卡的状态为已报工
@@ -359,7 +358,8 @@ top:begin
 
   else -- 进行移库处理	   
 		 set OperatorId = -1,EmployeeId = '',EmployeeName = '';
-     select report_qty,record_id into ReportQty,PrevProgressRecordId
+     select qty,record_id,workshop_id,workshop_code,workshop_name
+          into ReportQty,PrevProgressRecordId,WorkshopIdFrom,WorkshopCodeFrom,WorkshopNameFrom
        from production_order_progress
       where rfid_card_no = RfidNo
       order by create_time desc
@@ -370,8 +370,9 @@ top:begin
      insert into production_moving(
        production_order_id,production_order_no,production_id,production_code,production_name,
        rfid_no,rfid_card_id,rfid_terminator_id,rfid_controller_group_id,qty,
-       operator_id,employee_id,employee_name,moving_time,
+       operator_id,employee_id,employee_name,time_of_origin,
        workstation_id,workstation_code,workstation_name,workshop_id,workshop_code,workshop_name,
+       workshop_id_from,workshop_code_from,workshop_name_from,
        create_by_id,create_by_code,create_by_name,create_time,
        update_by_id,update_by_code,update_by_name,update_time,opt_flag,prev_progress_record_id
      )values(
@@ -379,6 +380,7 @@ top:begin
        RfidNo,RfidId,DID,GID,ReportQty,
        OperatorId,EmployeeId,EmployeeName,GatherTime,
        WorkstationId,WorkstationCode,WorkstationName,LoginWorkshopId,LoginWorkshopCode,LoginWorkshopName,
+       WorkshopIdFrom,WorkshopCodeFrom,WorkshopNameFrom,
        OperatorId,EmployeeId,EmployeeName,Now(),
        null,null,null,null,0,PrevProgressRecordId
      );
