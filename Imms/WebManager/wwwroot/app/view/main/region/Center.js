@@ -32,7 +32,7 @@ Ext.define('app.view.main.region.Center', {
 							margin:"5 5 5 5",
 							handler:function(){
 								var summaryGrid = this.up("maincenter").down("gridpanel");
-								summaryGrid.store.loadReportData(summaryGrid.summaryStore);								
+								summaryGrid.store.loadTodayReportData(summaryGrid.summaryStore);								
 							}
 						}
 					]
@@ -43,7 +43,7 @@ Ext.define('app.view.main.region.Center', {
 					height: "100%",
 					border: 1,
 					columnLines: true,
-					store: Ext.create({ xtype: "imms_mfc_ProductSummaryReportStore", autoLoad: false }),
+					store: Ext.create({ xtype: "imms_mfc_TodayProductSummaryReportStore", autoLoad: false }),
 					columns: [
 						{ dataIndex: "productionCode", text: "产品编号", width: 120,align:"center", menuDisabled: true },
 						{ dataIndex: "productionName", text: "产品名称", width: 220, align: "center", menuDisabled: true },

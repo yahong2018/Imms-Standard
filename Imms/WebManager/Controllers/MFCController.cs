@@ -45,7 +45,7 @@ namespace Imms.WebManager.Controllers
             {
                 file.CopyTo(stream);
                 stream.Seek(0, System.IO.SeekOrigin.Begin);
-               
+
                 CommonRepository.UseDbContext(dbContext =>
                 {
                     ExcelHelper.ImportExcel(stream, ext, "Sheet1", 2, -1, (IRow row) =>
@@ -70,13 +70,13 @@ namespace Imms.WebManager.Controllers
                         //     }
                         // }
 
-                        string productionCode = ExcelHelper.GetCellValue(row,0).ToString();
-                        string productionName = ExcelHelper.GetCellValue(row,1).ToString();
-                        int qty = (int)((double)ExcelHelper.GetCellValue(row,2));
-                        string kanbanNo = ExcelHelper.GetCellValue(row,3).ToString();
-                        string workshopCode = ExcelHelper.GetCellValue(row,4).ToString();
-                        string rfidNo = ExcelHelper.GetCellValue(row,5).ToString();
-                        DateTime dateTime =(DateTime) ExcelHelper.GetCellValue(row,6,true);
+                        string productionCode = ExcelHelper.GetCellValue(row, 0).ToString();
+                        string productionName = ExcelHelper.GetCellValue(row, 1).ToString();
+                        int qty = (int)((double)ExcelHelper.GetCellValue(row, 2));
+                        string kanbanNo = ExcelHelper.GetCellValue(row, 3).ToString();
+                        string workshopCode = ExcelHelper.GetCellValue(row, 4).ToString();
+                        string rfidNo = ExcelHelper.GetCellValue(row, 5).ToString();
+                        DateTime dateTime = (DateTime)ExcelHelper.GetCellValue(row, 6, true);
 
                         RfidCard card = new RfidCard();
                         card.KanbanNo = kanbanNo.ToString();
@@ -88,8 +88,9 @@ namespace Imms.WebManager.Controllers
                         card.ProductionCode = productionCode;
                         card.ProductionName = productionName;
 
-                        Workshop workshop = dbContext.Set<Workshop>().FirstOrDefault(x=>x.OrgCode == workshopCode);
-                        if(workshop==null){
+                        Workshop workshop = dbContext.Set<Workshop>().FirstOrDefault(x => x.OrgCode == workshopCode);
+                        if (workshop == null)
+                        {
                             throw new BusinessException(GlobalConstants.EXCEPTION_CODE_PARAMETER_INVALID, $"第{row.RowNum}行的'车间':'{workshopCode}'错误！");
                         }
                         card.WorkshopId = workshop.RecordId;
@@ -180,6 +181,69 @@ namespace Imms.WebManager.Controllers
     public class ProductionOrderProgressController : SimpleCRUDController<ProductionOrderProgress>
     {
         public ProductionOrderProgressController() => this.Logic = new SimpleCRUDLogic<ProductionOrderProgress>();
+
+
+        [Route("getProductProgressSummary"), HttpGet]
+        public ActionResult<string> GetProductProgressSummary(int isToday = 0)
+        {
+            if (isToday == 1)
+            {
+                return this.GetTodayProductSummary();
+            }
+
+            return "";
+        }
+
+        private ActionResult<string> GetTodayProductSummary()
+        {
+            string result = null;
+            CommonRepository.UseDbContext(dbContext =>
+            {
+                DateTime beginDate = DateTime.Today;
+                DateTime endDate = beginDate.AddDays(1);
+
+                var progressList = dbContext.Set<ProductionOrderProgress>()
+                    .Where(x => x.ReportTime >= beginDate
+                                && x.ReportTime < endDate
+                                && (x.ReportType == 0 || x.ReportType == 127)
+                    ).ToList();
+
+                var resultList = progressList
+                   .GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopId, x.WorkshopCode, x.WorkshopName })
+                   .Select(group => new
+                   {
+                       group.Key.ProductionId,
+                       group.Key.ProductionCode,
+                       group.Key.ProductionName,
+                       group.Key.WorkshopId,
+                       group.Key.WorkshopCode,
+                       group.Key.WorkshopName,
+                       Qty = group.Sum(x => x.ReportQty),
+                       DataType = 2
+                   }).ToList();
+
+                var movingList = dbContext.Set<ProductionMoving>()
+                          .Where(x => x.MovingTime >= beginDate && x.MovingTime < endDate)
+                          .ToList();
+                var movingGroupList = movingList.GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopId, x.WorkshopCode, x.WorkshopName })
+                   .Select(group => new
+                   {
+                       group.Key.ProductionId,
+                       group.Key.ProductionCode,
+                       group.Key.ProductionName,
+                       group.Key.WorkshopId,
+                       group.Key.WorkshopCode,
+                       group.Key.WorkshopName,
+                       Qty = group.Sum(x => x.Qty),
+                       DataType = 1
+                   }).ToList();
+
+                resultList.AddRange(movingGroupList);
+                result = resultList.ToJson();
+            });
+
+            return result;
+        }
 
         [Route("reportInstroeByErp"), HttpPost]
         public int ReportInstoreByERP([FromBody] InstoreItem instoreItem)

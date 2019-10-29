@@ -42,7 +42,7 @@ namespace Imms.WebManager.Controllers
                 R = workshopId.ToString()
             };
 
-            ExtJsResult result = Logic.GetAll(page, start, limit, new FilterExpression[] { expression });
+            ExtJsResult result = Logic.GetAllWithExtResult(page, start, limit, new FilterExpression[] { expression });
             return result;
         }
     }

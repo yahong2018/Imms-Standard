@@ -2,19 +2,21 @@ Ext.define("app.store.imms.mfc.ProductSummaryStore", {
     extend: "Ext.data.Store",
     alias: "widget.imms_mfc_ProductSummaryStore",
     model: "app.model.imms.mfc.ProductSummaryModel",
+    defaultUrl:"api/imms/mfc/productionOrderProgress/getProductProgressSummary",
     proxy: {
         type: 'ajax',
-        url: 'home/getTodayProductSummary',
+        url: 'api/imms/mfc/productionOrderProgress/getProductProgressSummary',
         reader: {
             type: "json",
+            
             rootProperty: 'rootProperty'
         }
     }
 });
 
-Ext.define("app.store.imms.mfc.ProductSummaryReportStore", {
+Ext.define("app.store.imms.mfc.TodayProductSummaryReportStore", {
     extend: "Ext.data.Store",
-    alias: "widget.imms_mfc_ProductSummaryReportStore",
+    alias: "widget.imms_mfc_TodayProductSummaryReportStore",
     fields: [
         { name: "productionCode", type: "string" },
         { name: "productionName", type: "string" },
@@ -54,11 +56,10 @@ Ext.define("app.store.imms.mfc.ProductSummaryReportStore", {
         { name: "WK42_ZZ_2", type: "string" },
     ],
 
-    loadReportData: function (innerStore) {
+    loadTodayReportData: function (innerStore) {
         var theReportStore = this;
+        innerStore.proxy.url = innerStore.defaultUrl + '?isToday=1'
         innerStore.load(function (records, operation, success) {
-            // debugger;
-
             theReportStore.removeAll();
             theReportStore.commitChanges();
 

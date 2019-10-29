@@ -97,13 +97,13 @@ namespace Imms.Data
         }
 
 
-        public ExtJsResult GetAll(int page, int start, int limit, string filterStr, GetDataSourceDelegate<T> getDataSourceHandler = null, FilterDataSourceDelegate<T> filterHandler = null)
+        public ExtJsResult GetAllWithExtResult(int page, int start, int limit, string filterStr, GetDataSourceDelegate<T> getDataSourceHandler = null, FilterDataSourceDelegate<T> filterHandler = null)
         {
             FilterExpression[] filterList = filterStr.ToObject<FilterExpression[]>();
-            return this.GetAll(page, start, limit, filterList, getDataSourceHandler, filterHandler);
+            return this.GetAllWithExtResult(page, start, limit, filterList, getDataSourceHandler, filterHandler);
         }
 
-        public ExtJsResult GetAll(int page, int start, int limit, FilterExpression[] filterList, GetDataSourceDelegate<T> getDataSourceHandler = null, FilterDataSourceDelegate<T> filterHandler = null)
+        public ExtJsResult GetAllWithExtResult(int page, int start, int limit, FilterExpression[] filterList, GetDataSourceDelegate<T> getDataSourceHandler = null, FilterDataSourceDelegate<T> filterHandler = null)
         {
             GetDataSourceDelegate<T> getDataSource = getDataSourceHandler;
             if (getDataSource == null)

@@ -100,56 +100,6 @@ namespace Imms.WebManager.Controllers
             return loginText;
         }
 
-        [Route("getTodayProductSummary"), HttpGet]
-        public ActionResult<string> GetTodayProductSummary()
-        {
-            string result = null;
-            CommonRepository.UseDbContext(dbContext =>
-            {
-                DateTime beginDate = DateTime.Today;
-                DateTime endDate = beginDate.AddDays(1);
-
-                var progressList = dbContext.Set<ProductionOrderProgress>()
-                    .Where(x => x.ReportTime >= beginDate
-                                && x.ReportTime < endDate
-                                && (x.ReportType == 0 || x.ReportType == 127)
-                    ).ToList();
-
-                var resultList = progressList
-                   .GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopId, x.WorkshopCode, x.WorkshopName })
-                   .Select(group => new
-                   {
-                       group.Key.ProductionId,
-                       group.Key.ProductionCode,
-                       group.Key.ProductionName,
-                       group.Key.WorkshopId,
-                       group.Key.WorkshopCode,
-                       group.Key.WorkshopName,
-                       Qty = group.Sum(x => x.ReportQty),
-                       DataType = 2
-                   }).ToList();
-
-                var movingList = dbContext.Set<ProductionMoving>()
-                          .Where(x => x.MovingTime >= beginDate && x.MovingTime < endDate)
-                          .ToList();
-                var movingGroupList = movingList.GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopId, x.WorkshopCode, x.WorkshopName })
-                   .Select(group => new
-                   {
-                       group.Key.ProductionId,
-                       group.Key.ProductionCode,
-                       group.Key.ProductionName,
-                       group.Key.WorkshopId,
-                       group.Key.WorkshopCode,
-                       group.Key.WorkshopName,
-                       Qty = group.Sum(x => x.Qty),
-                       DataType = 1
-                   }).ToList();
-
-                resultList.AddRange(movingGroupList);
-                result = resultList.ToJson();
-            });
-
-            return result;
-        }
+       
     }
 }
