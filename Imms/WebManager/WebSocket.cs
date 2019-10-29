@@ -101,8 +101,8 @@ namespace Imms.WebManager
                 if (date.Hour > this.hours[i] && date.Hour != this.hours[0])
                 {
                     var dbItem = allList.Where(x => x.CreateTime.Hour + 1 == this.hours[i]);
-                    item.qty_good = dbItem.Select(x => x.GoodQty).Sum();
-                    item.qty_bad = dbItem.Select(x => x.BadQty).Sum();
+                    // item.qty_good = dbItem.Select(x => x.GoodQty).Sum();
+                    // item.qty_bad = dbItem.Select(x => x.BadQty).Sum();
                 }
                 else
                 {
@@ -148,8 +148,8 @@ namespace Imms.WebManager
             }
             lastRecordCount = hourList.Count;
             DetailItem detailItem = KanbanRealtimeHub.demoRealtimeItem.line_detail_data.Where(x => x.hour == DateTime.Now.Hour + 1).Single();
-            detailItem.qty_good = hourList.Select(x => x.GoodQty).Sum();
-            detailItem.qty_bad = hourList.Select(x => x.BadQty).Sum();
+            // detailItem.qty_good = hourList.Select(x => x.GoodQty).Sum();
+            // detailItem.qty_bad = hourList.Select(x => x.BadQty).Sum();
 
             lock (KanbanRealtimeHub.realTimeConnectedIdList)
             {
@@ -170,7 +170,7 @@ namespace Imms.WebManager
                 begin = new DateTime(now.Year, now.Month, now.Day);
                 end = begin.AddDays(1);
             }
-            List<ProductionOrderProgress> result = dbContext.Set<ProductionOrderProgress>().Where(x => x.ReportTime >= begin && x.ReportTime < end).ToList();
+            List<ProductionOrderProgress> result = dbContext.Set<ProductionOrderProgress>().Where(x => x.TimeOfOrigin >= begin && x.TimeOfOrigin < end).ToList();
             return result;
         }
     }

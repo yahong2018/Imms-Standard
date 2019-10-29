@@ -14,19 +14,23 @@ Ext.define("app.view.imms.mfc.productionMoving.ProductionMoving", {
     columns: [
         // { dataIndex: "productionOrderNo", text: "计划单号" },
         { dataIndex: "recordId", text: "业务流水" },
-        { dataIndex: "workshopCode", text: "接收车间编号" },
-        { dataIndex: "workshopName", text: "接收车间名称" },
-        { dataIndex: "workstationCode", text: "接收工位编号" },
-        { dataIndex: "workstationName", text: "接收工位名称" },
         { dataIndex: "productionCode", text: "产品编号" },
         { dataIndex: "productionName", text: "产品名称" },
-        { dataIndex: "rfidNo", text: "RFID卡号" },
-        { dataIndex: "rfidTerminatorId", text: "工位机号" },
-        { dataIndex: "rfidControllerGroupId", text: "控制器号" },
+
+        { dataIndex: "workshopCode", text: "接收车间编号" },
+        { dataIndex: "workshopName", text: "接收车间名称" },
+
+        { dataIndex: "workshopCodeFrom", text: "原车间编号" },
+        { dataIndex: "workshopNameFrom", text: "原车间名称" },
+
         { dataIndex: "qty", text: "接收数量" },
         { dataIndex: "employeeId", text: "接收人工号" },
         { dataIndex: "employeeName", text: "接收人姓名" },
-        { dataIndex: "movingTime", text: "接收时间" },
+        { dataIndex: "timeOfOrigin", text: "接收时间" },
+
+        { dataIndex: "rfidNo", text: "RFID卡号" },
+        { dataIndex: "rfidTerminatorId", text: "工位机号" },
+        { dataIndex: "rfidControllerGroupId", text: "控制器号" },        
     ],
 
     constructor: function (config) {

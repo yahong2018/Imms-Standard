@@ -12,6 +12,7 @@ Ext.define("app.model.imms.mfc.ProductionOrderProgressModel", {
         { name: "workstationId", type: "int" },
         { name: "workstationCode", type: "string" },
         { name: "workstationName", type: "string" },
+        { name: "wocgCode", type: "string" },
 
         { name: "productionId", type: "int" },
         { name: "productionCode", type: "string" },
@@ -24,13 +25,10 @@ Ext.define("app.model.imms.mfc.ProductionOrderProgressModel", {
         { name: "rfidTerminatorId", type: "int" },
         { name: "rfidControllerId", type: "int" },
 
-        { name: "reportTime", type: 'zhxhDate', dateFormat: 'Y-m-d H:i:s'  },
-        { name: "reportQty", type: "int" },        
+        { name: "timeOfOrigin", type: 'zhxhDate', dateFormat: 'Y-m-d H:i:s'  },
+        { name: "qty", type: "int" },        
         { name: "rfidCardNo", type: "string" },
         { name: "reportType", type: "int" },
-
-        { name: "goodQty", type: "int" },
-        { name: "badQty", type: "int" },
 
         { name: "remark", type: "string" },
     ]

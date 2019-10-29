@@ -91,6 +91,7 @@ create table work_organization_unit
     
     rfid_controller_id     int                         not null default 0,
     rfid_terminator_id     int                         not null default 0,
+    wocg_code              varchar(20)                 null,
 
     create_by_id           bigint                      not null,
     create_by_code         varchar(20)                 not null,
@@ -258,6 +259,7 @@ create table production_order_progress
     workstation_id         bigint                    not null, -- 工位Id
     workstation_code       varchar(20)               not null,
     workstation_name       varchar(50)               not null,
+    wocg_code              varchar(20)               not null, -- 工作中心组
 
     production_id          bigint                    not null, -- 产品编号
     production_code        varchar(20)               not null,
@@ -266,14 +268,11 @@ create table production_order_progress
     rfid_terminator_id     int                       not null, -- 机器号
     rfid_controller_id     int                       not null, -- 组号
     
-    report_time            datetime                  not null, -- 报告时间    
+    time_of_origin         datetime                  not null, -- 报告时间    
     rfid_card_no           varchar(20)               not null, -- RFID卡号，如果是尾数，则为为''
     report_type            int                       not null, -- 数量类型：0. 整数刷卡申报  1.尾数       
-    report_qty             int                       not null, -- 报工数量
-    good_qty               int                       not null, -- 良品数
-    bad_qty                int                       not null, -- 不良品数
+    qty                    int                       not null, -- 报工数量    
     card_qty               int                       not null, -- 卡的数量:正常情况，卡的数量 = 报工数量，但是有尾数的时候，报工数量=卡的数量-尾数的数量
-
 
     operator_id            bigint                    not null,
     employee_id            varchar(20)               not null,
@@ -315,14 +314,17 @@ create table production_moving
     
     rfid_terminator_id         int                       not null,
     rfid_controller_group_id   int                       not null,             
-                
-    qty                        int                       not null,
             
     operator_id                bigint                    not null,
     employee_id                varchar(20)               not null,
     employee_name              varchar(50)               not null,
    
-    moving_time                datetime                  not null,
+    qty                        int                       not null,
+    time_of_origin             datetime                  not null,
+
+    workshop_id_from           int                       not null,
+    workshop_code_from         varchar(20)               not null,
+    workshop_name_from         varchar(50)               not null,
    
     workstation_id             int                       not null,
     workstation_code           varchar(20)               not null,
@@ -348,6 +350,17 @@ create table production_moving
     PRIMARY KEY(record_id)
 );
 
+--
+-- 品质代码
+--
+create table defect(
+  record_id                   bigint     auto_increment      not null,
+  defect_code                 varchar(20)                    not null,
+  defect_name                 varchar(50)                    not null,
+
+  primary key(record_id)
+);
+
 
 --
 -- 生产品质: quality_check
@@ -362,35 +375,29 @@ create table quality_check
   production_code                varchar(20)                 not null,
   production_name                varchar(50)                 not null,
 
-  discover_id                    bigint                      not null,  
-  discover_code                  varchar(20)                 not null,
-  discover_name                  varchar(50)                 not null,  
-  discover_time                  datetime                    not null,
+  wocg_code                      varchar(20)                 not null,   -- 工作中心组
 
-  producer_id                    bigint                      not null,
-  producer_code                  varchar(20)                 not null,
-  producer_name                  varchar(50)                 not null,
-  produce_time                   datetime                    not null, 
+  workshop_id                    bigint                      not null,  
+  workshop_code                  varchar(20)                 not null,
+  workshop_name                  varchar(20)                 not null,
 
-  response_id                    bigint                      not null,  
-  response_code                  varchar(20)                 not null,
-  response_name                  varchar(20)                 not null,
-
-  defect_type_code               varchar(20)                 not null, 
-  defect_description             varchar(500)                not null,
+  defect_id                      long                        not null,
+  defect_code                    varchar(20)                 not null, 
+  defect_name                    varchar(500)                not null,
+  time_of_origin                 datetime                    not null,
   qty                            int                         not null,
 
-  create_by_id                   bigint                    not null,
-  create_by_code                 varchar(20)               not null,
-  create_by_name                 varchar(50)               not null,
-  create_time                    datetime                  not null,
+  create_by_id                   bigint                      not null,
+  create_by_code                 varchar(20)                 not null,
+  create_by_name                 varchar(50)                 not null,
+  create_time                    datetime                    not null,
   
-  update_by_id                   bigint                    null,
-  update_by_code                 varchar(20)               null,
-  update_by_name                 varchar(50)               null,
-  update_time                    datetime                  null,
+  update_by_id                   bigint                      null,
+  update_by_code                 varchar(20)                 null,
+  update_by_name                 varchar(50)                 null,
+  update_time                    datetime                    null,
      
-  opt_flag                       int                       not null default 0,  
+  opt_flag                       int                         not null default 0,  
 
   PRIMARY KEY(record_id)  
 );

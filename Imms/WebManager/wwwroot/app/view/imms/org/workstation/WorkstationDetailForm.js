@@ -36,6 +36,14 @@ Ext.define("app.view.imms.org.workstation.WorkstationDetailForm", {
             enforceMaxLength: true,
             width: 380
         }, {
+            name: "wocgCode",
+            xtype: "textfield",
+            fieldLabel: "工作中心组",
+            allowBlank: false,
+            maxLength: 50,
+            enforceMaxLength: true,
+            width: 380
+        },{
             name: "rfidControllerId",
             xtype: "textfield",
             fieldLabel: "Rfid控制器编号",

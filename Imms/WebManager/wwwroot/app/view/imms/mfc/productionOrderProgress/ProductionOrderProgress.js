@@ -18,6 +18,7 @@ Ext.define("app.view.imms.mfc.productionOrderProgress.ProductionOrderProgress", 
 
         { dataIndex: "workstationCode", text: "工位编码" },
         { dataIndex: "workstationName", text: "工位名称" },
+        { dataIndex: "wocgCode", text: "工作中心组" },        
 
         { dataIndex: "productionCode", text: "产品编码" ,width:150},
         { dataIndex: "productionName", text: "产品名称", width: 200},
@@ -28,8 +29,8 @@ Ext.define("app.view.imms.mfc.productionOrderProgress.ProductionOrderProgress", 
         { dataIndex: "rfidTerminatorId", text: "工位机" },
         { dataIndex: "rfidControllerId", text: "控制器" },
 
-        { dataIndex: "reportTime", text: '时间', width: 150 },
-        { dataIndex: "reportQty", text: "数量" },
+        { dataIndex: "timeOfOrigin", text: '时间', width: 150 },
+        { dataIndex: "qty", text: "数量" },
         { dataIndex: "rfidCardNo", text: "卡号" },
         { dataIndex: "reportType", text: "汇报类型" },
     ],

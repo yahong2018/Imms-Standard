@@ -21,8 +21,9 @@ Ext.define("app.model.imms.mfc.ProductionMovingModel", {
         { name: "employeeId", type: "string" },
         { name: "employeeName", type: "string" },
 
-        { name: "movingTime", type: "zhxhDate", dateFormat: "Y-m-d H:i:s" },
+        { name: "timeOfOrigin", type: "zhxhDate", dateFormat: "Y-m-d H:i:s" },
 
+        { name: "wocgCode", type: "string" },
         { name: "workstationId", type: "int" },
         { name: "workstationCode", type: "string" },
         { name: "workstationName", type: "string" },
@@ -30,6 +31,10 @@ Ext.define("app.model.imms.mfc.ProductionMovingModel", {
         { name: "workshopId", type: "int" },
         { name: "workshopCode", type: "string" },
         { name: "workshopName", type: "string" },
+
+        { name: "workshopIdFrom", type: "int" },
+        { name: "workshopCodeFrom", type: "string" },
+        { name: "workshopNameFrom", type: "string" },
 
         { name: "prevProgressRecordId", type: "int" },
     ]

@@ -1,9 +1,11 @@
 
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using Imms.Data.Domain;
+using Imms.Mes.Data.Domain;
 
 namespace Imms.WebManager
 {
@@ -188,13 +190,23 @@ namespace Imms.WebManager
             {
                 return;
             }
+            List<ProductionOrderProgress> dataList = null;
+            Imms.Data.CommonRepository.UseDbContext(dbContext =>
+            {
+                dataList = dbContext.Set<ProductionOrderProgress>().Where(x => x.RecordId > this.last_sync_id_progress && x.WorkshopCode != "EV_2").ToList();
+            });
+            var itemList = dataList.GroupBy(x => new { x.WorkshopCode, x.ProductionCode })
+            .Select(group => new InstoreSyncItem
+            {
+                loccode = group.Key.WorkshopCode,
+                proccode = group.Key.ProductionCode,
+                qty = group.Sum(x => x.Qty),
+                unitcode = "pcs"
+            }).ToArray();
 
             InstoreSyncData data = new InstoreSyncData();
             data.beld = this.AccountId;
-            data.prodpwt = new InstoreSyncItem[]{
-                new InstoreSyncItem(){proccode="iphone",unitcode="pcs",qty=23},
-                new InstoreSyncItem(){proccode="iphonex",unitcode="pcs",qty=23},
-            };
+            data.prodpwt = itemList;
 
             string strData = data.ToJson();
             string reportUrl = this.ServerHost + "/" + this.InstoreSyncUrl;
@@ -240,6 +252,7 @@ namespace Imms.WebManager
         public string proccode { get; set; }
         public string unitcode { get; set; }
         public int qty { get; set; }
+        public string loccode { get; set; }
     }
 
     public class MoveSyncData

@@ -8,7 +8,8 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheck", {
         "app.model.imms.org.WorkshopModel", "app.store.imms.org.WorkshopStore",
         "app.model.imms.material.MaterialModel", "app.store.imms.material.MaterialStore",
         "app.model.imms.org.OperatorModel", "app.store.imms.org.OperatorStore",
-        "app.model.imms.mfc.ProductionOrderModel", "app.store.imms.mfc.ProductionOrderStore"
+        "app.model.imms.mfc.ProductionOrderModel", "app.store.imms.mfc.ProductionOrderStore",
+        "app.model.imms.mfc.DefectModel", "app.store.imms.mfc.DefectStore"
     ],
     uses: ["app.view.imms.mfc.qualityCheck.QualityCheckDetailForm"],
     columns: [
@@ -16,21 +17,15 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheck", {
         { dataIndex: "recordId", text: "业务流水" },
         { dataIndex: "productionCode", text: "产品代码", width: 100 },
         { dataIndex: "productionName", text: "产品名称", width: 200 },
-        { dataIndex: "qty", text: "缺陷数量", width: 100 },
+        { dataIndex: "qty", text: "数量", width: 100 },
+        { dataIndex: "timeOfOrigin", text: "时间", width: 100 },
 
-        { dataIndex: "defectTypeCode", text: "品质代码", width: 100 },
-        { dataIndex: "defectDescription", text: "品质描述", width: 200 },
+        { dataIndex: "defectCode", text: "品质代码", width: 100 },
+        { dataIndex: "defectName", text: "品质描述", width: 200 },
 
-        { dataIndex: "discoverCode", text: "发现人工号", width: 100 },
-        { dataIndex: "discoverName", text: "发现人姓名", width: 150 },
-        { dataIndex: "discoverTime", text: "发现时间", width: 150 },
-
-        { dataIndex: "producerCode", text: "生产人工号", width: 100 },
-        { dataIndex: "producerName", text: "生产人姓名", width: 150 },
-        { dataIndex: "produceTime", text: "产生时间", width: 150 },
-
-        { dataIndex: "responseCode", text: "责任人工号", width: 100 },
-        { dataIndex: "reponseName", text: "责任人姓名", width: 150 },
+        { dataIndex: "workshopCode", text: "车间代码", width: 100 },
+        { dataIndex: "workshopName", text: "车间名称", width: 150 },
+        { dataIndex: "wocgCode", text: "工作中心组", width: 150 },
     ],
     constructor: function (config) {
         var configBase = {

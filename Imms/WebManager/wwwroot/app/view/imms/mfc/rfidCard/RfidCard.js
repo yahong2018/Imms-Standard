@@ -37,7 +37,7 @@ Ext.define("app.view.imms.mfc.rfidCard.RfidCard", {
         //     }
         // },
         {
-            text: "导入", privilege: "ExcelImport", handler: function () {
+            text: "看板导入", privilege: "ExcelImport", handler: function () {
                 var win = Ext.create({ xtype:"imms_mfc_rfidCard_ExcelImportWindow"});
                 win.store = this.up("app_view_imms_mfc_rfidCard_RfidCard").store;
                 win.show();

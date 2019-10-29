@@ -203,8 +203,8 @@ namespace Imms.WebManager.Controllers
                 DateTime endDate = beginDate.AddDays(1);
 
                 var progressList = dbContext.Set<ProductionOrderProgress>()
-                    .Where(x => x.ReportTime >= beginDate
-                                && x.ReportTime < endDate
+                    .Where(x => x.TimeOfOrigin >= beginDate
+                                && x.TimeOfOrigin < endDate
                                 && (x.ReportType == 0 || x.ReportType == 127)
                     ).ToList();
 
@@ -218,12 +218,12 @@ namespace Imms.WebManager.Controllers
                        group.Key.WorkshopId,
                        group.Key.WorkshopCode,
                        group.Key.WorkshopName,
-                       Qty = group.Sum(x => x.ReportQty),
+                       Qty = group.Sum(x => x.Qty),
                        DataType = 2
                    }).ToList();
 
                 var movingList = dbContext.Set<ProductionMoving>()
-                          .Where(x => x.MovingTime >= beginDate && x.MovingTime < endDate)
+                          .Where(x => x.TimeOfOrigin >= beginDate && x.TimeOfOrigin < endDate)
                           .ToList();
                 var movingGroupList = movingList.GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopId, x.WorkshopCode, x.WorkshopName })
                    .Select(group => new
@@ -441,6 +441,11 @@ namespace Imms.WebManager.Controllers
         public QualityCheckController() => this.Logic = new SimpleCRUDLogic<QualityCheck>();
     }
 
+    [Route("api/imms/mfc/defect")]
+    public class DefectController : SimpleCRUDController<Defect>
+    {
+        public DefectController() => this.Logic = new SimpleCRUDLogic<Defect>();
+    }
 
     public class ProgressReportItem
     {
