@@ -73,24 +73,24 @@ insert into rfid_card(record_id,rfid_no,card_type,card_status,production_id,prod
 
 -- 初始化产品
 
-insert into material(record_id,material_code,material_name,description,first_workshop_id,first_workshop_code,first_workshop_name,
+insert into material(record_id,material_code,material_name,description,
 create_by_id,create_by_code,create_by_name,create_time,update_by_id,update_by_code,update_by_name,update_time,opt_flag
 )values(
-    1,'A-0001','产品1','',1,'WK01_YZ','压铸',
+    1,'A-0001','产品1','',
     1,'C00001','刘永红',Now(),null,null,null,null,0
 );
 
-insert into material(record_id,material_code,material_name,description,first_workshop_id,first_workshop_code,first_workshop_name,
+insert into material(record_id,material_code,material_name,description,
 create_by_id,create_by_code,create_by_name,create_time,update_by_id,update_by_code,update_by_name,update_time,opt_flag
 )values(
-    2,'A-0002','产品2','',1,'WK01_YZ','压铸',
+    2,'A-0002','产品2','',
     1,'C00001','刘永红',Now(),null,null,null,null,0
 );
 
-insert into material(record_id,material_code,material_name,description,first_workshop_id,first_workshop_code,first_workshop_name,
+insert into material(record_id,material_code,material_name,description,
 create_by_id,create_by_code,create_by_name,create_time,update_by_id,update_by_code,update_by_name,update_time,opt_flag
 )values(
-    3,'A-0003','产品3','',1,'WK01_YZ','压铸',
+    3,'A-0003','产品3','',
     1,'C00001','刘永红',Now(),null,null,null,null,0
 );
 

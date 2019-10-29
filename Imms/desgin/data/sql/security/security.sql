@@ -1,3 +1,10 @@
+drop table system_user;
+drop table system_role;
+drop table role_user;
+drop table role_privilege;
+drop table system_program;
+drop table program_privilege;
+
 CREATE TABLE system_user
 (
   record_id                 BIGINT AUTO_INCREMENT      NOT NULL,
@@ -65,6 +72,7 @@ CREATE TABLE system_program
   show_order                 INT                        NOT NULL,
   parameters                 VARCHAR(255)               NOT NULL,
   parent_id                  VARCHAR(50)                NOT NULL,
+  program_status             int                        not null,
 
   PRIMARY KEY (record_id),
   index IDX_SYSTEM_PROGRAM_0(program_code),

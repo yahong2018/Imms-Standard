@@ -1,4 +1,4 @@
-Ext.define("app.view.imms.mfc.simulator.LineMC", {
+﻿Ext.define("app.view.imms.mfc.simulator.LineMC", {
     extend: "Ext.container.Container",
     xtype: "app_view_imms_mfc_simulator_LineMC",
     requires: ["app.view.imms.mfc.simulator.RfidTerminator"],
@@ -12,14 +12,14 @@ Ext.define("app.view.imms.mfc.simulator.LineMC", {
                 {
                     xtype: "imms_mfc_simulator_RfidTerminator",
                     workstationName: "MC加工1号线",
-                    GID: 2,
-                    DID: 31,
+                    GID: 7,
+                    DID: 1,
                 },
                 {
                     xtype: "imms_mfc_simulator_RfidTerminator",
                     workstationName: "MC加工2号线",
-                    GID: 2,
-                    DID: 32,
+                    GID: 7,
+                    DID: 2,
                 },
             ]
         },
@@ -31,14 +31,14 @@ Ext.define("app.view.imms.mfc.simulator.LineMC", {
                 {
                     xtype: "imms_mfc_simulator_RfidTerminator",
                     workstationName: "MC加工3号线",
-                    GID: 2,
-                    DID: 33
+                    GID: 7,
+                    DID: 3
                 },
                 {
                     xtype: "imms_mfc_simulator_RfidTerminator",
                     workstationName: "MC加工4号线",
-                    GID: 2,
-                    DID: 34
+                    GID: 7,
+                    DID: 4
                 }]
         }
     ]

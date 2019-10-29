@@ -1,6 +1,7 @@
 Ext.define('app.view.main.region.Center', {
 	extend: 'Ext.tab.Panel',
 	alias: 'widget.maincenter',
+	uses: ['app.ux.ButtonTransparent'],
 
 	initComponent: function () {
 		this.items = [{
@@ -16,9 +17,25 @@ Ext.define('app.view.main.region.Center', {
 				{
 					region: "north",
 					height: 50,
-					xtype: "label",
-					text: "本日生产状态一览表",
-					style: "text-align:center;font-size:24px;font-weight:bolder;line-height:50px;vertical-align: middle;"
+					xtype:"panel",
+					layout:"hbox",
+					items:[
+						{
+							xtype: "label",
+							text: "本日生产状态一览表",
+							flex:1,
+							style: "text-align:center;font-size:24px;font-weight:bolder;line-height:50px;vertical-align: middle;"
+						},{
+							xtype:"button",
+							text:"刷新",
+							width:80,
+							margin:"5 5 5 5",
+							handler:function(){
+								var summaryGrid = this.up("maincenter").down("gridpanel");
+								summaryGrid.store.loadReportData(summaryGrid.summaryStore);								
+							}
+						}
+					]
 				},
 				{
 					region: "center",
@@ -81,7 +98,6 @@ Ext.define('app.view.main.region.Center', {
 								{ dataIndex: "WK22_DZ_2", text: "产出", width: 50, menuDisabled: true },
 							]
 						},
-
 						{
 							text: "E/V前工程",
 							columns: [
@@ -104,7 +120,6 @@ Ext.define('app.view.main.region.Center', {
 							]
 						},
 						{ text: " ", width: 10, menuDisabled: true },
-
 						{
 							text: "注塑",
 							columns: [

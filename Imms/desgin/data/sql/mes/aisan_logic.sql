@@ -1,3 +1,12 @@
+drop procedure MES_GetCardType;
+drop procedure MES_GetProductionOrder;
+drop procedure MES_GetLastWorkshopId;
+drop procedure MES_ProcessDeviceData;
+drop procedure MES_ReportProductionOrder;
+drop procedure MES_Debug;
+-- drop procedure WorkstationIsLogin;
+
+
 -- --
 -- -- 判断工位机是否已经登录，如果已经登录，则返回登录的记录编号
 -- --
@@ -25,6 +34,8 @@
 --             limit 1
 --     ),-1);
 -- end;
+
+
 
 --
 -- 判断卡的类别

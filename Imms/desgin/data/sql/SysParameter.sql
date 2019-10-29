@@ -13,3 +13,8 @@ insert into system_parameter(record_id,parameter_class_id,parameter_code,paramet
 insert into system_parameter(record_id,parameter_class_id,parameter_code,parameter_name,parameter_value) values(11,1,'qualitycheck_report_url','品质数据同步地址','');
 
 insert into system_parameter(record_id,parameter_class_id,parameter_code,parameter_name,parameter_value) values(12,1,'account_id','账套Id','63');
+
+insert into system_parameter(record_id,parameter_class_id,parameter_code,parameter_name,parameter_value) values(13,1,'last_sync_id_progress','最后报工数据同步的Id','1');
+insert into system_parameter(record_id,parameter_class_id,parameter_code,parameter_name,parameter_value) values(14,1,'last_sync_id_progress_ww','最后委外数据同步的Id','1');
+insert into system_parameter(record_id,parameter_class_id,parameter_code,parameter_name,parameter_value) values(15,1,'last_sync_id_move','最后移库数据同步的Id','1');
+insert into system_parameter(record_id,parameter_class_id,parameter_code,parameter_name,parameter_value) values(16,1,'last_sync_id_qualitycheck','最后品质数据同步的Id','1');

@@ -29,7 +29,14 @@ namespace Imms.WebManager
 
             HttpClient httpClient = this.GetHttpClient4WDB();
             this.Synchronizer.HttpClient = httpClient;
-            this.Synchronizer.SyncData();
+            try
+            {
+                this.Synchronizer.SyncData();
+            }
+            catch (Exception ex)
+            {
+                GlobalConstants.DefaultLogger.Error("数据同步出现错误：" + ex.Message);
+            }
         }
 
         public HttpClient GetHttpClient4WDB()
@@ -44,12 +51,17 @@ namespace Imms.WebManager
         private WDBLoginParameter _loginParameter = new WDBLoginParameter();
         private WDBLoginResult _loginResult = new WDBLoginResult();
 
-        public string ServerHost { get; set; };
+        public string ServerHost { get; set; }
         public string LoginUrl { get; set; }
         public string InstoreSyncUrl { get; set; }
         public string MoveSyncUrl { get; set; }
         public string QuanlityCheckSyncUrl { get; set; }
         public int AccountId { get; set; } = 63;
+
+        public long last_sync_id_progress { get; set; }   //内部入库数据的最后Id
+        public long last_sync_id_progress_ww { get; set; } //委外入库数据的最后id
+        public long last_sync_id_move { get; set; }  //移库数据的最后Id
+        public long last_sync_id_qualitycheck { get; set; } //品质数据的最后Id
 
         public WDBSynchronizer()
         {
@@ -60,12 +72,15 @@ namespace Imms.WebManager
             BusinessException result = null;
             try
             {
-                this.GetLoginParameter(); //获取参数
-                this.LoginToWDB();    //登录
-                this.DoSyncInstoreData(); //入库报工
-                this.DoSyncInstoreWWData(); //委外入库
-                this.DoSyncMovingData();   //移库
-                this.DoSyncQualityCheckdata();  //品质
+                lock (typeof(Sync4WDBService))  //同一时间，只能有1个数据同步实例运行
+                {
+                    this.GetLoginParameter(); //获取参数
+                    this.LoginToWDB();    //登录
+                    this.DoSyncInstoreData(); //入库报工
+                    this.DoSyncInstoreWWData(); //委外入库
+                    this.DoSyncMovingData();   //移库
+                    this.DoSyncQualityCheckdata();  //品质
+                }
 
                 result = new BusinessException(GlobalConstants.EXCEPTION_CODE_NO_ERROR, "成功同步");
             }
@@ -106,6 +121,11 @@ namespace Imms.WebManager
                 {
                     this.AccountId = tempAccountid;
                 }
+
+                this.last_sync_id_progress = long.Parse(list.Single(x => x.ParameterCode == "last_sync_id_progress").ParameterValue);
+                this.last_sync_id_progress_ww = long.Parse(list.Single(x => x.ParameterCode == "last_sync_id_progress_ww").ParameterValue);
+                this.last_sync_id_move = long.Parse(list.Single(x => x.ParameterCode == "last_sync_id_move").ParameterValue);
+                this.last_sync_id_qualitycheck = long.Parse(list.Single(x => x.ParameterCode == "last_sync_id_qualitycheck").ParameterValue);
             });
         }
 

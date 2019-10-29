@@ -61,9 +61,9 @@ Ext.define('app.view.main.Main', {
 			this.startTask();
 
 			var summaryGrid = this.down("maincenter");
-			summaryGrid = summaryGrid.down("gridpanel")
-			var summaryStore = Ext.create({ xtype: "imms_mfc_ProductSummaryStore", autoLoad: false });
-			summaryGrid.store.loadReportData(summaryStore);
+			summaryGrid = summaryGrid.down("gridpanel");
+			summaryGrid.summaryStore = Ext.create({ xtype: "imms_mfc_ProductSummaryStore", autoLoad: false });
+			summaryGrid.store.loadReportData(summaryGrid.summaryStore);
 		}
 	},
 

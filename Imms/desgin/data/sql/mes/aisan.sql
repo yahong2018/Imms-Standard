@@ -1,3 +1,18 @@
+drop table system_parameter_class;
+drop table system_parameter;
+drop table system_logs;
+drop view v_rfid_controller;
+drop table work_organization_unit;
+drop table operator;
+drop table material;
+drop table rfid_card;
+drop table production_order;
+drop table production_order_progress;
+drop table production_moving;
+drop table quality_check;
+drop table workstation_login;
+
+
 create table system_parameter_class
 (
   record_id            bigint    auto_increment   not null,
