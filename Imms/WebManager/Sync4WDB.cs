@@ -159,7 +159,36 @@ namespace Imms.WebManager
 
         private void DoSyncQualityCheckdata()
         {
-            //throw new NotImplementedException();
+            if (string.IsNullOrEmpty(this.QuanlityCheckSyncUrl))
+            {
+                return;
+            }
+            List<QualityCheck> dataList = null;
+            Imms.Data.CommonRepository.UseDbContext(dbContext =>
+            {
+                dataList = dbContext.Set<QualityCheck>().Where(x => x.RecordId > this.last_sync_id_qualitycheck).ToList();
+            });
+            var itemList = dataList
+            .Select(x => new QualitySyncItem
+            {
+                procode = x.ProductionCode,                
+                unitcode = "pcs",
+                qty = x.Qty,
+                wocgcode = x.WocgCode,
+                udfbldm = x.DefectCode,
+                udfblbm = x.WorkshopCode,
+                loccode = x.WorkshopCode+"_BAD"
+            }).ToArray();
+
+            QualitySyncData data = new QualitySyncData();
+            data.beId = this.AccountId;
+            data.doctypeId = 4;
+            data.prodpwt = itemList;
+
+            string strData = data.ToJson();
+            string reportUrl = this.ServerHost + "/" + this.QuanlityCheckSyncUrl;
+            HttpResponseMessage responseMessage = this.HttpClient.PostAsync(reportUrl, new StringContent(strData)).GetAwaiter().GetResult();
+            responseMessage.EnsureSuccessStatusCode();
         }
 
         private void DoSyncMovingData()
@@ -169,14 +198,24 @@ namespace Imms.WebManager
                 return;
             }
 
+            List<ProductionMoving> dataList = null;
+            Imms.Data.CommonRepository.UseDbContext(dbContext =>
+            {
+                dataList = dbContext.Set<ProductionMoving>().Where(x => x.RecordId > this.last_sync_id_move && x.WorkshopCode != "EV_1").ToList();
+            });
+            var itemList = dataList.GroupBy(x => new { x.WorkshopCode, x.ProductionCode, x.WorkshopCodeFrom })
+            .Select(group => new MoveSyncItem
+            {
+                loccode = group.Key.WorkshopCodeFrom,
+                aloccode = group.Key.WorkshopCode,
+                proccode = group.Key.ProductionCode,
+                qty = group.Sum(x => x.Qty),
+                unitcode = "pcs"
+            }).ToArray();
+
             MoveSyncData data = new MoveSyncData();
-            data.beld = this.AccountId;
-            data.movet = new MoveSyncItem[]{
-                new MoveSyncItem(){proccode="iphone",unitcode="pcs",qty=23},
-                new MoveSyncItem(){proccode="iphonex",unitcode="pcs",qty=23},
-            };
-            data.loccode = "YZ"; //移出仓库
-            data.aloccode = "CJG";//移入仓库    
+            data.beId = this.AccountId;
+            data.movet = itemList;
 
             string strData = data.ToJson();
             string reportUrl = this.ServerHost + "/" + this.MoveSyncUrl;
@@ -195,17 +234,18 @@ namespace Imms.WebManager
             {
                 dataList = dbContext.Set<ProductionOrderProgress>().Where(x => x.RecordId > this.last_sync_id_progress && x.WorkshopCode != "EV_2").ToList();
             });
-            var itemList = dataList.GroupBy(x => new { x.WorkshopCode, x.ProductionCode })
+            var itemList = dataList.GroupBy(x => new { x.WorkshopCode, x.ProductionCode, x.WocgCode })
             .Select(group => new InstoreSyncItem
             {
                 loccode = group.Key.WorkshopCode,
                 proccode = group.Key.ProductionCode,
+                wocgcode = group.Key.WocgCode,
                 qty = group.Sum(x => x.Qty),
                 unitcode = "pcs"
             }).ToArray();
 
             InstoreSyncData data = new InstoreSyncData();
-            data.beld = this.AccountId;
+            data.beId = this.AccountId;
             data.prodpwt = itemList;
 
             string strData = data.ToJson();
@@ -220,13 +260,23 @@ namespace Imms.WebManager
             {
                 return;
             }
+            List<ProductionOrderProgress> dataList = null;
+            Imms.Data.CommonRepository.UseDbContext(dbContext =>
+            {
+                dataList = dbContext.Set<ProductionOrderProgress>().Where(x => x.RecordId > this.last_sync_id_progress_ww && x.WorkshopCode == "EV_2").ToList();
+            });
+            var itemList = dataList.GroupBy(x => new { x.WorkshopCode, x.ProductionCode })
+            .Select(group => new InstoreSyncItemWW
+            {
+                loccode = group.Key.WorkshopCode,
+                proccode = group.Key.ProductionCode,
+                qty = group.Sum(x => x.Qty),
+                unitcode = "pcs"
+            }).ToArray();
 
             InstoreSyncDataWW data = new InstoreSyncDataWW();
-            data.beld = this.AccountId;
-            data.pdcorespwt = new InstoreSyncItem[]{
-                new InstoreSyncItem(){proccode="iphone",unitcode="pcs",qty=23},
-                new InstoreSyncItem(){proccode="iphonex",unitcode="pcs",qty=23},
-            };
+            data.beId = this.AccountId;
+            data.pdcorespwt = itemList;
 
             string strData = data.ToJson();
             string reportUrl = this.ServerHost + "/" + this.InstoreSyncUrl;
@@ -237,17 +287,26 @@ namespace Imms.WebManager
 
     public class InstoreSyncData
     {
-        public int beld { get; set; }
+        public int beId { get; set; }
         public InstoreSyncItem[] prodpwt { get; set; }
+    }
+
+    public class InstoreSyncItem
+    {
+        public string proccode { get; set; }
+        public string unitcode { get; set; }
+        public int qty { get; set; }
+        public string loccode { get; set; }
+        public string wocgcode { get; set; }
     }
 
     public class InstoreSyncDataWW
     {
-        public int beld { get; set; }
-        public InstoreSyncItem[] pdcorespwt { get; set; }
+        public int beId { get; set; }
+        public InstoreSyncItemWW[] pdcorespwt { get; set; }
     }
 
-    public class InstoreSyncItem
+    public class InstoreSyncItemWW
     {
         public string proccode { get; set; }
         public string unitcode { get; set; }
@@ -257,17 +316,36 @@ namespace Imms.WebManager
 
     public class MoveSyncData
     {
-        public int beld { get; set; }
-        public string loccode { get; set; }
-        public string aloccode { get; set; }
+        public int beId { get; set; }
+
         public MoveSyncItem[] movet { get; set; }
     }
 
     public class MoveSyncItem
     {
+        public string loccode { get; set; } //出
+        public string aloccode { get; set; }//入
+
         public string proccode { get; set; }
         public string unitcode { get; set; }
         public int qty { get; set; }
+    }
+
+    public class QualitySyncData
+    {
+        public int beId { get; set; }
+        public int doctypeId { get; set; }
+        public QualitySyncItem[] prodpwt { get; set; }
+    }
+    public class QualitySyncItem
+    {
+        public string procode { get; set; }
+        public string unitcode { get; set; }
+        public int qty { get; set; }
+        public string wocgcode { get; set; }
+        public string udfbldm { get; set; }
+        public string udfblbm { get; set; }
+        public string loccode { get; set; }
     }
 
     public class WDBLoginParameter
