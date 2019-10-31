@@ -32,6 +32,7 @@ namespace Imms.Mes.Data
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.ProductionOrderConfigure());
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.ProductionOrderProgressConfigure());
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.QualityCheckConfigure());
+            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.DefectConfigure());
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.ProductionMovingConfigure());
 
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.WorkstationLoginConfigure());

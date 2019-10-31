@@ -120,6 +120,7 @@ namespace Imms.Data
             CommonRepository.UseDbContext(dbContext =>
             {
                 IQueryable<T> dataSource = filter(getDataSource(dbContext), filterList);
+                IQueryable<T> countSource = filter(getDataSource(dbContext), filterList);
                 if (start > 0)
                 {
                     dataSource = dataSource.Skip(start);
@@ -129,15 +130,15 @@ namespace Imms.Data
                     dataSource = dataSource.Take(limit);
                 }
                 List<T> list = dataSource.ToList();
-                int count = 0;
-                if (filterList != null && filterList.Length > 0)
-                {
-                    count = this.FilterDataSource(this.GetDataSource(dbContext), filterList).Count();
-                }
-                else
-                {
-                    count = list.Count;
-                }
+                int count = this.FilterDataSource(this.GetDataSource(dbContext), filterList).Count();
+                // if (filterList != null && filterList.Length > 0)
+                // {
+                //     count = this.FilterDataSource(this.GetDataSource(dbContext), filterList).Count();
+                // }
+                // else
+                // {
+                //     count = list.Count;
+                // }
 
                 result.RootProperty = list;
                 result.total = count;

@@ -133,7 +133,7 @@ end;
 -- 处理工位机数据:目前没有考虑脱机数据
 --
 create procedure MES_ProcessDeviceData(
- in IsNewData int,        
+in IsNewData int,        
  in	GID INT,
  in	DID INT,
  in	IsOffLineData INT, 		
@@ -141,7 +141,7 @@ create procedure MES_ProcessDeviceData(
  in	DataGatherTime DATETIME,
  in	DataMakeTime DATETIME,
  in	StrPara1 varchar(200), 
- out Resp  varchar(4000)     
+ out RespMessage  varchar(500)
 )
 top:begin    
   declare CardType,ReportQty int;
@@ -149,39 +149,64 @@ top:begin
   declare RfidNo,WocgCode,EmployeeId,WorkshopCode,WorkstationCode,ProductionCode varchar(20);
   declare EmployeeName,WorkstationName,WorkshopName,ProductionName varchar(50);
 	declare code varchar(5) default '00000';
-  declare msg text;
+  declare msg text;	
+	declare LogMessage varchar(500);
+	declare LogId bigint;
  
   declare exit handler for sqlexception
   begin
-    get diagnostics condition 1 code = returned_sqlstate, msg = message_text;
+    get diagnostics condition 1 code = returned_sqlstate, msg = message_text;		
 		
-    set Resp = '|2|1';
-    set Resp = CONCAT(Resp,'|4');
-    set Resp = CONCAT(Resp,'|210|255|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次    
-    set Resp = CONCAT(Resp,'|1|系统异常,请联系管理员:');
-    set Resp = CONCAT(Resp,'|2|[',code,']');
-    set Resp = CONCAT(Resp,'|3|',msg);
-    
-  end;      
+		set LogMessage = CONCAT('code:',code,',message:',msg);
+		call MES_Debug(LogMessage,LogId);
+		
+		set RespMessage=	'2|1|3';
+		set RespMessage = CONCAT(RespMessage,'|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+		set RespMessage = CONCAT(RespMessage,'|1|系统异常:',LogId,'|0');
+		set RespMessage = CONCAT(RespMessage,'|2|请联系管理员|0');		
+  end;     
+
+  if not exists(select *  from work_organization_unit w
+    where w.org_type = 'ORG_WORK_STATION'
+      and w.rfid_controller_id = GID
+      and w.rfid_terminator_id = DID ) then
+		
+		set RespMessage=	'2|1|3';
+		set RespMessage = CONCAT(RespMessage,'|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+		set RespMessage = CONCAT(RespMessage,'|1|组号:',GID,',机号:',DID,'|0');
+		set RespMessage = CONCAT(RespMessage,'|2|请联系管理员注册|0');			
+		leave top;
+	end if;	
 	
-	set Resp = '|2|1|2';
+	  if (select count(*)  from work_organization_unit w
+    where w.org_type = 'ORG_WORK_STATION'
+      and w.rfid_controller_id = GID
+      and w.rfid_terminator_id = DID )>1 then
+		
+		set RespMessage=	'2|1|4';
+		set RespMessage = CONCAT(RespMessage,'|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+		set RespMessage = CONCAT(RespMessage,'|1|组号:',GID,',机号:',DID,'|0');
+		set RespMessage = CONCAT(RespMessage,'|2|工位重复注册|0');			
+		set RespMessage = CONCAT(RespMessage,'|3|请联系管理员|0');			
+		leave top;
+	end if;	
+
+	
   if(DataType = 1) then  -- 如果是刷卡输入
     set RfidNo = StrPara1;
     call MES_GetCardType(RfidNo,CardType,CardId);		
 
     if((CardId = -1) or (CardId = -10)) then
-      set Resp = CONCAT(Resp,'|210|255|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次
-      set Resp = CONCAT(Resp,'|1|非法卡:',RfidNo);      
-
+		  set RespMessage=	'2|1|4';
+      set RespMessage = CONCAT(RespMessage, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次
+      set RespMessage = CONCAT(RespMessage,'|1|卡没注册:|0');            
+			set RespMessage = CONCAT(RespMessage,'|2|',RfidNo,'|0'); 
+			set RespMessage = CONCAT(RespMessage,'|3|请联系管理员注册卡|0');            
+			
       leave top;
     end if;    
 
-    if (CardType = 10 ) then -- 如果是员工卡，则新建尾数记录，如果尾数记录已经存在，则更新记录的的相关数据        
-        if (IsOffLineData = 1 or IsNewData = 0 ) then 
-           set Resp = '';
-           leave top;
-        end if;
-				
+    if (CardType = 10 ) then -- 如果是员工卡，则新建尾数记录，如果尾数记录已经存在，则更新记录的的相关数据       
 				set OperatorId = CardId;				
 				select o.employee_id,o.employee_name into EmployeeId,EmployeeName
             from operator o 
@@ -210,29 +235,38 @@ top:begin
 									 DataGatherTime,0,'',1,0,OperatorId,EmployeeId,EmployeeName,
                    OperatorId,EmployeeId,EmployeeName,Now(),64);
         end if;
-
-        set Resp = CONCAT(Resp,'|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 打开键盘，将键盘的模式设置为多键输入，发声一次
-        set Resp = CONCAT(Resp,'|1|请输入尾数数量');
+				
+				set RespMessage=	'2|1|2';
+        set RespMessage = CONCAT(RespMessage,'|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 打开键盘，将键盘的模式设置为多键输入，发声一次
+        set RespMessage = CONCAT(RespMessage,'|1|请输入尾数数量|0');				
 
     elseif(CardType = 1) then  -- 如果是数量卡    
-        set Resp = CONCAT(Resp,'|210|255|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次    
-        call MES_ReportProductionOrder(RfidNo,CardId,GID,DID,DataGatherTime,Resp);        
+		    
+        -- set RespCommand = '|210|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150';  -- 锁定所有的键盘，发声一次    
+        call MES_ReportProductionOrder(RfidNo,CardId,GID,DID,DataGatherTime,RespMessage);  
+							
     end if;
-  elseif(DataType = 3) then -- 如果是键盘输入 , 则进行尾数报工
-        set Resp = CONCAT(Resp,'|210|255|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次    
+  elseif(DataType = 3) then -- 如果是键盘输入 , 则进行尾数报工 
+			  call MES_Debug('aaaa',LogId);
         if ((select count(*) from production_order_progress  where opt_flag = 64 and rfid_terminator_id = DID  and rfid_controller_id = GID) = 0) then
-          set Resp = CONCAT(Resp,'|1|请先刷员工卡');          
+				  set RespMessage=	'2|1|2';
+				  set RespMessage = CONCAT(RespMessage,'|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次    
+          set RespMessage = CONCAT(RespMessage,'|1|请先刷员工卡|0');          
         else
           set ReportQty = cast(StrPara1 as unsigned);
           update production_order_progress
              set qty = ReportQty,
                  opt_flag = 65
            where opt_flag = 64 and rfid_terminator_id = DID  and rfid_controller_id = GID;
-
-          set Resp = CONCAT(Resp,'|1|已报尾数[',ReportQty,']个,请刷数量卡.');
+					 
+				  set RespMessage=	'2|1|3';
+					set RespMessage = CONCAT(RespMessage,'|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次     
+          set RespMessage = CONCAT(RespMessage,'|1|已报尾数',ReportQty,'个|0');
+					set RespMessage = CONCAT(RespMessage,'|2|请刷数量卡.|0');
+				
         end if;        
   end if;
-end;
+end
 
 --
 -- 刷数量卡：进行整数报工或者移库
@@ -256,25 +290,27 @@ top:begin
   declare LastWorkshopId,FirstWorkshopId  bigint;
   declare IsMove,CardStatus int;  
 	declare ErrorCode varchar(5) default '00000';
+	declare LogMessage varchar(500);
+	declare LogId bigint;
 	declare Msg text;
   declare InTran int default 0;
   
   declare exit handler for sqlexception
   begin			
     get diagnostics condition 1 ErrorCode = returned_sqlstate, Msg = message_text;		
-    
-    set Resp = '|2|1';
-    set Resp = CONCAT(Resp,'|4');
-    set Resp = CONCAT(Resp,'|210|255|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次    
-    set Resp = CONCAT(Resp,'|1|系统异常,请联系管理员:');
-    set Resp = CONCAT(Resp,'|2|[',ErrorCode,']');
-    set Resp = CONCAT(Resp,'|3|',msg);
-		
     if (InTran = 1) then		
       rollback;   
-    end if;
-  end;    
-	
+    end if;		
+    
+		set LogMessage = CONCAT('RifidNo:',RfidNo,',RfidId:',RfidId,',GID:',GID,',DID:',DID,',GatherTime:',GatherTime,'code:',ErrorCode,',message:',Msg);
+		call MES_Debug(LogMessage,LogId);
+		
+		set Resp=	'2|1|3';
+		set Resp = CONCAT(Resp,'|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+		set Resp = CONCAT(Resp,'|1|系统异常:',LogId,'|0');
+		set Resp = CONCAT(Resp,'|2|联系管理员|0');		
+  end;   
+
 	set IsMove = 0,InTran = 0;	
 
   -- 验证刷的数量卡是否是属于当前车间的卡
@@ -294,13 +330,21 @@ top:begin
   if(WorkshopId <> LoginWorkshopId) then	    
       if (CardStatus = 1 ) then
            set IsMove = 1; -- 如果刷卡已经报工，则说明本次操作是移库，否则，不能刷其他地方刷卡
-      else         
-         set Resp = CONCAT('当前工位是[',LoginWorkshopName,']','不能刷属于[',WorkshopName,']的卡!');
+      else 
+	       set Resp=	'2|1|3';
+         set Resp = CONCAT(Resp, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次
+         set Resp = CONCAT(Resp,'|1|本看板可刷卡车间：|0');
+				 set Resp = CONCAT(Resp,'|2|',WorkshopName,'|0');			 
+				 
          leave top;
       end if;
   elseif(CardStatus = 1 ) then -- 如果卡已经报工，则不能重复报工
-      set Resp = CONCAT('本看板已经报工，必须移库以后才可以继续报工！');
-      leave top;     
+			 set Resp=	'2|1|3';
+			 set Resp = CONCAT(Resp, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次
+			 set Resp = CONCAT(Resp,'|1|本看板已经报工|0');
+			 set Resp = CONCAT(Resp,'|2|请移库后再报工|0');		       
+			 
+       leave top;     
   end if;
 
   set ProductionOrderId = -1,ProductionOrderNo='';
@@ -395,11 +439,15 @@ top:begin
   commit;
 
   if (IsMove = 0) then
-    set Resp = CONCAT('已报工[',ReportQty,']个产品');
+			 set Resp=	'2|1|2';
+			 set Resp = CONCAT(Resp, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次
+       set Resp = CONCAT(Resp,'|1|已报工',ReportQty,'个|0');
   else
-    set Resp = CONCAT('已移库[',ReportQty,']个产品');
+			 set Resp=	'2|1|2';
+			 set Resp = CONCAT(Resp, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次
+       set Resp = CONCAT(Resp,'|1|已移库',ReportQty,'个|0');	       
   end if;
-end;
+end
 
 
 --

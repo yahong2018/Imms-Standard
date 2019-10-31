@@ -186,3 +186,22 @@ select @Resp;
 select log_value from system_logs;
 
 */
+
+/*
+数据导入
+
+load data infile 'D:/Data/mydata/mysql/import/defect.csv' 
+into table defect 
+CHARACTER SET utf8
+FIELDS TERMINATED BY ',' 
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES;
+
+[mysqld]
+port=3306
+character_set_server=utf8
+basedir=D:\Data\mydata\mysql
+datadir=D:\Data\mydata\mysql\database
+max_connections=1000
+secure-file-priv=D:\Data\mydata\mysql\import
+*/

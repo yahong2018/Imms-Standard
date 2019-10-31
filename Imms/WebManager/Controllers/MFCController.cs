@@ -163,25 +163,31 @@ namespace Imms.WebManager.Controllers
         public ProductionOrderController() => this.Logic = new SimpleCRUDLogic<ProductionOrder>();
     }
 
-    public class InstoreItem
+    public class ManufactureSummaryItem
     {
-        public string KanbanNo { get; set; }
         public string ProductionCode { get; set; }
         public string ProductionName { get; set; }
-        public string StoreNo { get; set; }
-        public string StoreName { get; set; }
-        public string operatorCode { get; set; }
-        public string operatorName { get; set; }
-        public int Qty { get; set; }
-        public string MovingTime { get; set; }
+        public string WorkshopCode { get; set; }
+        public DateTime DateOfOrigin { get; set; }
+        public int QtyTotal { get; set; }
+        public int QtyDay { get; set; }
+        public int QtyNight { get; set; }
     }
-
 
     [Route("api/imms/mfc/productionOrderProgress")]
     public class ProductionOrderProgressController : SimpleCRUDController<ProductionOrderProgress>
     {
         public ProductionOrderProgressController() => this.Logic = new SimpleCRUDLogic<ProductionOrderProgress>();
 
+        private void ParseShift(List<ProductionOrderProgress> progressList)
+        {
+            foreach (ProductionOrderProgress item in progressList)
+            {
+                ManufactureSummaryItem summaryItem = new ManufactureSummaryItem();
+                
+            }
+        }
+        
 
         [Route("getProductProgressSummary"), HttpGet]
         public ActionResult<string> GetProductProgressSummary(int isToday = 0)
@@ -191,7 +197,93 @@ namespace Imms.WebManager.Controllers
                 return this.GetTodayProductSummary();
             }
 
-            return "";
+            int page, start, limit;
+            string filterStr;
+            this.GetQueryParameters(out page, out start, out limit, out filterStr);
+            SimpleCRUDLogic<ProductionOrderProgress> progressLogic = new SimpleCRUDLogic<ProductionOrderProgress>();
+            List<ProductionOrderProgress> progressList = (List<ProductionOrderProgress>)progressLogic.GetAllWithExtResult(0, 0, 0, filterStr).RootProperty;
+            var resultList = progressList
+                   .Select(x => new { x.RecordId, x.ProductionId, x.ProductionCode, x.ProductionName, x.WorkshopId, x.WorkshopName, x.WorkshopCode, x.Qty, DateOfOrigin = x.TimeOfOrigin.ToString("yyyy/MM/dd") })
+                   .GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopId, x.WorkshopCode, x.WorkshopName, x.DateOfOrigin })
+                   .Select(group => new ProductionSummaryItem
+                   {
+                       DateOfOrigin = group.Key.DateOfOrigin,
+                       ProductionId = group.Key.ProductionId,
+                       ProductionCode = group.Key.ProductionCode,
+                       ProductionName = group.Key.ProductionName,
+                       WorkshopId = group.Key.WorkshopId,
+                       WorkshopCode = group.Key.WorkshopCode,
+                       WorkshopName = group.Key.WorkshopName,
+                       FinishedQty = group.Sum(x => x.Qty),
+                       BadQty = 0,
+                       MoveInQty = 0
+                   }).ToList();
+
+            SimpleCRUDLogic<QualityCheck> qualityLogic = new SimpleCRUDLogic<QualityCheck>();
+            List<QualityCheck> qualityList = (List<QualityCheck>)qualityLogic.GetAllWithExtResult(0, 0, 0, filterStr).RootProperty;
+            var qualityGroupList = qualityList
+                   .Select(x => new { x.RecordId, x.ProductionId, x.ProductionCode, x.ProductionName, x.WorkshopId, x.WorkshopName, x.WorkshopCode, x.Qty, DateOfOrigin = x.TimeOfOrigin.ToString("yyyy/MM/dd") })
+                   .GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopId, x.WorkshopCode, x.WorkshopName, x.DateOfOrigin })
+                   .Select(group => new ProductionSummaryItem
+                   {
+                       DateOfOrigin = group.Key.DateOfOrigin,
+                       ProductionId = group.Key.ProductionId,
+                       ProductionCode = group.Key.ProductionCode,
+                       ProductionName = group.Key.ProductionName,
+                       WorkshopId = group.Key.WorkshopId,
+                       WorkshopCode = group.Key.WorkshopCode,
+                       WorkshopName = group.Key.WorkshopName,
+                       FinishedQty = 0,
+                       BadQty = group.Sum(x => x.Qty),
+                       MoveInQty = 0
+                   }).ToList();
+
+            foreach (var item in qualityGroupList)
+            {
+                var resultItem = resultList.FirstOrDefault(x => x.ProductionId == item.ProductionId && x.WorkshopId == item.WorkshopId);
+                if (resultItem == null)
+                {
+                    resultList.Add(item);
+                }
+                else
+                {
+                    resultItem.BadQty = item.BadQty;
+                }
+            }
+
+            SimpleCRUDLogic<ProductionMoving> moveLogic = new SimpleCRUDLogic<ProductionMoving>();
+            List<ProductionMoving> moveList = (List<ProductionMoving>)moveLogic.GetAllWithExtResult(0, 0, 0, filterStr).RootProperty;
+            var moveGroupList = moveList
+                   .Select(x => new { x.RecordId, x.ProductionId, x.ProductionCode, x.ProductionName, x.WorkshopId, x.WorkshopName, x.WorkshopCode, x.Qty, DateOfOrigin = x.TimeOfOrigin.ToString("yyyy/MM/dd") })
+                   .GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopId, x.WorkshopCode, x.WorkshopName, x.DateOfOrigin })
+                   .Select(group => new ProductionSummaryItem
+                   {
+                       DateOfOrigin = group.Key.DateOfOrigin,
+                       ProductionId = group.Key.ProductionId,
+                       ProductionCode = group.Key.ProductionCode,
+                       ProductionName = group.Key.ProductionName,
+                       WorkshopId = group.Key.WorkshopId,
+                       WorkshopCode = group.Key.WorkshopCode,
+                       WorkshopName = group.Key.WorkshopName,
+                       FinishedQty = 0,
+                       BadQty = 0,
+                       MoveInQty = group.Sum(x => x.Qty)
+                   }).ToList();
+
+            foreach (var item in moveGroupList)
+            {
+                var resultItem = resultList.FirstOrDefault(x => x.ProductionId == item.ProductionId && x.WorkshopId == item.WorkshopId && x.DateOfOrigin == item.DateOfOrigin);
+                if (resultItem == null)
+                {
+                    resultList.Add(item);
+                }
+                else
+                {
+                    resultItem.MoveInQty = item.MoveInQty;
+                }
+            }
+
+            return resultList.ToJson();
         }
 
         private ActionResult<string> GetTodayProductSummary()
@@ -457,5 +549,32 @@ namespace Imms.WebManager.Controllers
         public DateTime DataGatherTime { get; set; }
         public DateTime DataMakeTime { get; set; }
         public string StrPara1 { get; set; }
+    }
+
+    public class InstoreItem
+    {
+        public string KanbanNo { get; set; }
+        public string ProductionCode { get; set; }
+        public string ProductionName { get; set; }
+        public string StoreNo { get; set; }
+        public string StoreName { get; set; }
+        public string operatorCode { get; set; }
+        public string operatorName { get; set; }
+        public int Qty { get; set; }
+        public string MovingTime { get; set; }
+    }
+
+    public class ProductionSummaryItem
+    {
+        public long ProductionId { get; set; }
+        public string ProductionCode { get; set; }
+        public string ProductionName { get; set; }
+        public long WorkshopId { get; set; }
+        public string WorkshopCode { get; set; }
+        public string WorkshopName { get; set; }
+        public string DateOfOrigin { get; set; }
+        public int FinishedQty { get; set; }
+        public int BadQty { get; set; }
+        public int MoveInQty { get; set; }
     }
 }

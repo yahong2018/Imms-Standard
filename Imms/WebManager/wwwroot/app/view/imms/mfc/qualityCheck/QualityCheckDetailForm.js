@@ -8,10 +8,10 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
         layout: "anchor",
         anchor: "100%",
     },
-    defectStore: Ext.create({ xtype: "imms_mfc_DefectStore", autoLoad: false }),
+    defectStore: Ext.create({ xtype: "imms_mfc_DefectStore", autoLoad: true,pageSize:0 }),
     operatorStore: Ext.create({ xtype: 'imms_org_OperatorStore', autoLoad: true, pageSize: 0 }),
     workshopStore: Ext.create({ xtype: 'imms_org_WorkshopStore', autoLoad: true, pageSize: 0 }),
-    workstationStore: Ext.create({ xtype: 'imms_org_WorkstationStore', autoLoad: true, pageSize: 0 }),
+    productionStore: Ext.create({ xtype: 'app_store_imms_material_MaterialStore', autoLoad: true, pageSize: 0 }),
     items: [
         { name: "defectId", xtype: "hidden" },
         { name: "productionId", xtype: "hidden" },
@@ -22,8 +22,18 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
             layout: "hbox",
             margin: '0 0 3 ',
             items: [
-                { name: "productionCode", xtype: "textfield", fieldLabel: "产品", allowBlank: false },
-                { name: "productionName", xtype: "textfield", margin: '0 20 0 5', flex: 0.8, readOnly: true },
+                { name: "productionCode", xtype: "textfield", fieldLabel: "产品", allowBlank: false ,listeners: {
+                    change: function (self, newValue, oldValue, eOpts) {
+                        debugger;
+                        var form = this.up("imms_mfc_qualityCheck_QualityCheckDetailForm");
+                        var record = form.productionStore.findRecord("materialCode", newValue, 0, false, false, true);
+                        if (record != null) {
+                            form.down("[name='productionId']").setValue(record.get("recordId"));
+                            form.down("[name='productionName']").setValue(record.get("materialName"));
+                        }
+                    }                  
+                }},
+                { name: "productionName", xtype: "textfield", margin: '0 20 0 5',allowBlank:false, flex: 0.8, readOnly: true },
             ]
         },
         {
@@ -43,7 +53,7 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
                         }
                     }
                 },
-                { name: "workshopName", xtype: "textfield", flex: 0.8, margin: '0 20 5 5', readOnly: true },
+                { name: "workshopName", xtype: "textfield", flex: 0.8, margin: '0 20 5 5', allowBlank: false, readOnly: true },
             ]
         },
         { name: "wocgCode", xtype: "textfield", width: 200, fieldLabel: "工作中心组",  allowBlank: false },
@@ -65,18 +75,20 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
                     name: "defectCode", xtype: "textfield", fieldLabel: "缺陷", margin: '0 20 5 0', allowBlank: false, listeners: {
                         change: function (self, newValue, oldValue, eOpts) {
                             var form = this.up("imms_mfc_qualityCheck_QualityCheckDetailForm");
-                            var record = form.defectTypeStore.findRecord("defectCode", newValue, 0, false, false, true);
+                            var record = form.defectStore.findRecord("defectCode", newValue, 0, false, false, true);
                             if (record != null) {
                                 form.down("[name='defectId']").setValue(record.get("recordId"));
                                 form.down("[name='defectName']").setValue(record.get("defectName"));
+                            }else{
+                                form.down("[name='defectId']").setValue(-1);
+                                form.down("[name='defectName']").setValue("");
                             }
                         }
                     }
                 },
                 { name: "defectName", xtype: "textfield", margin: '0 20 5 0', allowBlank: false, flex: 0.8 },
             ]
-        },
-
+        }
     ],
     showHiddenItems: [
         {
