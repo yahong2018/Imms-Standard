@@ -15,6 +15,7 @@ namespace Imms.Data.Domain
     public partial class SystemParameter : Entity<long>
     {
         public long ParameterClassId { get; set; }
+        public string parameterClassName{get;set;}
         public string ParameterCode { get; set; }
         public string ParameterName { get; set; }
         public string ParameterValue { get; set; }
@@ -44,6 +45,7 @@ namespace Imms.Data.Domain
             ImmsDbContext.RegisterEntityTable<SystemParameter>("system_parameter");
 
             builder.Property(e => e.ParameterClassId).HasColumnName("parameter_class_id");
+            builder.Property(e=>e.parameterClassName).HasColumnName("parameter_class_name");
             builder.Property(e=>e.ParameterCode).HasColumnName("parameter_code");
             builder.Property(e=>e.ParameterName).HasColumnName("parameter_name");
             builder.Property(e=>e.ParameterValue).HasColumnName("parameter_value");

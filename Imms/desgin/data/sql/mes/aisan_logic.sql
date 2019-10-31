@@ -266,7 +266,7 @@ top:begin
 				
         end if;        
   end if;
-end
+end;
 
 --
 -- 刷数量卡：进行整数报工或者移库
@@ -447,7 +447,7 @@ top:begin
 			 set Resp = CONCAT(Resp, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次
        set Resp = CONCAT(Resp,'|1|已移库',ReportQty,'个|0');	       
   end if;
-end
+end;
 
 
 --

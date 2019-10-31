@@ -29,6 +29,7 @@ create table system_parameter
 (
     record_id          bigint  auto_increment   not null,
     parameter_class_id bigint                   not null, -- 参数分类
+    parameter_class_name varchar(50)            not null,
     parameter_code     varchar(50)              not null,
     parameter_name     varchar(120)             not null,
     parameter_value    varchar(255)             not null,
@@ -269,8 +270,8 @@ create table production_order_progress
     rfid_controller_id     int                       not null, -- 组号
     
     time_of_origin         datetime                  not null, -- 报告时间: 日历日
-    time_of_origin_work    datetime                  not null, -- 报告时间: 工作日
-    shift_id               int                       not null, -- 班次: 0.白班(08:30:00 ~ 19:29:59)  1.夜班(20:00:00 ~ 08:29:59)
+   -- time_of_origin_work    datetime                  not null, -- 报告时间: 工作日
+   -- shift_id               int                       not null, -- 班次: 0.白班(08:30:00 ~ 19:29:59)  1.夜班(20:00:00 ~ 08:29:59)
 
     rfid_card_no           varchar(20)               not null, -- RFID卡号，如果是尾数，则为为''
     report_type            int                       not null, -- 数量类型：0. 整数刷卡申报  1.尾数       
@@ -324,8 +325,8 @@ create table production_moving
    
     qty                        int                       not null,
     time_of_origin             datetime                  not null,
-    time_of_origin_work    datetime                  not null, -- 报告时间: 工作日
-    shift_id               int                       not null, -- 班次: 0.白班(08:30:00 ~ 19:29:59)  1.夜班(20:00:00 ~ 08:29:59)
+   -- time_of_origin_work    datetime                      not null, -- 报告时间: 工作日
+   -- shift_id               int                           not null, -- 班次: 0.白班(08:30:00 ~ 19:29:59)  1.夜班(20:00:00 ~ 08:29:59)
 
     workshop_id_from           int                       not null,
     workshop_code_from         varchar(20)               not null,
@@ -390,8 +391,8 @@ create table quality_check
   defect_code                    varchar(20)                 not null, 
   defect_name                    varchar(500)                not null,
   time_of_origin                 datetime                    not null,
-  time_of_origin_work            datetime                    not null, -- 报告时间: 工作日
-  shift_id                       int                         not null, -- 班次: 0.白班(08:30:00 ~ 19:29:59)  1.夜班(20:00:00 ~ 08:29:59)  
+--  time_of_origin_work            datetime                    not null, -- 报告时间: 工作日
+--  shift_id                       int                         not null, -- 班次: 0.白班(08:30:00 ~ 19:29:59)  1.夜班(20:00:00 ~ 08:29:59)  
 
   qty                            int                         not null,
 

@@ -357,13 +357,14 @@ namespace Imms.WebManager.Controllers
             ProductionMoving movingItem = new ProductionMoving();
             movingItem.RfidCardId = card.RecordId;
             movingItem.RfidNo = card.RfidNo;
-            movingItem.WorkshopId = card.WorkshopId;
-            movingItem.WorkshopCode = card.WorkshopCode;
-            movingItem.WorkshopName = card.WorkshopName;
+            movingItem.WorkshopIdFrom = card.WorkshopId;
+            movingItem.WorkshopCodeFrom = card.WorkshopCode;
+            movingItem.WorkshopNameFrom = card.WorkshopName;
             movingItem.Qty = instoreItem.Qty;
             movingItem.ProductionId = card.ProductionId;
             movingItem.ProductionCode = card.ProductionCode;
             movingItem.ProductionName = card.ProductionName;
+            movingItem.TimeOfOrigin = DateTime.Now;
 
             movingItem.ProductionOrderId = -1;
             movingItem.ProductionOrderNo = "";
@@ -372,6 +373,10 @@ namespace Imms.WebManager.Controllers
             movingItem.WorkstationId = -1;
             movingItem.WorkstationCode = "";
             movingItem.WorkstationName = "";
+
+            movingItem.WorkshopId = -1;
+            movingItem.WorkshopCode = instoreItem.StoreNo;
+            movingItem.WorkshopName = instoreItem.StoreName;
 
             movingItem.OperatorId = -1;
             movingItem.EmployeeId = instoreItem.operatorCode;
@@ -458,7 +463,7 @@ namespace Imms.WebManager.Controllers
                         cmd.Parameters.Add(parameter);
 
                         parameter = cmd.CreateParameter();
-                        parameter.ParameterName = "Resp";
+                        parameter.ParameterName = "RespMessage";
                         parameter.DbType = System.Data.DbType.AnsiString;
                         parameter.Direction = System.Data.ParameterDirection.Output;
                         parameter.Size = 4000;

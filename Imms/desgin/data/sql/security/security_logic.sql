@@ -29,9 +29,8 @@ INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUE
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS01_02', 'ASSIGN_ROLE', '授权');
 
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS01_03', 'RUN', '系统运行');
-INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS01_03', 'INSERT', '新增');
+INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS01_03', 'SYNC_WITH_ERP_WDB', '新增');
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS01_03', 'UPDATE', '修改');
-INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS01_03', 'DELETE', '删除');
 
 -- ----------------------------------------------------------------------------------------------------------------------
 

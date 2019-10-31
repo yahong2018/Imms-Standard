@@ -1,146 +1,41 @@
 Ext.define('app.view.admin.systemParameter.SystemParameter', {
-    extend: 'Ext.form.FormPanel',
-    xtype: 'admin_systemParameter_SystemParameter',
-    bodyPadding: 5,
-    frame: true,
-    items: [
+    extend: 'app.ux.dbgrid.DbGrid',
+    xtype: 'app_view_admin_systemParameter_SystemParameter',
+    requires:["app.model.admin.SystemParameterModel","app.store.admin.SystemParameterStore"],
+    uses:["app.view.admin.systemParameter.SystemParameterDetailForm"],
+    hideInsert:true,
+    hideDelete:true,
+    columns:[
+        { dataIndex:"parameterClassName",text:"参数类别",width:180},
+        { dataIndex: "parameterCode", text: "参数代码", width: 200 },
+        { dataIndex: "parameterName", text: "参数含义", width: 200 },
+        { dataIndex: "parameterValue", text: "参数值",flex:1,minWidth:300},
+    ],
+    additionToolbarItems: [
+        '-',
         {
-            xtype: 'fieldset',
-            title: "与ERP同步参数",
-            width: 680,
-            items: [                
-                {
-                    xtype: "container",
-                    layout: "hbox",
-                    items: [
-                        {
-                            xtype: "container",
-                            width: 300,
-                            items: [
-                                {
-                                    xtype: "textfield",
-                                    name: "grant_type",
-                                    fieldLabel: "grant_type",
-                                },
-                                {
-                                    xtype: "textfield",
-                                    name: "client_id",
-                                    fieldLabel: "client_id",
-                                }, {
-                                    xtype: "textfield",
-                                    name: "client_secret",
-                                    fieldLabel: "client_secret",
-                                }, {
-                                    xtype: "textfield",
-                                    name: "username",
-                                    fieldLabel: "username",
-                                }, {
-                                    xtype: "textfield",
-                                    name: "password",
-                                    fieldLabel: "password",
-                                }
-                            ]
-                        },
-                        {
-                            xtype: "container",
-                            defaults: {
-                                labelWidth: 150,
-                            },
-                            items: [
-                                {
-                                    xtype: "textfield",
-                                    name: "account_id",
-                                    fieldLabel: "账套Id",
-                                },
-                                {
-                                    xtype: "textfield",
-                                    name: "last_sync_id_progress",
-                                    fieldLabel: "最后报工数据同步的Id",
-                                }, {
-                                    xtype: "textfield",
-                                    name: "last_sync_id_progress_ww",
-                                    fieldLabel: "最后委外数据同步的Id",
-                                }, {
-                                    xtype: "textfield",
-                                    name: "last_sync_id_move",
-                                    fieldLabel: "最后移库数据同步的Id",
-                                }, {
-                                    xtype: "textfield",
-                                    name: "last_sync_id_qualitycheck",
-                                    fieldLabel: "最后品质数据同步的Id",
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    xtype: "container",
-                    defaults: {
-                        labelWidth: 150,
-                        width: 625,
-                    },
-                    items: [
-                        {
-                            xtype: "textfield",
-                            name: "server_host",
-                            fieldLabel: "服务器地址",                             
-                        },
-                        {
-                            xtype: "textfield",
-                            name: "login_url",
-                            fieldLabel: "登录地址",
-                            
-                        }, {
-                            xtype: "textfield",
-                            name: "progress_report_url",
-                            fieldLabel: "入库报工数据同步地址",
-                            
-                            
-                        }, {
-                            xtype: "textfield",
-                            name: "moving_report_url",
-                            fieldLabel: "移库数据同步地址",
-                        }, {
-                            xtype: "textfield",
-                            name: "qualitycheck_report_url",
-                            fieldLabel: "品质数据同步地址",
-                        },
-                    ]
-                },
-                {
-                    xtype: "container",
-                    layout: "hbox",
-                    defaults: {
-                        width: 80,
-                    },
-                    items: [
-                        {
-                            xtype: "button",
-                            text: "立即同步",
-                            handler: function () {
-                                app.ux.Utils.ajaxRequest({
-                                    url: "api/system/parameter/sync_wdb",
-                                    method: "GET",
-                                    successCallback: function (result, response, opts) {
-                                        debugger;
-                                        alert(result);
-                                    }
-                                })
-                            }
-                        },
-                        {
-                            xtype: "button",
-                            text: "保存参数",
-                            margin: "0 0 5 75",
-                            handler: function () {
-                            }
-                        },
-                    ]
-                },
-            ]                
-            
+            text: '立即同步', privilege: "SYNC_WITH_ERP_WDB", handler: function () {
+                app.ux.Utils.ajaxRequest({
+                    url: "api/admin/systemParameter/sync_wdb",
+                    method: "GET",
+                    successCallback: function (result, response, opts) {
+                        debugger;
+                        alert(result);
+                    }
+                })
+            }
+        },
+    ],
+
+    constructor:function(config){
+        var configBase = {
+            store: Ext.create({ xtype: 'app_store_admin_SystemParameterStore' }),
+            detailFormClass: 'admin_systemParameter_SystemParameterDetailForm',
+            detailWindowTitle: '系统参数'
         }
+        Ext.applyIf(config, configBase);
 
-
-    ]
+        this.callParent(arguments);
+    }
+        
 });

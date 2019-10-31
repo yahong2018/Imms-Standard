@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -71,15 +72,19 @@ namespace Imms.WebManager
 
         private static Task HandleExceptionAsync(Microsoft.AspNetCore.Http.HttpContext context, int statusCode, string msg)
         {
-            var result = JsonConvert.SerializeObject(new ApiResult() { Success = false, Data = new ApiResultData() { ExceptionCode = statusCode, Message = msg } });
+            var result = JsonConvert.SerializeObject(new ApiResult() { Success = false, Data = new ApiResultData() { ExceptionCode = statusCode,RequestUrl = context.Request.Path, Message = msg } });
+            GlobalConstants.DefaultLogger.Error(result);
+
             context.Response.ContentType = "application/json;charset=utf-8";
             return context.Response.WriteAsync(result);
         }
 
         //异常错误信息捕获，将错误信息用Json方式返回
         private static Task HandleExceptionAsync(Microsoft.AspNetCore.Http.HttpContext context, Exception ex, int statusCode)
-        {
-            ApiResult apiResult = new ApiResult() { Success = false, Data = new ApiResultData() { Message = ex.Message, ExceptionCode = statusCode } };
+        {            
+            StringBuilder builder = new StringBuilder(ex.Message);
+            GetExceptionMessage(ex, builder);
+            ApiResult apiResult = new ApiResult() { Success = false, Data = new ApiResultData() { Message = builder.ToString(), RequestUrl = context.Request.Path, ExceptionCode = statusCode } };
             if (ex is BusinessException)
             {
                 apiResult.Data.ExceptionCode = (ex as BusinessException).ExceptionCode;
@@ -87,7 +92,21 @@ namespace Imms.WebManager
 
             var result = JsonConvert.SerializeObject(apiResult);
             context.Response.ContentType = "application/json;charset=utf-8";
+
+            GlobalConstants.DefaultLogger.Error(result);
+            GlobalConstants.DefaultLogger.Error(ex.StackTrace);
+
             return context.Response.WriteAsync(result);
+        }
+
+        private static void GetExceptionMessage(Exception ex,StringBuilder builder)
+        {            
+            while (ex.InnerException != null)
+            {
+                builder.Append("\r\n");
+                builder.Append(ex.InnerException.Message);
+                GetExceptionMessage(ex.InnerException, builder);
+            }
         }
     }
     //扩展方法
@@ -108,6 +127,7 @@ namespace Imms.WebManager
     public class ApiResultData
     {
         public int ExceptionCode { get; set; } = 0;
+        public string RequestUrl { get; set; }
         public string Message { get; set; }
     }
 }
