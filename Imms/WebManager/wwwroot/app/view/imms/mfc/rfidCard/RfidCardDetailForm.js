@@ -1,98 +1,103 @@
 Ext.define("app.view.imms.mfc.rfidCard.RfidCardDetailForm", {
     extend: "app.ux.TrackableFormPanel",
     xtype: "imms_mfc_rfidCard_RfidCardDetailForm",
-    padding: 10,
+    padding: 5,
+    width: 600,
+    layout: "anchor",
     defaults: {
-        labelWidth: 70
+        layout: "anchor",
+        anchor: "100%",
     },
+    workshopStore: Ext.create({ xtype: 'imms_org_WorkshopStore', autoLoad: true, pageSize: 0 }),
+    productionStore: Ext.create({ xtype: 'app_store_imms_material_MaterialStore', autoLoad: true, pageSize: 0 }),
     items: [
+        { name: "productionId", xtype: "hidden" },
+        { name: "workshopId", xtype: "hidden" },
         {
-            name:"workshopCode",
-            xtype:"hidden"
+            xtype: "container",
+            layout: "hbox",
+            margin: '0 0 3 ',
+            items: [
+                {
+                    name: "kanbanNo",
+                    xtype: "textfield",
+                    fieldLabel: "看板编号",
+                    allowBlank: false,                                     
+                },
+                {
+                    name: "rfidNo",
+                    xtype: "textfield",
+                    fieldLabel: "RFID卡号",
+                    allowBlank: false,
+                    margin: '0 5 0 20',     
+                },
+            ]
         },
         {
-            name: "workshopName",
-            xtype: "hidden"
-        }, {
-            name: "productionCode",
-            xtype: "hidden"
+            xtype: "container",
+            layout: "hbox",
+            margin: '0 0 3 ',
+            items: [
+                {
+                    name: "cardType",
+                    xtype: "textfield",
+                    fieldLabel: "卡类型",
+                    allowBlank: false,                     
+                },
+                {
+                    name: "cardStatus",
+                    xtype: "textfield",
+                    fieldLabel: "状态",
+                    allowBlank: false,
+                    margin: '0 5 0 20',     
+                },
+            ]
         },
         {
-            name: "productionName",
-            xtype: "hidden"
-        }, {
-            name: "kanbanNo",
-            xtype: "textfield",
-            fieldLabel: "看板编号",
-            allowBlank: false,
-            width: 380,
-        }, 
-        {
-            name: "rfidNo",
-            xtype: "textfield",
-            fieldLabel: "RFID卡号",
-            allowBlank: false,
-            width: 380,
-        }, 
-        {
-            name: "cardStatus",
-            xtype: "textfield",
-            fieldLabel: "状态",
-            allowBlank: false,
-            width: 380,
+            xtype: "container",
+            layout: "hbox",
+            margin: '0 0 3 ',
+            items: [
+                {
+                    name: "productionCode", xtype: "textfield", fieldLabel: "产品", allowBlank: false, listeners: {
+                        change: function (self, newValue, oldValue, eOpts) {
+                            var form = this.up("imms_mfc_rfidCard_RfidCardDetailForm");
+                            var record = form.productionStore.findRecord("materialCode", newValue, 0, false, false, true);
+                            if (record != null) {
+                                form.down("[name='productionId']").setValue(record.get("recordId"));
+                                form.down("[name='productionName']").setValue(record.get("materialName"));
+                            }
+                        }
+                    }
+                },
+                { name: "productionName", xtype: "textfield", margin: '0 20 0 5', allowBlank: false, flex: 0.8, readOnly: true },
+            ]
         },
         {
-            name: "workshopId",
-            xtype: "combobox",
-            fieldLabel: "车间",
-            allowBlank: false,
-            width: 380,
-            valueField: "recordId",
-            displayField: "orgName",
-            store: Ext.create("app.store.imms.org.WorkshopStore", { autoLoad: false }),
-            listeners: {
-                change: function (self, newValue, oldValue, eOpts) {
-                    var record = self.getSelectedRecord();
-                    var form = self.up("imms_mfc_rfidCard_RfidCardDetailForm");
-                    var orgCode = form.down("[name='workshopCode']");
-                    var orgName = form.down("[name='workshopName']");
-                    orgCode.setValue(record.get("orgCode"));
-                    orgName.setValue(record.get("orgName"));
-                }
-            }
-        },
-     
-        {
-            name: "productionId",
-            xtype: "combobox",
-            fieldLabel: "产品",
-            allowBlank: false,
-            width: 380,
-            valueField: "recordId",
-            displayField: "materialName",
-            store: Ext.create("app.store.imms.material.MaterialStore", { autoLoad: false }),
-            listeners: {
-                change: function (self, newValue, oldValue, eOpts) {
-
-                    var record = self.getSelectedRecord();
-                    var form = self.up("imms_mfc_rfidCard_RfidCardDetailForm");
-                    var productionCode = form.down("[name='productionCode']");
-                    var productionName = form.down("[name='productionName']");
-                    productionCode.setValue(record.get("materialCode"));
-                    productionName.setValue(record.get("materialName"));
-                }
-            }
+            xtype: "container",
+            layout: "hbox",
+            items: [
+                {
+                    name: "workshopCode", xtype: "textfield", fieldLabel: "部门", allowBlank: false,
+                    listeners: {
+                        change: function (self, newValue, oldValue, eOpts) {
+                            var form = this.up("imms_mfc_rfidCard_RfidCardDetailForm");
+                            var record = form.workshopStore.findRecord("orgCode", newValue, 0, false, false, true);
+                            if (record != null) {
+                                form.down("[name='workshopId']").setValue(record.get("recordId"));
+                                form.down("[name='workshopName']").setValue(record.get("orgName"));
+                            }
+                        }
+                    }
+                },
+                { name: "workshopName", xtype: "textfield", flex: 0.8, margin: '0 20 5 5', allowBlank: false, readOnly: true },
+            ]
         },
         {
             name: "qty",
             xtype: "textfield",
             fieldLabel: "数量",
             allowBlank: false,
-            width: 380,
         }
-    ],
-    onRecordLoad: function (config) {
-        this.down("[name='productionId']").store.load();
-        this.down("[name='workshopId']").store.load();
-    }
+    ]
 });

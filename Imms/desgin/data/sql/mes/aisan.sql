@@ -1,4 +1,4 @@
-drop table system_parameter_class;
+
 drop table system_parameter;
 drop table system_logs;
 drop view v_rfid_controller;
@@ -11,16 +11,6 @@ drop table production_order_progress;
 drop table production_moving;
 drop table quality_check;
 drop table workstation_login;
-
-
-create table system_parameter_class
-(
-  record_id            bigint    auto_increment   not null,
-  class_name           varchar(50)                not null,
-
-  PRIMARY KEY(record_id),
-  index idx_sytsem_parameter_class_0(class_name)
-);
 
 --
 -- 系统参数，包括与ERP的接口
@@ -173,7 +163,7 @@ create table rfid_card
 
     kanban_no              varchar(20)                 not null,        
     rfid_no                varchar(20)                 not null,
-    card_type              int                         not null,       --  卡类别: 0. 工艺数量   1. 员工卡
+    card_type              int                         not null,       --  卡类别: 0. 工艺数量   1. 员工卡   2.塔的卡
     card_status            int                         not null,       --  0.正常卡   1. 已报工的卡    255.已作废的卡
 
     production_id          bigint                      not null,       -- （工艺数量卡）所代表的产品

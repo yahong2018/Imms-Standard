@@ -8,7 +8,7 @@ using Imms.Data.Domain;
 using Imms.Mes.Data.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Imms.WebManager
+namespace Imms.Mes.Services
 {
     public class Sync4WDBService : BaseService
     {
