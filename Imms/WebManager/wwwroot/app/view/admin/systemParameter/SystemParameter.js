@@ -6,6 +6,7 @@ Ext.define('app.view.admin.systemParameter.SystemParameter', {
     hideInsert:true,
     hideDelete:true,
     columns:[
+        { dataIndex:"parameterClassCode",text:"类别代码",width:100},
         { dataIndex:"parameterClassName",text:"参数类别",width:180},
         { dataIndex: "parameterCode", text: "参数代码", width: 200 },
         { dataIndex: "parameterName", text: "参数含义", width: 200 },

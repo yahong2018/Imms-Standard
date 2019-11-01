@@ -9,8 +9,11 @@ Ext.define("app.view.admin.systemParameter.SystemParameterDetailForm", {
             name:"recordId"
         },
         {
-            xtype: "hidden",
-            name: "parameterClassId"
+            xtype: "textfield",
+            name: "parameterClassCode",
+            fieldLabel:"类别代码",
+            readOnly:true,
+            width:300
         }, {
             xtype: "textfield",
             name: "parameterClassName",

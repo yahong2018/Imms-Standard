@@ -145,7 +145,7 @@ namespace Imms.Data
             modelBuilder.ApplyConfiguration(new CodeSeedConfigure());
 
             modelBuilder.ApplyConfiguration(new WorkOrganizationUnitConfigure());   
-            modelBuilder.ApplyConfiguration(new SystemParameterClassConfigure()) ;
+            // modelBuilder.ApplyConfiguration(new SystemParameterClassConfigure()) ;
             modelBuilder.ApplyConfiguration(new SystemParameterConfigure());
 
             foreach (ICustomModelBuilder customModelBuilder in customModelBuilders)

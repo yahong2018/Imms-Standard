@@ -1,7 +1,7 @@
 Ext.define("app.model.admin.SystemParameterModel", {
     extend: "app.model.EntityModel",
     fields: [
-        { name: "parameterClassId", type: "int" },
+        { name: "parameterClassCode", type: "string" },
         { name: "parameterClassName", type: "string" },
         { name: "parameterCode", type: "string" },
         { name: "parameterName", type: "string" },

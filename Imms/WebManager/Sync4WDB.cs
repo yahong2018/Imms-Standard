@@ -111,7 +111,7 @@ namespace Imms.WebManager
 
         private void GetLoginParameter()
         {
-            this.ParameterList = this.dbContext.Set<SystemParameterClass>().Where(x => x.ClassName == "B003").SelectMany(x => x.Parameters).ToList();
+            this.ParameterList = this.dbContext.Set<SystemParameter>().Where(x => x.ParameterClassCode == "B003").ToList();
             this.ServerHost = this.ParameterList.Single(x => x.ParameterCode == "server_host").ParameterValue;
 
             this._loginParameter.grant_type = this.ParameterList.Single(x => x.ParameterCode == "grant_type").ParameterValue;

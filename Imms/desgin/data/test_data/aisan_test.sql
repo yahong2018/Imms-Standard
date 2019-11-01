@@ -113,9 +113,6 @@ create_by_id,create_by_code,create_by_name,create_time,update_by_id,update_by_co
 --     1,'C00001','刘永红',Now(),null,null,null,null,0
 -- );
 
--- 系统参数
-insert into system_parameter(parameter_class_id,parameter_code,parameter_name,parameter_value)
-                 values(0,'LOG_LEVEL','日志级别','5');  -- 5. Debug  4. Info  3. Warn  2. Error 1 Fatal
 								 
 
 
