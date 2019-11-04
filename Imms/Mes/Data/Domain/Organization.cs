@@ -15,7 +15,9 @@ namespace Imms.Mes.Data.Domain
 
         public int OperationIndex { get; set; }
         public int PrevOperationIndex { get; set; }
-   }
+        public int MoveCardType { get; set; }
+        public int WorkshopType { get; set; }        
+    }
 
     public class Workstation : WorkOrganizationUnit
     {
@@ -112,6 +114,8 @@ namespace Imms.Mes.Data.Domain
 
             builder.Property(e => e.OperationIndex).HasColumnName("operation_index");
             builder.Property(e => e.PrevOperationIndex).HasColumnName("prev_operation_index");
+            builder.Property(e => e.MoveCardType).HasColumnName("move_card_type");
+            builder.Property(e=>e.WorkshopType).HasColumnName("workshop_type");
         }
     }
 

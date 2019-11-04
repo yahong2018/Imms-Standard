@@ -77,8 +77,9 @@ create table work_organization_unit
     parent_code            varchar(50)                 null,
     parent_name            varchar(50)                 null,
 
-    operation_index        int                         not null default 0,
-    prev_operation_index   int                         not null default 0,
+    operation_index        int                         not null default 0,   -- 对于车间来说，工序编号必须唯一
+    prev_operation_index   int                         not null default 0,    
+    move_card_type         int                         not null default 0,   -- 移库卡类型:  2.数量卡    3.委外加工卡
     
     rfid_controller_id     int                         not null default 0,
     rfid_terminator_id     int                         not null default 0,
@@ -163,8 +164,8 @@ create table rfid_card
 
     kanban_no              varchar(20)                 not null,        
     rfid_no                varchar(20)                 not null,
-    card_type              int                         not null,       --  卡类别: 0. 工艺数量   1. 员工卡   2.塔的卡
-    card_status            int                         not null,       --  0.正常卡   1. 已报工的卡    255.已作废的卡
+    card_type              int                         not null,       --  卡类别: 1.员工卡     2.数量卡    3.委外加工卡
+    card_status            int                         not null,       --  0. 未使用   1. 已派发   2.已绑定   10. 已报工   20. 已移库收货      255.已作废
 
     production_id          bigint                      not null,       -- （工艺数量卡）所代表的产品
     production_code        varchar(20)                 not null,
@@ -174,8 +175,9 @@ create table rfid_card
     workshop_code          varchar(20)                 not null,  
     workshop_name          varchar(50)                 not null,
 
-    qty                    int                         null,            -- （工艺数量卡）数量
-  
+    issue_qty              int                         not null,       -- 派发数量
+    stock_qty              int                         not null,       -- 库存数量
+
     create_by_id           bigint                      not null,
     create_by_code         varchar(20)                 not null,
     create_by_name         varchar(50)                 not null,
@@ -190,6 +192,7 @@ create table rfid_card
 
   PRIMARY KEY(record_id)
 );
+
 
 --
 -- 生产计划: 就用produciton_order表
@@ -260,13 +263,14 @@ create table production_order_progress
     rfid_controller_id     int                       not null, -- 组号
     
     time_of_origin         datetime                  not null, -- 报告时间: 日历日
-   -- time_of_origin_work    datetime                  not null, -- 报告时间: 工作日
-   -- shift_id               int                       not null, -- 班次: 0.白班(08:30:00 ~ 19:29:59)  1.夜班(20:00:00 ~ 08:29:59)
+    time_of_origin_work    datetime                  not null, -- 报告时间: 工作日
+    shift_id               int                       not null, -- 班次: 0.白班(08:30:00 ~ 19:29:59)  1.夜班(20:00:00 ~ 08:29:59)
 
-    rfid_card_no           varchar(20)               not null, -- RFID卡号，如果是尾数，则为为''
-    report_type            int                       not null, -- 数量类型：0. 整数刷卡申报  1.尾数       
+    rfid_card_id           bigint                    not null, -- RFID卡记录号
+    rfid_card_no           varchar(20)               not null, -- RFID卡号
+    report_type            int                       not null, -- 报工类型
     qty                    int                       not null, -- 报工数量    
-    card_qty               int                       not null, -- 卡的数量:正常情况，卡的数量 = 报工数量，但是有尾数的时候，报工数量=卡的数量-尾数的数量
+    card_qty               int                       not null, -- 卡的数量
 
     operator_id            bigint                    not null,
     employee_id            varchar(20)               not null,
@@ -313,10 +317,14 @@ create table production_moving
     employee_id                varchar(20)               not null,
     employee_name              varchar(50)               not null,
    
+    operator_id_from           bigint                    not null,
+    employee_id_from           varchar(20)               not null,
+    employee_name_from         varchar(50)               not null,
+
     qty                        int                       not null,
     time_of_origin             datetime                  not null,
-   -- time_of_origin_work    datetime                      not null, -- 报告时间: 工作日
-   -- shift_id               int                           not null, -- 班次: 0.白班(08:30:00 ~ 19:29:59)  1.夜班(20:00:00 ~ 08:29:59)
+    time_of_origin_work        datetime                      not null, -- 报告时间: 工作日
+    shift_id                   int                           not null, -- 班次: 0.白班(08:30:00 ~ 19:29:59)  1.夜班(20:00:00 ~ 08:29:59)
 
     workshop_id_from           int                       not null,
     workshop_code_from         varchar(20)               not null,

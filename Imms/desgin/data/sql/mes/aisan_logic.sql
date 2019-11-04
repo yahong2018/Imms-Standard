@@ -37,35 +37,6 @@ drop procedure MES_Debug;
 
 
 
---
--- 判断卡的类别
---
-create procedure  MES_GetCardType(
- in  CardNo     varchar(20),
- out CardType   int, 
- out CardId     bigint
-)
-begin
-   set CardType = 1; -- 数量卡
-   set CardId = ifnull((
-       select record_id 
-         from rfid_card
-         where rfid_no = CardNo
-          and (card_status = 0 or card_status = 1) -- 未报工或者已报工的卡
-        limit 1
-   ),-1);
-
-   if(CardId = -1) then   -- 员工卡
-      set CardId = ifnull((
-        select record_id
-          from operator
-         where employee_card_no = CardNo
-         limit 1
-      ),-10);
-			
-      set CardType = if(CardId = -10, -10 ,10);    
-   end if;           
-end;
 
 --
 -- 根据产品编号获取生产计划
@@ -129,6 +100,8 @@ begin
     end if;
 end;
 
+
+
 --
 -- 处理工位机数据:目前没有考虑脱机数据
 --
@@ -150,101 +123,34 @@ top:begin
   declare EmployeeName,WorkstationName,WorkshopName,ProductionName varchar(50);
 	declare code varchar(5) default '00000';
   declare msg text;	
-	declare LogMessage varchar(500);
-	declare LogId bigint;
- 
+	
   declare exit handler for sqlexception
   begin
     get diagnostics condition 1 code = returned_sqlstate, msg = message_text;		
 		
-		set LogMessage = CONCAT('code:',code,',message:',msg);
-		call MES_Debug(LogMessage,LogId);
-		
-		set RespMessage=	'2|1|3';
-		set RespMessage = CONCAT(RespMessage,'|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
-		set RespMessage = CONCAT(RespMessage,'|1|系统异常:',LogId,'|0');
-		set RespMessage = CONCAT(RespMessage,'|2|请联系管理员|0');		
-  end;     
+    call MES_SqlExceptionHandler(StrPara1,DataType,GID,DID,DataGatherTime,code,msg,RespMessage);
+  end;  
 
-  if not exists(select *  from work_organization_unit w
-    where w.org_type = 'ORG_WORK_STATION'
-      and w.rfid_controller_id = GID
-      and w.rfid_terminator_id = DID ) then
-		
-		set RespMessage=	'2|1|3';
-		set RespMessage = CONCAT(RespMessage,'|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
-		set RespMessage = CONCAT(RespMessage,'|1|组号:',GID,',机号:',DID,'|0');
-		set RespMessage = CONCAT(RespMessage,'|2|请联系管理员注册|0');			
-		leave top;
-	end if;	
-	
-	  if (select count(*)  from work_organization_unit w
-    where w.org_type = 'ORG_WORK_STATION'
-      and w.rfid_controller_id = GID
-      and w.rfid_terminator_id = DID )>1 then
-		
-		set RespMessage=	'2|1|4';
-		set RespMessage = CONCAT(RespMessage,'|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
-		set RespMessage = CONCAT(RespMessage,'|1|组号:',GID,',机号:',DID,'|0');
-		set RespMessage = CONCAT(RespMessage,'|2|工位重复注册|0');			
-		set RespMessage = CONCAT(RespMessage,'|3|请联系管理员|0');			
-		leave top;
-	end if;	
+  call MES_VerifyWorkstation(GID,DID,WorkStationId,RespMessage);
+  if WorkStationId = -1 then     
+     leave top;
+  end if;
+
 
 	
   if(DataType = 1) then  -- 如果是刷卡输入
-    set RfidNo = StrPara1;
-    call MES_GetCardType(RfidNo,CardType,CardId);		
-
-    if((CardId = -1) or (CardId = -10)) then
-		  set RespMessage=	'2|1|4';
-      set RespMessage = CONCAT(RespMessage, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次
-      set RespMessage = CONCAT(RespMessage,'|1|卡没注册:|0');            
-			set RespMessage = CONCAT(RespMessage,'|2|',RfidNo,'|0'); 
-			set RespMessage = CONCAT(RespMessage,'|3|请联系管理员注册卡|0');            
-			
+    set RfidNo = StrPara1;    
+    call MES_VerifyCard(RfidNo,CardType,CardId,RespMessage);
+    if not (CardType in(0,1,2)) then		  
       leave top;
     end if;    
 
-    if (CardType = 10 ) then -- 如果是员工卡，则新建尾数记录，如果尾数记录已经存在，则更新记录的的相关数据       
-				set OperatorId = CardId;				
-				select o.employee_id,o.employee_name into EmployeeId,EmployeeName
-            from operator o 
-            where record_id = OperatorId;			
-						
-        if exists(select * from production_order_progress  where opt_flag = 64 and rfid_terminator_id = DID  and rfid_controller_id = GID) then          
-          update production_order_progress
-            set operator_id = OperatorId, employee_id = EmployeeId, employee_name = EmployeeName,
-                create_by_id = OperatorId, create_by_code = EmployeeId, create_by_name = EmployeeName, create_time = Now()
-          where opt_flag = 64
-            and rfid_terminator_id = DID
-            and rfid_controller_id = GID ;
-        else
-					 select record_id,org_code,org_name,parent_id,parent_code,parent_name,wocg_code
-					         into WorkstationId,WorkstationCode,WorkstationName,WorkshopId,WorkshopCode,WorkshopName,WocgCode
-						  from work_organization_unit w
-							  where w.rfid_controller_id = GID
-								  and w.rfid_terminator_id = DID;
-									
-           insert into production_order_progress(production_order_id,production_order_no,production_id,production_code,production_name,
-					        workshop_id,workshop_code,workshop_name,workstation_id,workstation_code,workstation_name,wocg_code,rfid_terminator_id,rfid_controller_id,									
-									time_of_origin,qty,rfid_card_no,report_type,card_qty,operator_id,employee_id,employee_name,
-                  create_by_id,create_by_code,create_by_name,create_time,opt_flag)
-            values(-1,'',-1,'','',
-						       WorkshopId,WorkshopCode,WorkshopName,WorkstationId,WorkstationCode,WorkstationName,WocgCode,DID,GID,                   
-									 DataGatherTime,0,'',1,0,OperatorId,EmployeeId,EmployeeName,
-                   OperatorId,EmployeeId,EmployeeName,Now(),64);
-        end if;
-				
-				set RespMessage=	'2|1|2';
-        set RespMessage = CONCAT(RespMessage,'|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 打开键盘，将键盘的模式设置为多键输入，发声一次
-        set RespMessage = CONCAT(RespMessage,'|1|请输入尾数数量|0');				
-
-    elseif(CardType = 1) then  -- 如果是数量卡    
-		    
-        -- set RespCommand = '|210|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150';  -- 锁定所有的键盘，发声一次    
-        call MES_ReportProductionOrder(RfidNo,CardId,GID,DID,DataGatherTime,RespMessage);  
-							
+    if (CardType = 0 ) then  -- 工程内看板
+				call MES_ReportProductionOrder(RfidNo,CardId,GID,DID,DataGatherTime,RespMessage);  							
+    elseif(CardType = 1) then  -- 员工卡
+        call MES_HandleEmployeeCard(CardId,GID,DID,RespMessage);
+    elseif(CardType = 2)  then  -- 外发看板
+        /**/
     end if;
   elseif(DataType = 3) then -- 如果是键盘输入 , 则进行尾数报工 
 			  call MES_Debug('aaaa',LogId);
@@ -289,9 +195,7 @@ top:begin
   declare LoginWorkshopName,LoginWorkstationName,WorkshopNameFrom  varchar(50);
   declare LastWorkshopId,FirstWorkshopId  bigint;
   declare IsMove,CardStatus int;  
-	declare ErrorCode varchar(5) default '00000';
-	declare LogMessage varchar(500);
-	declare LogId bigint;
+	declare ErrorCode varchar(5) default '00000';	
 	declare Msg text;
   declare InTran int default 0;
   
@@ -301,14 +205,8 @@ top:begin
     if (InTran = 1) then		
       rollback;   
     end if;		
-    
-		set LogMessage = CONCAT('RifidNo:',RfidNo,',RfidId:',RfidId,',GID:',GID,',DID:',DID,',GatherTime:',GatherTime,'code:',ErrorCode,',message:',Msg);
-		call MES_Debug(LogMessage,LogId);
-		
-		set Resp=	'2|1|3';
-		set Resp = CONCAT(Resp,'|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
-		set Resp = CONCAT(Resp,'|1|系统异常:',LogId,'|0');
-		set Resp = CONCAT(Resp,'|2|联系管理员|0');		
+
+    call MES_SqlExceptionHandler(RfidNo,1,GID,DID,GatherTime,ErrorCode,Msg,RespMessage);    			
   end;   
 
 	set IsMove = 0,InTran = 0;	
@@ -450,25 +348,3 @@ top:begin
 end;
 
 
---
--- 存储过程日志
---
-create procedure MES_Debug
-(  
-  Content varchar(500)
-)
-begin
-  declare LogLevel int;
-  declare StrLogLevel varchar(50);
-
-  select parameter_value into StrLogLevel
-    from system_parameter
-    where parameter_code='LOG_LEVEL'
-      and parameter_class_id = 0;
-  set LogLevel = cast(ifnull(StrLogLevel,'0') as unsigned);
-
-  if(LogLevel <= 5) then
-     insert into system_logs(user_id,log_time,log_type,log_level,log_value)
-         values(0,Now(),'SYS_DB',0,Content);
-  end if;
-end;
