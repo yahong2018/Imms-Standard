@@ -22,14 +22,14 @@ Ext.define("app.view.imms.mfc.rfidCard.RfidCardDetailForm", {
                     name: "kanbanNo",
                     xtype: "textfield",
                     fieldLabel: "看板编号",
-                    allowBlank: false,                                     
+                    allowBlank: false,
                 },
                 {
                     name: "rfidNo",
                     xtype: "textfield",
                     fieldLabel: "RFID卡号",
                     allowBlank: false,
-                    margin: '0 5 0 20',     
+                    margin: '0 5 0 20',
                 },
             ]
         },
@@ -41,15 +41,15 @@ Ext.define("app.view.imms.mfc.rfidCard.RfidCardDetailForm", {
                 {
                     name: "cardType",
                     xtype: "textfield",
-                    fieldLabel: "卡类型",
-                    allowBlank: false,                     
+                    fieldLabel: "类型",
+                    allowBlank: false,
                 },
                 {
                     name: "cardStatus",
                     xtype: "textfield",
                     fieldLabel: "状态",
                     allowBlank: false,
-                    margin: '0 5 0 20',     
+                    margin: '0 5 0 20',
                 },
             ]
         },
@@ -94,10 +94,23 @@ Ext.define("app.view.imms.mfc.rfidCard.RfidCardDetailForm", {
             ]
         },
         {
-            name: "qty",
-            xtype: "textfield",
-            fieldLabel: "数量",
-            allowBlank: false,
+            xtype: "container",
+            layout: "hbox",
+            items: [
+                {
+                    name: "issueQty",
+                    xtype: "textfield",
+                    fieldLabel: "派发数量",
+                    allowBlank: false,
+                },
+                {
+                    name: "stockQty",
+                    xtype: "textfield",
+                    fieldLabel: "库存数量",
+                    allowBlank: false,
+                    margin: '0 0 0 20',
+                }
+            ]
         }
     ]
 });

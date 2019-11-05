@@ -84,7 +84,7 @@ namespace Imms.WebManager.Controllers
                         card.CardStatus = 0;
                         card.CardType = 0;
                         card.ProductionId = -1;
-                        card.Qty = qty;
+                        card.IssueQty = qty;
                         card.ProductionCode = productionCode;
                         card.ProductionName = productionName;
 
@@ -133,7 +133,7 @@ namespace Imms.WebManager.Controllers
                        x.ProductionCode,
                        x.ProductionName,
                        x.RfidNo,
-                       x.Qty
+                       Qty=x.IssueQty
                    }
                  ).ToList();
 

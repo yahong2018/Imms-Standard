@@ -14,6 +14,7 @@ Ext.define("app.model.imms.mfc.RfidCardModel", {
         { name: "workshopCode", type: "string" },
         { name: "workshopName", type: "string" },
 
-        { name: "qty", type: "int" },
+        { name: "issueQty", type: "int" },
+        { name: "stockQty", type: "int" }
     ]
 });

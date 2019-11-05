@@ -44,7 +44,8 @@ namespace Imms.Mes.Data.Domain
         public string WorkshopCode{get;set;}
         public string WorkshopName{get;set;}
         
-        public int Qty{get;set;}        
+        public int IssueQty{get;set;}        
+        public int StockQty{get;set;}
 
         public virtual Material Production{get;set;}        
         public virtual Workshop Workshop {get;set;}
@@ -71,7 +72,8 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.WorkshopCode).HasColumnName("workshop_code");
             builder.Property(e => e.WorkshopName).HasColumnName("workshop_name");
 
-            builder.Property(e => e.Qty).HasColumnName("qty");
+            builder.Property(e => e.IssueQty).HasColumnName("issue_qty");
+            builder.Property(e=>e.StockQty).HasColumnName("stock_qty");
             builder.Property(e=>e.KanbanNo).HasColumnName("kanban_no");
             
             builder.HasOne(e=>e.Production).WithMany().HasForeignKey(e=>e.ProductionId).HasConstraintName("production_id");            

@@ -51,6 +51,9 @@ namespace Imms.Mes.Data.Domain
         public string ProductionName { get; set; }
 
         public DateTime TimeOfOrigin { get; set; }
+        public DateTime TimeOfOriginWork{get;set;}
+        public int ShiftId{get;set;}
+
         public int Qty { get; set; }
         public string RfidCardNo { get; set; }
         public int ReportType { get; set; }
@@ -120,6 +123,8 @@ namespace Imms.Mes.Data.Domain
         public string EmployeeName { get; set; }
 
         public DateTime TimeOfOrigin { get; set; }
+        public DateTime TimeOfOriginWork { get; set; }
+        public int ShiftId { get; set; }
 
         public long WorkstationId { get; set; }
         public string WorkstationCode { get; set; }
@@ -132,6 +137,10 @@ namespace Imms.Mes.Data.Domain
         public long WorkshopIdFrom { get; set; }
         public string WorkshopCodeFrom { get; set; }
         public string WorkshopNameFrom { get; set; }
+
+        public long OperatorIdFrom { get; set; }
+        public string EmployeeIdFrom { get; set; }
+        public string EmployeeNameFrom { get; set; }
 
         public long PrevProgressRecordId { get; set; }
 
@@ -171,6 +180,8 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.EmployeeName).HasColumnName("employee_name");
 
             builder.Property(e => e.TimeOfOrigin).HasColumnName("time_of_origin");
+            builder.Property(e => e.TimeOfOriginWork).HasColumnName("time_of_origin_work");
+            builder.Property(e => e.ShiftId).HasColumnName("shift_id");
 
             builder.Property(e => e.WorkstationId).HasColumnName("workstation_id");
             builder.Property(e => e.WorkstationCode).HasColumnName("workstation_code");
@@ -183,6 +194,10 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.WorkshopIdFrom).HasColumnName("workshop_id_from");
             builder.Property(e => e.WorkshopCodeFrom).HasColumnName("workshop_code_from");
             builder.Property(e => e.WorkshopNameFrom).HasColumnName("workshop_name_from");
+
+            builder.Property(e=>e.OperatorIdFrom).HasColumnName("operator_id_from");
+            builder.Property(e=>e.EmployeeIdFrom).HasColumnName("employee_id_from");
+            builder.Property(e=>e.EmployeeNameFrom).HasColumnName("employee_name_from");
 
             builder.Property(e => e.PrevProgressRecordId).HasColumnName("prev_progress_record_id");
 
@@ -222,6 +237,9 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.RfidControllerId).HasColumnName("rfid_controller_id");
 
             builder.Property(e => e.TimeOfOrigin).HasColumnName("time_of_origin");
+            builder.Property(e=>e.TimeOfOriginWork).HasColumnName("time_of_origin_work");
+            builder.Property(e=>e.ShiftId).HasColumnName("shift_id");
+
             builder.Property(e => e.Qty).HasColumnName("qty");
             builder.Property(e => e.RfidCardNo).HasColumnName("rfid_card_no");
             builder.Property(e => e.ReportType).HasColumnName("report_type");

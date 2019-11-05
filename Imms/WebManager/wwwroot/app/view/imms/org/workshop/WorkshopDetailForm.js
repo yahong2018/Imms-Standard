@@ -2,10 +2,11 @@ Ext.define("app.view.imms.org.workshop.WorkshopDetailForm", {
     extend: "app.ux.TrackableFormPanel",
     xtype: "imms_org_workshop_WorkshopDetailForm",
     requires: ["app.model.imms.org.WorkshopModel"],
-    width: 400,
+    width: 600,
     bodyPadding: 5,
     defaults: {
-        labelWidth: 70
+        layout: "anchor",
+        anchor: "100%",
     },
     items: [
          {
@@ -24,6 +25,25 @@ Ext.define("app.view.imms.org.workshop.WorkshopDetailForm", {
             maxLength: 50,
             enforceMaxLength: true,
             width: 380
+        },
+        {
+            xtype:"container",
+            layout:"hbox",
+            margin: "3 0 5 0",
+            items:[
+                {
+                    xtype:"textfield",
+                    fieldLabel:"车间类型",
+                    name:"workshopType",
+                    allowBlank:false,
+                    width:150,
+                },{
+                    xtype:"label",
+                    text:"0. 内部车间 3.外发前工程车间 4.外发车间 5.外发后工程车间",
+                    flex:0.8,
+                    margin:"5 0 3 3"
+                }
+            ]
         },
         {
             name:"operationIndex",

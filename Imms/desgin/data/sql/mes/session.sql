@@ -19,8 +19,17 @@
       9. 接收人刷工卡
       10. 系统 进行退还处理，提示已成功退还xxx件          3
 
-  Tower卡的收容数，就是筐的数量。
-  每刷一次看板卡，就要扣除一次Tower卡的收容数，当筐的数量达到最大数以后，该Tower卡就不可以再报工。
+  
+  后工序给前工序发卡
+     1. 发卡人刷工卡
+     2. 菜单： 1.工件退还   2.发前工程看板
+     3. 选择 2
+     4. 提示 请刷看板
+     5. 发卡人 刷看板
+     6. 提示 请输入数量
+     7. 输入数量
+     8. 提示 发卡完成
+  
 */
 
 create table workstation_session
@@ -93,6 +102,7 @@ create table outsource_card_bind(
 
     primary key(record_id)
 );
+
 
 drop procedure MES_HandleErrorReq;
 create procedure MES_HandleErrorReq(
@@ -515,7 +525,7 @@ create procedure MES_DoReportWip(
   in    WorkshopId           bigint,
   in    WorkshopCode         varchar(20),
   in    WorkshopName         varchar(50),
-  in    MoveCardType         int,
+  in    WorkshopType         int,
   in    MoveCardId           bigint,
   in    MoveCardNo           varchar(20),
   in    WorkstationBindId    bigint,
@@ -577,7 +587,7 @@ begin
        ,stock_qty = IssueQty 
   where record_id = CardId;
 
-  if MoveCardType = 3 then  -- 如果是以外发卡的方式移动，则更新本工位外发卡的库存数与状态
+  if WorkshopType = 3 then  -- 如果是外发前工程
       insert into outsource_card_bind(outsource_card_id,outsource_card_no,qty_report_id, qty_card_id,qty_card_no,attach_time,workstation_bind_id)
                               values (MoveCardId,MoveCardNo,ReportRecordId,CardId,CardNo,Now(),WorkstationBindId);     
       update rfid_card
@@ -602,7 +612,7 @@ create procedure MES_CheckCardAndWorkstation(
   in   LoginedPrevProcedureIndex int,
   in   WorkshopName              varchar(50),
   in   NextWorkshopName          varchar(50),
-  in   WorkshopMoveCardType      int,
+  in   WorkshopType              int,    -- 车间类型: 0. 内部车间   3.外发前工程车间   4.外发车间   5.外发后工程车间
   in   MoveCardId                bigint,
   in   WorkstationBindStatus     int,
   in   BindWorkshopId            int,
@@ -613,7 +623,7 @@ create procedure MES_CheckCardAndWorkstation(
 )
 begin
    select '' into RespData;
-   if (CheckType = 1) and (CardType = 3) and (WorkshopMoveCardType <> 3) then
+   if (CheckType = 1) and (CardType = 3) and (WorkshopType <> 3) then
       set RespData=	'2|1|3';
       set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
       set RespData = CONCAT(RespData,'|1|不可以在本车间|0');
@@ -650,7 +660,7 @@ begin
       -- 数量卡不可以重复报工，只可以在上下工序之间流动。
       -- 外发卡每次刷卡，自动将该卡转入下一个处理流程；暂时外发卡不检查车间位置。
       if (CardStatus in(1,2))  then
-			    if (WorkshopMoveCardType = 3) and (MoveCardId = -1)  and (CardType = 2)  then
+			    if (WorkshopType = 3) and (MoveCardId = -1)  and (CardType = 2)  then
 							set RespData=	'2|1|2';
 							set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|5|150');
 							set RespData = CONCAT(RespData,'|1|先刷外发卡再报工|0');
@@ -678,10 +688,10 @@ begin
 									set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
 									set RespData = CONCAT(RespData,'|1|本看板已经报工|0');
 									set RespData = CONCAT(RespData,'|2|请移库后再报工|0');								
-		      elseif(CardProcedureIndex = LoginedPrevProcedureIndex) and (WorkshopMoveCardType = 3) then					    
+		      elseif(CardProcedureIndex = LoginedPrevProcedureIndex) and (WorkshopType = 3) then					    
               set RespData=	'2|1|5';
               set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|5|150');
-              set RespData = CONCAT(RespData,'|1|外发前工程的看板|0'); 
+              set RespData = CONCAT(RespData,'|1|外发前工程的内部看板|0'); 
               set RespData = CONCAT(RespData,'|2|不可以进行移库操作;|0'); 
               set RespData = CONCAT(RespData,'|3|只有外发看板才可以|0'); 
               set RespData = CONCAT(RespData,'|4|进行移库操作.|0'); 
@@ -715,7 +725,7 @@ create procedure MES_ProcessWipCardInput(
 )
 top:begin    
   declare CardWorkshopId,LoginedWorkshopId,ProductionId,MoveCardId,WorkstationBindId,BindWorkshopId,LogId  bigint default -1;
-  declare CardStatus,CardType,CardProcedureIndex,LoginedProcedureIndex,LoginedPrevProcedureIndex,WorkshopMoveCardType,IssueQty,StockQty int default -1;
+  declare CardStatus,CardType,CardProcedureIndex,LoginedProcedureIndex,LoginedPrevProcedureIndex,WorkshopType,IssueQty,StockQty int default -1;
   declare ProductionCode,LoginedWorkshopCode,CardWorkshopCode,WorkstationCode,WocgCode,BindWorkshopCode,NextWorkshopCode,MoveCardNo varchar(20);
   declare ProductionName,LoginedWorkshopName,CardWorkshopName,WorkstationName,NextWorkshopName,BindWorkshopName varchar(50);
   declare ProcessIndex,CheckType,WorkstationBindStatus int default 1;
@@ -727,8 +737,8 @@ top:begin
   from work_organization_unit  w join rfid_card  c on w.record_id = c.workshop_id
   where c.record_id =  CardId;
     
-  select wss.record_id,wss.org_code,wss.org_name,wss.operation_index,wss.prev_operation_index,wss.move_card_type,wst.org_code,wst.org_name,wst.wocg_code
-    into LoginedWorkshopId,LoginedWorkshopCode,LoginedWorkshopName,LoginedProcedureIndex,LoginedPrevProcedureIndex,WorkshopMoveCardType,WorkstationCode,WorkstationName,WocgCode
+  select wss.record_id,wss.org_code,wss.org_name,wss.operation_index,wss.prev_operation_index,wss.workshop_type,wst.org_code,wst.org_name,wst.wocg_code
+    into LoginedWorkshopId,LoginedWorkshopCode,LoginedWorkshopName,LoginedProcedureIndex,LoginedPrevProcedureIndex,WorkshopType,WorkstationCode,WorkstationName,WocgCode
   from work_organization_unit wst join work_organization_unit wss on wst.parent_id = wss.record_id
   where wst.record_id = WorkstationId;
 
@@ -751,20 +761,20 @@ top:begin
   end if;
 	-- call MES_Debug(CONCAT('MES_CheckCardAndWorkstation CardType:',CardType,',CardStatus:',CardStatus,',CheckType:',CheckType,',CardProcedureIndex:',CardProcedureIndex,',LoginedProcedureIndex:',LoginedProcedureIndex), LogId);
 	
-  call MES_CheckCardAndWorkstation(WorkstationId,CardStatus,CardType,CardProcedureIndex,LoginedProcedureIndex,LoginedPrevProcedureIndex,CardWorkshopName,NextWorkshopName,WorkshopMoveCardType,MoveCardId,WorkstationBindStatus,BindWorkshopId,BindWorkshopCode,BindWorkshopName,CheckType,RespData);
+  call MES_CheckCardAndWorkstation(WorkstationId,CardStatus,CardType,CardProcedureIndex,LoginedProcedureIndex,LoginedPrevProcedureIndex,CardWorkshopName,NextWorkshopName,WorkshopType,MoveCardId,WorkstationBindStatus,BindWorkshopId,BindWorkshopCode,BindWorkshopName,CheckType,RespData);
   if( RespData <> '') then
       leave top;
   end if;
   
   if (CardStatus = 1) then  
       if CardType = 2 then  -- 工程内报工    
-          call MES_DoReportWip(LoginedWorkshopId,LoginedWorkshopCode,LoginedWorkshopName,WorkshopMoveCardType,MoveCardId,MoveCardNo,WorkstationBindId,GID,DID,WorkstationId,WorkstationCode,WorkstationName,WocgCode,ProductionId,ProductionCode,ProductionName,RfidNo,CardId,IssueQty,StockQty,CardType,CardStatus,ReqTime,RespData);       					
+          call MES_DoReportWip(LoginedWorkshopId,LoginedWorkshopCode,LoginedWorkshopName,WorkshopType,MoveCardId,MoveCardNo,WorkstationBindId,GID,DID,WorkstationId,WorkstationCode,WorkstationName,WocgCode,ProductionId,ProductionCode,ProductionName,RfidNo,CardId,IssueQty,StockQty,CardType,CardStatus,ReqTime,RespData);       					
       elseif CardType = 3 then  -- 外发卡绑定
           call MES_DoBindOutsourceCard(WorkstationId,WorkstationCode,WorkstationName,CardId,CardNo,RespData);
 					call MES_Debug('MES_DoBindOutsourceCard',LogId);
       end if;
   elseif(CardStatus = 2 ) and (LoginedProcedureIndex = CardProcedureIndex) and (CardType = 2) then -- 补数
-      call MES_DoReportWip(LoginedWorkshopId,LoginedWorkshopCode,LoginedWorkshopName,WorkshopMoveCardType,MoveCardId,MoveCardNo,WorkstationBindId,GID,DID,WorkstationId,WorkstationCode,WorkstationName,WocgCode,ProductionId,ProductionCode,ProductionName,RfidNo,CardId,IssueQty,StockQty,CardType,CardStatus,ReqTime,RespData);       						    
+      call MES_DoReportWip(LoginedWorkshopId,LoginedWorkshopCode,LoginedWorkshopName,WorkshopType,MoveCardId,MoveCardNo,WorkstationBindId,GID,DID,WorkstationId,WorkstationCode,WorkstationName,WocgCode,ProductionId,ProductionCode,ProductionName,RfidNo,CardId,IssueQty,StockQty,CardType,CardStatus,ReqTime,RespData);       						    
 	else -- 移库
       call MES_DoMoveWip(LoginedWorkshopId,LoginedWorkshopCode,LoginedWorkshopName,CardWorkshopId,CardWorkshopCode,CardWorkshopName,WorkstationBindId,WorkstationBindStatus,GID,DID,WorkstationId,WorkstationCode,WorkstationName,WocgCode,ProductionId,ProductionCode,ProductionName,RfidNo,CardId,StockQty,CardType,CardStatus,ReqTime,RespData);      	
   end if;	 
@@ -1034,8 +1044,127 @@ create procedure MES_ProcessIssuePlanToPrevProcedure(
 		out RespData     varchar(200)
 )
 begin
-   select '给前工程发看板 第0 步' into RespData;		
+    declare Success int;
+    select -1,'' into Success,RespData;		
+		
+    if (CurrentStep = 0) then  
+        call MES_ProcessIssuePlanToPrevProcedure_0(Success,RespData);		
+	  elseif CurrentStep = 1 then --  刷看板
+		    call MES_ProcessIssuePlanToPrevProcedure_1(ReqDataType,CardId,Success,RespData);		
+		elseif CurrentStep = 2 then -- 输入数量
+        call MES_ProcessIssuePlanToPrevProcedure_1(SessionId,CurrentStep,ReqDataType,ReqData,Success,RespData);		
+		end if;
+		
+		if( Success = 0 ) then
+				if CurrentStep = 2 then
+					 update workstation_session
+						 set current_step = 255	
+					 where record_id = SessionId;
+				else 
+					 update workstation_session
+						 set current_step = CurrentStep
+					 where record_id = SessionId;		
+				end if;		
+		end if;
 end;
+
+drop procedure MES_ProcessIssuePlanToPrevProcedure_0;
+create procedure MES_ProcessIssuePlanToPrevProcedure_0(
+    out Success      int,
+		out RespData     varchar(200)   
+)
+begin
+		set RespData=	'2|1|2';
+		set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+		set RespData = CONCAT(RespData,'|1|请刷看板|0');		
+		
+		set Success = 0;   
+end;
+
+
+drop procedure MES_ProcessIssuePlanToPrevProcedure_1;
+create procedure MES_ProcessIssuePlanToPrevProcedure_1
+(    
+		in ReqDataType   int,	
+		in CardId        bigint,		
+		out Success      int,
+		out RespData     varchar(200)   
+)
+top:begin
+    -- 1.校验数量卡
+		-- 2.提示输入退还数量
+		
+		declare CardStatus int default -1;
+		select -1,'' into Success,RespData;		
+		
+		if(ReqDataType <> 2) then
+		   call MES_ProcessIssuePlanToPrevProcedure_0(Success,RespData);
+		   leave top;
+		end if;
+		
+		select card_status into CardStatus
+		  from rfid_card
+			where record_id = CardId;
+		
+		if(CardStatus<>20) then
+				set RespData=	'2|1|3';
+				set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+				set RespData = CONCAT(RespData,'|1|只有移库了的看板|0');					   
+				set RespData = CONCAT(RespData,'|2|才需要派发.|0');					   
+				
+				leave top;
+		end if;	
+		
+		set RespData=	'2|1|2';
+		set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+		set RespData = CONCAT(RespData,'|1|请输入派发数量|0');			
+		
+		set Success = 0;
+end;
+
+
+drop procedure MES_ProcessIssuePlanToPrevProcedure_2;
+create procedure MES_ProcessIssuePlanToPrevProcedure_2(
+    in SessionId     bigint,
+		in CurrentStep   int,				
+		in ReqDataType   int,
+		in ReqData       varchar(20),
+		out Success      int,
+		out RespData     varchar(200)
+)
+top:begin
+   --  校验数量，退还的数量不能大于移库的数量	 
+	 declare RfidNo varchar(20);
+	 declare IssueQty int;	 
+	 
+	 select -1,'' into Success,RespData;
+	 
+	 if (ReqDataType <> 4) or (ReqData = '') then
+				set RespData=	'2|1|2';
+				set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+				set RespData = CONCAT(RespData,'|1|请输入派发数量|0');				    
+				
+				leave top;
+	 end if;
+	 
+	 set IssueQty = cast(ReqData as UNSIGNED);	
+	 select s.req_data into RfidNo
+	    from workstation_session_step s
+		  where s.workstation_session_id = SessionId
+			  and s.step = 1;
+		
+	 update rfid_card
+	   set issue_qty = IssueQty,
+				 stock_qty = 0
+		 where rfid_no = RfidNo;
+	 	 
+   set RespData=	'2|1|2';
+	 set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+	 set RespData = CONCAT(RespData,'|1|派发完成|0');				    	 
+	 
+	 set Success = 0;
+end;
+
 
 
 drop procedure MES_ProcessSessionStep;

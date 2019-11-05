@@ -14,8 +14,7 @@ namespace Imms.Mes.Data.Domain
         public string WorkshopName { get { return base.OrgName; } set { base.OrgName = value; } }
 
         public int OperationIndex { get; set; }
-        public int PrevOperationIndex { get; set; }
-        public int MoveCardType { get; set; }
+        public int PrevOperationIndex { get; set; }        
         public int WorkshopType { get; set; }        
     }
 
@@ -113,8 +112,7 @@ namespace Imms.Mes.Data.Domain
             builder.Ignore(e => e.WorkshopName);
 
             builder.Property(e => e.OperationIndex).HasColumnName("operation_index");
-            builder.Property(e => e.PrevOperationIndex).HasColumnName("prev_operation_index");
-            builder.Property(e => e.MoveCardType).HasColumnName("move_card_type");
+            builder.Property(e => e.PrevOperationIndex).HasColumnName("prev_operation_index");            
             builder.Property(e=>e.WorkshopType).HasColumnName("workshop_type");
         }
     }

@@ -79,7 +79,7 @@ create table work_organization_unit
 
     operation_index        int                         not null default 0,   -- 对于车间来说，工序编号必须唯一
     prev_operation_index   int                         not null default 0,    
-    move_card_type         int                         not null default 0,   -- 移库卡类型:  2.数量卡    3.委外加工卡
+    workshop_type          int                         not null default 0,   -- 车间类型: 0. 内部车间   3.外发前工程车间   4.外发车间   5.外发后工程车间
     
     rfid_controller_id     int                         not null default 0,
     rfid_terminator_id     int                         not null default 0,
