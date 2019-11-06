@@ -155,6 +155,73 @@ create table material
 );
 
 --
+-- 物料结构
+--
+create table bom
+(
+    record_id             bigint    auto_increment     not null,
+    bom_no                varchar(20)                  not null,
+    bom_type              int                          not null,
+    bom_status            int                          not null,
+
+    material_id           bigint                       not null,
+    material_code         varchar(20)                  not null,
+    material_name         varchar(50)                  not null,
+
+    component_id          bigint                       not null,
+    component_code        varchar(20)                  not null,
+    component_name        varchar(50)                  not null,
+
+    material_qty          int                          not null,
+    component_qty         int                          not null,
+
+    create_by_id          bigint                       not null,
+    create_by_code        varchar(20)                  not null,
+    create_by_name        varchar(50)                  not null,
+    create_time           datetime                     not null,
+ 
+    update_by_id          bigint                       null,
+    update_by_code        varchar(20)                  null,
+    update_by_name        varchar(50)                  null,
+    update_time           datetime                     null,
+ 
+    opt_flag              int                          not null default 0,    
+
+    primary key(record_id)
+);
+
+--
+-- 物料库存
+--
+create table material_stock
+(
+    record_id               bigint    auto_increment    not null,
+    material_code           varchar(20)                 not null,
+    material_name           varchar(50)                 not null,
+
+    store_id                bigint                      not null,
+    store_code              varchar(20)                 not null,
+    store_name              varchar(50)                 not null,
+
+    stock_qty               int                         not null,
+    bad_qty                 int                         not null,
+
+    create_by_id            bigint                      not null,
+    create_by_code          varchar(20)                 not null,
+    create_by_name          varchar(50)                 not null,
+    create_time             datetime                    not null,
+  
+    update_by_id            bigint                      null,
+    update_by_code          varchar(20)                 null,
+    update_by_name          varchar(50)                 null,
+    update_time             datetime                    null,
+  
+    opt_flag                int                         not null default 0,  
+
+    primary key(record_id)
+);
+
+--
 -- 发卡管理
 --    本表不可以修改，只可以新增，如果已经被使用，则不可以删除。
 --
@@ -389,8 +456,8 @@ create table quality_check
   defect_code                    varchar(20)                 not null, 
   defect_name                    varchar(500)                not null,
   time_of_origin                 datetime                    not null,
---  time_of_origin_work            datetime                    not null, -- 报告时间: 工作日
---  shift_id                       int                         not null, -- 班次: 0.白班(08:30:00 ~ 19:29:59)  1.夜班(20:00:00 ~ 08:29:59)  
+  time_of_origin_work            datetime                    not null, -- 报告时间: 工作日
+  shift_id                       int                         not null, -- 班次: 0.白班(08:30:00 ~ 19:29:59)  1.夜班(20:00:00 ~ 08:29:59)  
 
   qty                            int                         not null,
 

@@ -94,6 +94,9 @@ namespace Imms.Mes.Data.Domain
         public string DefectName { get; set; }
 
         public DateTime TimeOfOrigin { get; set; }
+        public DateTime TimeOfOriginWork{get;set;}
+        public int ShiftId{get;set;}
+
         public int Qty { get; set; }
         public string WocgCode { get; set; }
 
@@ -314,6 +317,8 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.ProductionName).HasColumnName("production_name");
 
             builder.Property(e => e.TimeOfOrigin).HasColumnName("time_of_origin");
+            builder.Property(e=>e.TimeOfOriginWork).HasColumnName("time_of_origin_work");
+            builder.Property(e=>e.ShiftId).HasColumnName("shift_id");
 
             builder.Property(e => e.WorkshopId).HasColumnName("workshop_id");
             builder.Property(e => e.WorkshopCode).HasColumnName("workshop_code");
@@ -323,7 +328,7 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.DefectCode).HasColumnName("defect_code");
             builder.Property(e => e.DefectName).HasColumnName("defect_name");
             builder.Property(e => e.Qty).HasColumnName("qty");
-            builder.Property(e=>e.WocgCode).HasColumnName("wocg_code");
+            builder.Property(e=>e.WocgCode).HasColumnName("wocg_code");            
 
             builder.HasOne(e => e.ProductionOrder).WithMany(e => e.QualityChecks).HasForeignKey(e => e.ProductionOrderId).HasConstraintName("production_order_id");
             builder.HasOne(e => e.Production).WithMany().HasForeignKey(e => e.ProductionId).HasConstraintName("production_id");

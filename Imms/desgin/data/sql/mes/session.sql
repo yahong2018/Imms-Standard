@@ -513,7 +513,7 @@ begin
     set TimeOfOriginWork = date_add(ReqTime, interval -1 day);    
     set ShiftId = 1;
   end if;
-  if (ReqHour > 20) then
+  if (ReqHour >= 20) then
     set ShiftId = 1;
   end if;
   select Year(TimeOfOriginWork),Month(TimeOfOriginWork),Day(TimeOfOriginWork)   into ReqYear,ReqMonth,ReqDay;    

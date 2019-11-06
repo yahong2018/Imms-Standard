@@ -133,7 +133,7 @@ namespace Imms.WebManager.Controllers
                        x.ProductionCode,
                        x.ProductionName,
                        x.RfidNo,
-                       Qty=x.IssueQty
+                       Qty = x.IssueQty
                    }
                  ).ToList();
 
@@ -184,10 +184,10 @@ namespace Imms.WebManager.Controllers
             foreach (ProductionOrderProgress item in progressList)
             {
                 ManufactureSummaryItem summaryItem = new ManufactureSummaryItem();
-                
+
             }
         }
-        
+
 
         [Route("getProductProgressSummary"), HttpGet]
         public ActionResult<string> GetProductProgressSummary(int isToday = 0)
@@ -203,11 +203,11 @@ namespace Imms.WebManager.Controllers
             SimpleCRUDLogic<ProductionOrderProgress> progressLogic = new SimpleCRUDLogic<ProductionOrderProgress>();
             List<ProductionOrderProgress> progressList = (List<ProductionOrderProgress>)progressLogic.GetAllWithExtResult(0, 0, 0, filterStr).RootProperty;
             var resultList = progressList
-                   .Select(x => new { x.RecordId, x.ProductionId, x.ProductionCode, x.ProductionName, x.WorkshopId, x.WorkshopName, x.WorkshopCode, x.Qty, DateOfOrigin = x.TimeOfOrigin.ToString("yyyy/MM/dd") })
-                   .GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopId, x.WorkshopCode, x.WorkshopName, x.DateOfOrigin })
+                   .Select(x => new { x.RecordId, x.ProductionId, x.ProductionCode, x.ProductionName, x.WorkshopId, x.WorkshopName, x.WorkshopCode, x.Qty, x.TimeOfOriginWork })
+                   .GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopId, x.WorkshopCode, x.WorkshopName, x.TimeOfOriginWork })
                    .Select(group => new ProductionSummaryItem
                    {
-                       DateOfOrigin = group.Key.DateOfOrigin,
+                       TimeOfOriginWork = group.Key.TimeOfOriginWork,
                        ProductionId = group.Key.ProductionId,
                        ProductionCode = group.Key.ProductionCode,
                        ProductionName = group.Key.ProductionName,
@@ -216,17 +216,18 @@ namespace Imms.WebManager.Controllers
                        WorkshopName = group.Key.WorkshopName,
                        FinishedQty = group.Sum(x => x.Qty),
                        BadQty = 0,
-                       MoveInQty = 0
+                       MoveInQty = 0,
+                       MoveOutQty = 0
                    }).ToList();
 
             SimpleCRUDLogic<QualityCheck> qualityLogic = new SimpleCRUDLogic<QualityCheck>();
             List<QualityCheck> qualityList = (List<QualityCheck>)qualityLogic.GetAllWithExtResult(0, 0, 0, filterStr).RootProperty;
             var qualityGroupList = qualityList
-                   .Select(x => new { x.RecordId, x.ProductionId, x.ProductionCode, x.ProductionName, x.WorkshopId, x.WorkshopName, x.WorkshopCode, x.Qty, DateOfOrigin = x.TimeOfOrigin.ToString("yyyy/MM/dd") })
-                   .GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopId, x.WorkshopCode, x.WorkshopName, x.DateOfOrigin })
+                   .Select(x => new { x.RecordId, x.ProductionId, x.ProductionCode, x.ProductionName, x.WorkshopId, x.WorkshopName, x.WorkshopCode, x.Qty, x.TimeOfOriginWork })
+                   .GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopId, x.WorkshopCode, x.WorkshopName, x.TimeOfOriginWork })
                    .Select(group => new ProductionSummaryItem
                    {
-                       DateOfOrigin = group.Key.DateOfOrigin,
+                       TimeOfOriginWork = group.Key.TimeOfOriginWork,
                        ProductionId = group.Key.ProductionId,
                        ProductionCode = group.Key.ProductionCode,
                        ProductionName = group.Key.ProductionName,
@@ -235,7 +236,8 @@ namespace Imms.WebManager.Controllers
                        WorkshopName = group.Key.WorkshopName,
                        FinishedQty = 0,
                        BadQty = group.Sum(x => x.Qty),
-                       MoveInQty = 0
+                       MoveInQty = 0,
+                       MoveOutQty = 0
                    }).ToList();
 
             foreach (var item in qualityGroupList)
@@ -253,12 +255,12 @@ namespace Imms.WebManager.Controllers
 
             SimpleCRUDLogic<ProductionMoving> moveLogic = new SimpleCRUDLogic<ProductionMoving>();
             List<ProductionMoving> moveList = (List<ProductionMoving>)moveLogic.GetAllWithExtResult(0, 0, 0, filterStr).RootProperty;
-            var moveGroupList = moveList
-                   .Select(x => new { x.RecordId, x.ProductionId, x.ProductionCode, x.ProductionName, x.WorkshopId, x.WorkshopName, x.WorkshopCode, x.Qty, DateOfOrigin = x.TimeOfOrigin.ToString("yyyy/MM/dd") })
-                   .GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopId, x.WorkshopCode, x.WorkshopName, x.DateOfOrigin })
+            var moveInGroupList = moveList
+                   .Select(x => new { x.RecordId, x.ProductionId, x.ProductionCode, x.ProductionName, x.WorkshopId, x.WorkshopName, x.WorkshopCode, x.Qty, x.TimeOfOriginWork })
+                   .GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopId, x.WorkshopCode, x.WorkshopName, x.TimeOfOriginWork })
                    .Select(group => new ProductionSummaryItem
                    {
-                       DateOfOrigin = group.Key.DateOfOrigin,
+                       TimeOfOriginWork = group.Key.TimeOfOriginWork,
                        ProductionId = group.Key.ProductionId,
                        ProductionCode = group.Key.ProductionCode,
                        ProductionName = group.Key.ProductionName,
@@ -267,12 +269,13 @@ namespace Imms.WebManager.Controllers
                        WorkshopName = group.Key.WorkshopName,
                        FinishedQty = 0,
                        BadQty = 0,
-                       MoveInQty = group.Sum(x => x.Qty)
+                       MoveInQty = group.Sum(x => x.Qty),
+                       MoveOutQty = 0
                    }).ToList();
 
-            foreach (var item in moveGroupList)
+            foreach (var item in moveInGroupList)
             {
-                var resultItem = resultList.FirstOrDefault(x => x.ProductionId == item.ProductionId && x.WorkshopId == item.WorkshopId && x.DateOfOrigin == item.DateOfOrigin);
+                var resultItem = resultList.FirstOrDefault(x => x.ProductionId == item.ProductionId && x.WorkshopId == item.WorkshopId && x.TimeOfOriginWork == item.TimeOfOriginWork);
                 if (resultItem == null)
                 {
                     resultList.Add(item);
@@ -281,6 +284,42 @@ namespace Imms.WebManager.Controllers
                 {
                     resultItem.MoveInQty = item.MoveInQty;
                 }
+            }
+
+            var moveOutGroupList = moveList
+                               .Select(x => new { x.RecordId, x.ProductionId, x.ProductionCode, x.ProductionName, x.WorkshopIdFrom, x.WorkshopNameFrom, x.WorkshopCodeFrom, x.Qty, x.TimeOfOriginWork })
+                               .GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopIdFrom, x.WorkshopCodeFrom, x.WorkshopNameFrom, x.TimeOfOriginWork })
+                               .Select(group => new ProductionSummaryItem
+                               {
+                                   TimeOfOriginWork = group.Key.TimeOfOriginWork,
+                                   ProductionId = group.Key.ProductionId,
+                                   ProductionCode = group.Key.ProductionCode,
+                                   ProductionName = group.Key.ProductionName,
+                                   WorkshopId = group.Key.WorkshopIdFrom,
+                                   WorkshopCode = group.Key.WorkshopCodeFrom,
+                                   WorkshopName = group.Key.WorkshopNameFrom,
+                                   FinishedQty = 0,
+                                   BadQty = 0,
+                                   MoveInQty = 0,
+                                   MoveOutQty = group.Sum(x => x.Qty)
+                               }).ToList();
+
+            foreach (var item in moveOutGroupList)
+            {
+                var resultItem = resultList.FirstOrDefault(x => x.ProductionId == item.ProductionId && x.WorkshopId == item.WorkshopId && x.TimeOfOriginWork == item.TimeOfOriginWork);
+                if (resultItem == null)
+                {
+                    resultList.Add(item);
+                }
+                else
+                {
+                    resultItem.MoveOutQty = item.MoveOutQty;
+                }
+            }
+
+            foreach (var item in resultList)
+            {
+                item.StockQty = item.MoveInQty + item.FinishedQty - item.MoveOutQty;
             }
 
             return resultList.ToJson();
@@ -297,7 +336,6 @@ namespace Imms.WebManager.Controllers
                 var progressList = dbContext.Set<ProductionOrderProgress>()
                     .Where(x => x.TimeOfOrigin >= beginDate
                                 && x.TimeOfOrigin < endDate
-                                && (x.ReportType == 0 || x.ReportType == 127)
                     ).ToList();
 
                 var resultList = progressList
@@ -350,7 +388,7 @@ namespace Imms.WebManager.Controllers
             {
                 throw new BusinessException(GlobalConstants.EXCEPTION_CODE_DATA_NOT_FOUND, $"看板编号(KanbanNo)='{instoreItem.KanbanNo}'的看板还没有发卡！");
             }
-            if (card.CardStatus != 1)
+            if (card.CardStatus != 10)
             {
                 throw new BusinessException(GlobalConstants.EXCEPTION_CODE_PARAMETER_INVALID, $"看板编号(KanbanNo)='{instoreItem.KanbanNo}'的看板还没有报工，不可以执行移库动作！");
             }
@@ -364,7 +402,29 @@ namespace Imms.WebManager.Controllers
             movingItem.ProductionId = card.ProductionId;
             movingItem.ProductionCode = card.ProductionCode;
             movingItem.ProductionName = card.ProductionName;
-            movingItem.TimeOfOrigin = DateTime.Now;
+            DateTime movingTime = DateTime.Now;
+            if (DateTime.TryParse(instoreItem.MovingTime, out movingTime))
+            {
+                movingItem.TimeOfOrigin = movingTime;
+            }
+            else
+            {
+                movingItem.TimeOfOrigin = DateTime.Now;
+            }
+
+            movingItem.TimeOfOriginWork = new DateTime(movingItem.TimeOfOrigin.Year, movingItem.TimeOfOrigin.Month, movingItem.TimeOfOrigin.Day);
+            if (movingItem.TimeOfOrigin.Hour <= 8 && movingItem.TimeOfOrigin.Minute < 30)
+            {
+                movingItem.TimeOfOriginWork = movingItem.TimeOfOriginWork.AddDays(-1);
+            }
+            if ((movingItem.TimeOfOrigin.Hour <= 8 && movingItem.TimeOfOrigin.Minute < 30) || (movingItem.TimeOfOriginWork.Hour >= 20))
+            {
+                movingItem.ShiftId = 1;
+            }
+            else
+            {
+                movingItem.ShiftId = 0;
+            }
 
             movingItem.ProductionOrderId = -1;
             movingItem.ProductionOrderNo = "";
@@ -382,10 +442,14 @@ namespace Imms.WebManager.Controllers
             movingItem.EmployeeId = instoreItem.operatorCode;
             movingItem.EmployeeName = instoreItem.operatorName;
 
+            movingItem.OperatorIdFrom = -1;
+            movingItem.EmployeeIdFrom = "";
+            movingItem.EmployeeNameFrom = "";
+
             movingLogic.Create(movingItem);
 
-            card.CardStatus = 0;
-            cardLogic.Update(card);
+            //card.CardStatus = 0;
+            //cardLogic.Update(card);
 
             return GlobalConstants.EXCEPTION_CODE_NO_ERROR;
         }
@@ -403,7 +467,7 @@ namespace Imms.WebManager.Controllers
                     using (DbCommand cmd = connection.CreateCommand())
                     {
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                        cmd.CommandText = "MES_ProcessDeviceData";
+                        cmd.CommandText = "MES_ProcessDeviceDataEx";
 
                         DbParameter parameter = cmd.CreateParameter();
                         parameter.ParameterName = "IsNewData";
@@ -459,14 +523,14 @@ namespace Imms.WebManager.Controllers
                         parameter.DbType = System.Data.DbType.AnsiString;
                         parameter.Direction = System.Data.ParameterDirection.Input;
                         parameter.Value = item.StrPara1;
-                        parameter.Size = 200;
+                        parameter.Size = 20;
                         cmd.Parameters.Add(parameter);
 
                         parameter = cmd.CreateParameter();
-                        parameter.ParameterName = "RespMessage";
+                        parameter.ParameterName = "RespData";
                         parameter.DbType = System.Data.DbType.AnsiString;
                         parameter.Direction = System.Data.ParameterDirection.Output;
-                        parameter.Size = 4000;
+                        parameter.Size = 200;
                         cmd.Parameters.Add(parameter);
 
                         cmd.ExecuteNonQuery();
@@ -577,9 +641,11 @@ namespace Imms.WebManager.Controllers
         public long WorkshopId { get; set; }
         public string WorkshopCode { get; set; }
         public string WorkshopName { get; set; }
-        public string DateOfOrigin { get; set; }
+        public DateTime TimeOfOriginWork { get; set; }
         public int FinishedQty { get; set; }
         public int BadQty { get; set; }
         public int MoveInQty { get; set; }
+        public int MoveOutQty { get; set; }
+        public int StockQty { get; set; }
     }
 }

@@ -83,7 +83,7 @@ namespace Imms.WebManager
         private static Task HandleExceptionAsync(Microsoft.AspNetCore.Http.HttpContext context, Exception ex, int statusCode)
         {            
             StringBuilder builder = new StringBuilder(ex.Message);
-            GetExceptionMessage(ex, builder);
+            ErrorHandlingMiddleware.GetExceptionMessage(ex, builder);
             ApiResult apiResult = new ApiResult() { Success = false, Data = new ApiResultData() { Message = builder.ToString(), RequestUrl = context.Request.Path, ExceptionCode = statusCode } };
             if (ex is BusinessException)
             {
@@ -101,11 +101,12 @@ namespace Imms.WebManager
 
         private static void GetExceptionMessage(Exception ex,StringBuilder builder)
         {            
-            while (ex.InnerException != null)
+            if (ex.InnerException != null)
             {
                 builder.Append("\r\n");
                 builder.Append(ex.InnerException.Message);
-                GetExceptionMessage(ex.InnerException, builder);
+                Exception innerException = ex.InnerException;
+                ErrorHandlingMiddleware.GetExceptionMessage(innerException, builder);
             }
         }
     }

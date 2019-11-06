@@ -19,6 +19,13 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheck", {
         { dataIndex: "productionName", text: "产品名称", width: 200 },
         { dataIndex: "qty", text: "数量", width: 100 },
         { dataIndex: "timeOfOrigin", text: "时间", width: 100 },
+        { dataIndex: "timeOfOriginWork", text: "工作日", width: 100 },
+        { dataIndex: "shiftId", text: "班次", width: 100,renderer:function(value){
+            if(value==0){
+                return '白班';
+            }
+            return '夜班';
+        } },
 
         { dataIndex: "defectCode", text: "品质代码", width: 100 },
         { dataIndex: "defectName", text: "品质描述", width: 200 },

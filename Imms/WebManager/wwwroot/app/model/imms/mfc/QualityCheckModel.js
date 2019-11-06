@@ -12,11 +12,12 @@ Ext.define("app.model.imms.mfc.QualityCheckModel", {
         { name: "workshopCode", type: "string" },
         { name: "workshopName", type: "string" },
         { name: "timeOfOrigin", type: "zhxhDate", dateFormat: "Y-m-d H:i:s" },
+        { name: "timeOfOriginWork", type: "zhxhDate", dateFormat: "Y-m-d" },
+        { name: "shiftId", type: "int"},
         { name: "qty", type: "int" },
         
         { name: "defectId", type: "int" },
         { name: "defectCode", type: "string" },
-        { name: "defectName", type: "string" },
-        
+        { name: "defectName", type: "string" },        
     ]
 });

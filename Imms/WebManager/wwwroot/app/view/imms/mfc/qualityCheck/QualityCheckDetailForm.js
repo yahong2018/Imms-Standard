@@ -8,7 +8,7 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
         layout: "anchor",
         anchor: "100%",
     },
-    defectStore: Ext.create({ xtype: "imms_mfc_DefectStore", autoLoad: true,pageSize:0 }),
+    defectStore: Ext.create({ xtype: "imms_mfc_DefectStore", autoLoad: true, pageSize: 0 }),
     operatorStore: Ext.create({ xtype: 'imms_org_OperatorStore', autoLoad: true, pageSize: 0 }),
     workshopStore: Ext.create({ xtype: 'imms_org_WorkshopStore', autoLoad: true, pageSize: 0 }),
     productionStore: Ext.create({ xtype: 'app_store_imms_material_MaterialStore', autoLoad: true, pageSize: 0 }),
@@ -22,18 +22,20 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
             layout: "hbox",
             margin: '0 0 3 ',
             items: [
-                { name: "productionCode", xtype: "textfield", fieldLabel: "产品", allowBlank: false ,listeners: {
-                    change: function (self, newValue, oldValue, eOpts) {
-                        debugger;
-                        var form = this.up("imms_mfc_qualityCheck_QualityCheckDetailForm");
-                        var record = form.productionStore.findRecord("materialCode", newValue, 0, false, false, true);
-                        if (record != null) {
-                            form.down("[name='productionId']").setValue(record.get("recordId"));
-                            form.down("[name='productionName']").setValue(record.get("materialName"));
+                {
+                    name: "productionCode", xtype: "textfield", fieldLabel: "产品", allowBlank: false, listeners: {
+                        change: function (self, newValue, oldValue, eOpts) {
+                            debugger;
+                            var form = this.up("imms_mfc_qualityCheck_QualityCheckDetailForm");
+                            var record = form.productionStore.findRecord("materialCode", newValue, 0, false, false, true);
+                            if (record != null) {
+                                form.down("[name='productionId']").setValue(record.get("recordId"));
+                                form.down("[name='productionName']").setValue(record.get("materialName"));
+                            }
                         }
-                    }                  
-                }},
-                { name: "productionName", xtype: "textfield", margin: '0 20 0 5',allowBlank:false, flex: 0.8, readOnly: true },
+                    }
+                },
+                { name: "productionName", xtype: "textfield", margin: '0 20 0 5', allowBlank: false, flex: 0.8, readOnly: true },
             ]
         },
         {
@@ -56,7 +58,7 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
                 { name: "workshopName", xtype: "textfield", flex: 0.8, margin: '0 20 5 5', allowBlank: false, readOnly: true },
             ]
         },
-        { name: "wocgCode", xtype: "textfield", width: 200, fieldLabel: "工作中心组",  allowBlank: false },
+        { name: "wocgCode", xtype: "textfield", width: 200, fieldLabel: "工作中心组", allowBlank: false },
         {
             xtype: "container",
             layout: "hbox",
@@ -64,6 +66,15 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
             items: [
                 { name: "timeOfOrigin", xtype: "textfield", fieldLabel: "产生时间", margin: '0 20 5 0', allowBlank: false },
                 { name: "qty", xtype: "textfield", fieldLabel: "缺陷数量", margin: '0 20 5 0', allowBlank: false },
+            ]
+        },
+        {
+            xtype: "container",
+            layout: "hbox",
+            margin: '0 0 3 ',
+            items: [
+                { name: "timeOfOriginWork", xtype: "textfield", fieldLabel: "工作日", margin: '0 20 5 0', allowBlank: false },
+                { name: "shiftId", xtype: "textfield", fieldLabel: "班次", margin: '0 20 5 0', allowBlank: false },
             ]
         },
         {
@@ -79,7 +90,7 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
                             if (record != null) {
                                 form.down("[name='defectId']").setValue(record.get("recordId"));
                                 form.down("[name='defectName']").setValue(record.get("defectName"));
-                            }else{
+                            } else {
                                 form.down("[name='defectId']").setValue(-1);
                                 form.down("[name='defectName']").setValue("");
                             }
