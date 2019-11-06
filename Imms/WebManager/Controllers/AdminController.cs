@@ -20,9 +20,7 @@ namespace Imms.WebManager.Controllers
         [Route("sync_wdb")]
         public string Sync2WDB()
         {
-            WDBSynchronizer synchronizer = new WDBSynchronizer();
-            synchronizer.HttpClient = this._syncService.GetHttpClient4WDB();
-            return synchronizer.SyncData().ToString();
+            return this._syncService.SyncData().ToString();             
         }
     }
 }

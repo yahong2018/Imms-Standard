@@ -166,3 +166,51 @@ WK43_RK_ZZ    组装入库
 交接要做的事情
     1. 相关的文档
 
+---------------------------------------------------------------------------  
+2019/11/06
+http:192.168.121.11/jsf/rfws/erp/aisa/save/prodPw
+
+内部转移 /jsf/rfws/erp/aisa/savemove 
+入库 /jsf/rfws/erp/aisa/savepc
+
+内部转移:
+
+{
+   "beId":1,
+   "movet":[
+    {
+        "procode":"1411-06880",
+        "unitcode":"pcs",
+        "qty":2,
+        "loccode":"B02",
+        "aloccode":"THR"
+   }]
+}
+
+生产入库:
+{"beId":1,"prodpwt":[{"procode":"5010-08120","unitcode":"pcs","qty":23,"loccode":"THR","wcgcode":"THR01"}]}
+不良入库：
+{"beId":1, "doctypeId":4,"prodpwt":[{"procode":"5010-08120", "unitcode":"pcs","qty":2, "wcgcode":"THR01","udfbldm":"THR","udfblbm":"THR"}]}
+
+{"beId":1, "doctypeId":4,"prodpwt":[{"procode":"5010-08120", "unitcode":"pcs","qty":2, "wcgcode":"THR01","udfbldm":"01","udfblbm":"THR_BAD","loccode":"THR"}]}
+
+委外加工
+{"beId":1, "pdcorespwt":[{"procode":"5010-08120", "unitcode":"pcs","qty":2,"loccode":"HJG"}]}
+
+成功的时候返回：
+"{\"tranId\":266,\"tranCode\":\"PW19110277\",\"message\":\"\",\"status\":true}"
+
+失败的时候返回：
+"{\"tranId\":0,\"tranCode\":\"\",\"message\":\"[{\\\"exception\\\":\\\"\\\",\\\"htmlMessage\\\":false,\\\"id\\\":10300,\\\"info\\\":\\\"table is empty(prodpwt)\\\",\\\"info_desc\\\":\\\"\\\\\\\"生产入库单 (生产详细)\\\\\\\"表格的数据为空，不能保存。\\\",\\\"jsonStr\\\":\\\"\\\",\\\"key\\\":\\\"ce01_core_10300\\\",\\\"locators\\\":[{\\\"colMess\\\":\\\"\\\",\\\"colName\\\":\\\"\\\",\\\"id\\\":0,\\\"locatorKey\\\":\\\"prodpwt\\\",\\\"row\\\":0,\\\"tableMess\\\":\\\"\\\",\\\"tableName\\\":\\\"prodpwt\\\",\\\"type\\\":\\\"Table\\\"}],\\\"pass\\\":false,\\\"trace\\\":\\\"[MacCheckerUtil.checkEmptyTable_197]-[TradeModuleChecker.checkTradingEmptyTable_1060]-[CheckerLib.runChecker_224]-[CawEntityCurdAction.updateEntity_107]-[CawEntityInterceptor.logCall_44]\\\",\\\"type\\\":\\\"Error\\\"}]\",\"status\":false}"
+
+
+品质报工要增加
+    工艺代码
+
+后工程要可以连续发卡
+    1. 刷工卡
+    2. 刷物料卡
+    3. 系统显示默认的数量，提示用户修改数量，不修改直接按确定
+    4. 输入数量， 或者直接按确定。
+    5. 系统提示已发卡，继续发卡，请刷物料卡，按任意键结束发卡。
+    6. 跳转至第2条
