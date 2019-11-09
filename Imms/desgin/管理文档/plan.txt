@@ -214,3 +214,74 @@ http:192.168.121.11/jsf/rfws/erp/aisa/save/prodPw
     4. 输入数量， 或者直接按确定。
     5. 系统提示已发卡，继续发卡，请刷物料卡，按任意键结束发卡。
     6. 跳转至第2条
+
+--------------------------------------------------------------------------  
+物料表的格式
+    部门代码       部门名称      物料      类别     在库     转入    退还  退出  良品消耗   不良消耗   良品数量    不良数量  转出 
+    THR           THR           A         0       100     200     0     0     100       0          0          0        0           
+    THR           THR           B         1       60      0       10    0     0         0          100        0        50
+
+    对于半成品 
+        在库 = 转入 - 产出 - 不良 - 退还（上工序）
+    对于完成品
+        在库 = 产出 + 退还（本工序） + 不良 - 转出
+
+    create table material_stock(
+        material_id,
+        material_code,
+        material_name,
+        workshop_id,
+        workshop_code,
+        workshop_name,
+
+        qty_stock,
+        qty_move_in,         -- 转入
+        qty_return_in,       -- 退还
+        qty_return_out,      -- 退出
+        qty_consume_good,    -- 良品消耗
+        qty_consume_defect,  -- 不良品消耗
+        qty_good,            -- 良品数量
+        qty_defect,          -- 不良数量
+        qty_move_out,        -- 转出
+    )
+
+    报工&品质
+        1. 新增一笔报工记录
+        2. 根据BOM修改本部门【半成品】的在库数、良品消耗/不良消耗
+        3. 修改本部门【完成品】的在库数、良品数/不良数
+
+    移库
+        1.新增一笔移库记录
+        2.修改转出部门【完成品】的在库、转出
+        3.修改转入部门【半成品】的在库、转入  -- 由ERP那边完成品报工的时候，则不需要做这件事情
+
+    退回上工序
+        1.新增一笔移库记录
+        2.修改本部门【半成品】的在库、退出
+        3.修改上部门【完成品】的在库、退还
+
+进度表格式
+    日期          部门代码       部门名称      产品      良品(白)   不良(白)    良品(晚)    不良(晚)
+    2019/11/08    THR           THR          B         50        0           50          0
+    
+
+    create table ProductSummary
+    (
+        record_id
+
+        product_date
+
+        production_id,
+        production_code,
+        production_name,
+
+        workshop_id,
+        workshop_code,
+        workshop_name,
+
+        qty_good_0,        
+        qty_good_1,
+
+        qty_defect_0,
+        qty_defect_1
+    )

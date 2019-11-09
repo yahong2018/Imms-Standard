@@ -32,78 +32,6 @@
   
 */
 
-create table workstation_session
-(
-  record_id              bigint      auto_increment      not null,
-  workstation_id         bigint                          not null,
-  session_type           int                             not null, -- session的类别: -1. 未知 0. 刷工卡退还工件    1.刷工卡发前工程看板    2. 刷数量卡报工  3.刷数量卡移库   4.刷委外加工卡计数  5.刷委外加工卡外发 6.刷委外加工卡回厂 
-  current_step           int                             not null, -- 当前步骤：-1.新建 0.确定session_type  1~250. 当前步骤   253.已过期  254.已取消   255.已完成 
-                                                                   --  session_type  的session，只有一个步骤，就是255,因为不需要交互。                                                                   
-
-  operator_id            bigint                          not null, -- 操作员Id
-  employee_id            varchar(20)                     not null,
-  employee_name          varchar(50)                     not null,
-  employee_card_no       varchar(20)                     not null,
-
-  GID                    int                             not null, 
-  DID                    int                             not null,  
-
-  create_time            datetime                        not null,
-  last_process_time      datetime                        not null,   -- 最后处理时间
-  expire_time            datetime                        not null,   -- 过期时间，目前过期时间，就是最后处理时间后的一分钟，如果一分钟内没有任何处理，就默认为过期了。
-
-  primary key(record_Id)
-);
-
-create table workstation_session_step
-(
-  record_id                    bigint       auto_increment     not null,
-  workstation_session_id       bigint                          not null,
-  step                         int                             not null,
-  
-  req_time                     datetime                        not null, -- 请求时间
-  req_data_type                int                             not null, -- 1. 工卡    2.数量卡   3.委外加工卡    4.键盘输入   
-  req_data                     varchar(20)                     not null, -- 请求的数据
-    
-  resp_data                    varchar(200)                    not null, -- 从服务器返回的结果
-  resp_time                    datetime                        not null, -- 返回时间
-
-  primary key(record_id)
-);
-
-create table outsource_workstation_bind
-(
-    record_id               bigint       auto_increment   not null,
-    outsource_card_id       bigint                        not null,
-    outsource_card_no       varchar(20)                   not null,    
-    workstation_id          bigint                        not null,
-    workstation_code        varchar(20)                   not null,
-    workstation_name        varchar(50)                   not null,
-    workshop_id             bigint                        not null,
-    workshop_code           varchar(20)                   not null,
-    workshop_name           varchar(50)                   not null,
-    attach_time             datetime                      not null,
-    out_time                datetime                      null,           -- 外发时间
-    back_time               datetime                      null,           -- 回厂时间
-    bind_status             int                           not null,       -- 1.已绑定    2.已外发    3.已回厂
-
-    primary key(record_id)
-);
-
-create table outsource_card_bind(
-    record_id               bigint       auto_increment   not null,
-    outsource_card_id       bigint                        not null,       -- 外发卡
-    outsource_card_no       varchar(20)                   not null,
-    qty_report_id           bigint                        not null,       -- 报工记录号
-    qty_card_id             bigint                        not null,       -- 数量卡
-    qty_card_no             varchar(20)                   not null,
-    attach_time             datetime                      not null,       -- 绑定时间
-    workstation_bind_id     bigint                        not null,
-
-    primary key(record_id)
-);
-
-
 drop procedure MES_HandleErrorReq;
 create procedure MES_HandleErrorReq(
   in     ReqData       varchar(20),
@@ -136,7 +64,7 @@ begin
     call MES_Debug(LogMessage,LogId);
 
     set RespMessage = '2|1|3';
-    set RespMessage = CONCAT(RespMessage,'|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+    set RespMessage = CONCAT(RespMessage,'|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
     set RespMessage = CONCAT(RespMessage,'|1|系统异常:',LogId,'|0');
     set RespMessage = CONCAT(RespMessage,'|2|请联系管理员|0');	   
 end;
@@ -158,7 +86,7 @@ top:begin
       and w.rfid_terminator_id = DID )>1 then
 		
 		set RespMessage = '2|1|4';
-		set RespMessage = CONCAT(RespMessage,'|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+		set RespMessage = CONCAT(RespMessage,'|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
 		set RespMessage = CONCAT(RespMessage,'|1|组号:',GID,',机号:',DID,'|0');
 		set RespMessage = CONCAT(RespMessage,'|2|工位重复注册|0');			
 		set RespMessage = CONCAT(RespMessage,'|3|请联系管理员|0');	
@@ -174,7 +102,7 @@ top:begin
 
   if (WorkstationId = -1) then		
 		set RespMessage = '2|1|3';
-		set RespMessage = CONCAT(RespMessage,'|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+		set RespMessage = CONCAT(RespMessage,'|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
 		set RespMessage = CONCAT(RespMessage,'|1|组号:',GID,',机号:',DID,'|0');
 		set RespMessage = CONCAT(RespMessage,'|2|请联系管理员注册|0');			
     
@@ -220,7 +148,7 @@ begin
 		-- call MES_Debug(CONCAT('MES_VerifyCard, CardId:',CardId,',CardType:',CardType),LogId);
     if not CardType in(1,2,3) then
 	      set RespMessage=	'2|1|4';
-        set RespMessage = CONCAT(RespMessage, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次
+        set RespMessage = CONCAT(RespMessage, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次
         set RespMessage = CONCAT(RespMessage, '|1|卡没注册:|0');            
 		    set RespMessage = CONCAT(RespMessage, '|2|',RfidNo,'|0'); 
 		    set RespMessage = CONCAT(RespMessage, '|3|请联系管理员注册卡|0');            
@@ -312,7 +240,7 @@ begin
 	 where record_id = CardId;
   
   set RespData=	'2|1|2';
-  set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+  set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
   set RespData = CONCAT(RespData,'|1|已绑定外发看板|0');  
 end;
 
@@ -377,7 +305,7 @@ begin
 					
 				-- 返回结果
 				set RespData=	'2|1|2';
-				set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次
+				set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次
 				set RespData = CONCAT(RespData,'|1|已移库',StockQty,'个|0');  						
 
     else 
@@ -390,7 +318,7 @@ begin
 				
 				-- 返回结果
 				set RespData=	'2|1|2';
-				set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次
+				set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次
 				set RespData = CONCAT(RespData,'|1|已移库:',BasketCount,'项,|0');  			
 				set RespData = CONCAT(RespData,'|2|共计',TotalQty,'个,|0');  			
 				
@@ -598,7 +526,7 @@ begin
 
   -- 返回结果
 	set RespData=	'2|1|2';
-	set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次
+	set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  -- 锁定所有的键盘，发声一次
   set RespData = CONCAT(RespData,'|1|已报工',ReportQty,'个|0');  	 
 end;
 
@@ -625,35 +553,35 @@ begin
    select '' into RespData;
    if (CheckType = 1) and (CardType = 3) and (WorkshopType <> 3) then
       set RespData=	'2|1|3';
-      set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+      set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
       set RespData = CONCAT(RespData,'|1|不可以在本车间|0');
       set RespData = CONCAT(RespData,'|2|绑定外发看板|0');      
   elseif (CheckType = 3) and not CardStatus in (0,20) then
       set RespData=	'2|1|4';
-      set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+      set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
       set RespData = CONCAT(RespData,'|1|本看板已经派发|0');
       set RespData = CONCAT(RespData,'|2|报工移库之前|0');
       set RespData = CONCAT(RespData,'|3|不可以重复派发|0');      
   elseif (CardStatus = 0 and CheckType <> 3) or (CardStatus = 20 and CheckType <> 2 ) then
       set RespData=	'2|1|3';
-      set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+      set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
       set RespData = CONCAT(RespData,'|1|本看板没有派发,|0');
 			set RespData = CONCAT(RespData,'|2|或者已经移库.|0');      
   elseif (CheckType = 2 ) then
       if  (CardStatus <> 20)  then
           set RespData=	'2|1|3';
-          set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+          set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
           set RespData = CONCAT(RespData,'|1|看板还没有移库|0');
           set RespData = CONCAT(RespData,'|2|不需要退还|0');      
       elseif (CardProcedureIndex <> LoginedProcedureIndex) and (CardProcedureIndex <> LoginedPrevProcedureIndex) then
           set RespData=	'2|1|3';
-          set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+          set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
           set RespData = CONCAT(RespData,'|1|退还操作只能在|0');
           set RespData = CONCAT(RespData,'|2|上下车间操作|0');
       end if;
   elseif (CheckType = 0)  and (CardType = 3) and (WorkstationBindStatus >= 3)then
       set RespData=	'2|1|3';
-      set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+      set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
       set RespData = CONCAT(RespData,'|1|外发看板已回厂,|0');
       set RespData = CONCAT(RespData,'|2|派发以后才可以操作|0');           
   elseif (CheckType = 0) then 
@@ -662,22 +590,22 @@ begin
       if (CardStatus in(1,2))  then
 			    if (WorkshopType = 3) and (MoveCardId = -1)  and (CardType = 2)  then
 							set RespData=	'2|1|2';
-							set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|5|150');
+							set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|5|150');
 							set RespData = CONCAT(RespData,'|1|先刷外发卡再报工|0');
           elseif (CardProcedureIndex <> LoginedProcedureIndex)  and (CardType = 2) and (CardStatus = 1)  then
 							set RespData=	'2|1|3';
-							set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+							set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
 							set RespData = CONCAT(RespData,'|1|本看板可报工车间:|0');
 							set RespData = CONCAT(RespData,'|2|',WorkshopName,'|0');	  
 					elseif (CardProcedureIndex <> LoginedPrevProcedureIndex) and (CardType = 2) and (CardStatus = 2) then -- 退件以后再次移库
               if NextWorkshopName <> '' then -- 半成品车间
                   set RespData=	'2|1|3';
-                  set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');      
+                  set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');      
                   set RespData = CONCAT(RespData,'|1|本看板可移库车间:|0');
                   set RespData = CONCAT(RespData,'|2|',NextWorkshopName,'|0');
               else  -- 完成品车间(最后一道工序的车间)
                   set RespData=	'2|1|3';
-                  set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');      
+                  set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');      
                   set RespData = CONCAT(RespData,'|1|本看板只可以由工务|0');          
                   set RespData = CONCAT(RespData,'|2|进行完成品移库|0');          
               end if;  
@@ -685,12 +613,12 @@ begin
       elseif (CardStatus = 10) and (CardType = 2) then           
 			    if (CardProcedureIndex = LoginedProcedureIndex)  then					    
 									set RespData=	'2|1|3';
-									set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+									set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
 									set RespData = CONCAT(RespData,'|1|本看板已经报工|0');
 									set RespData = CONCAT(RespData,'|2|请移库后再报工|0');								
 		      elseif(CardProcedureIndex = LoginedPrevProcedureIndex) and (WorkshopType = 3) then					    
               set RespData=	'2|1|5';
-              set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|5|150');
+              set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|5|150');
               set RespData = CONCAT(RespData,'|1|外发前工程的内部看板|0'); 
               set RespData = CONCAT(RespData,'|2|不可以进行移库操作;|0'); 
               set RespData = CONCAT(RespData,'|3|只有外发看板才可以|0'); 
@@ -698,12 +626,12 @@ begin
           elseif (CardProcedureIndex <> LoginedPrevProcedureIndex) then -- 不同车间刷卡
               if NextWorkshopName <> '' then -- 半成品车间
                   set RespData=	'2|1|3';
-                  set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');      
+                  set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');      
                   set RespData = CONCAT(RespData,'|1|本看板可移库车间:|0');
                   set RespData = CONCAT(RespData,'|2|',NextWorkshopName,'|0');
               else  -- 完成品车间(最后一道工序的车间)
                   set RespData=	'2|1|3';
-                  set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');      
+                  set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');      
                   set RespData = CONCAT(RespData,'|1|本看板只可以由工务|0');          
                   set RespData = CONCAT(RespData,'|2|进行完成品移库|0');          
               end if;   
@@ -840,7 +768,7 @@ top:begin
     -- 接收人工卡确认
     -- 1. 必须是工卡
 	  -- 2. 接收人和退还人不能是同一个人 
-	  declare CreatorOperatorId,ReceiveOperatorId,LogId bigint;
+	  declare CreatorOperatorId,ReceiveOperatorId,LogId,LastMoveId,ProductionId,WorkshopId,WorkshopIdFrom bigint;
 	  declare CreatorCardNo,ReceiveCardNo,CreatorEmployeeId,TargetCardNo,ReceiveEmployeeId,WorkstationCode varchar(20);
 	  declare CreatorEmployeeName,ReceiveEmployeeName,WorkstationName varchar(50);
 	  declare BackQty,ShiftId int;
@@ -850,7 +778,7 @@ top:begin
 	 
 	  if ReqDataType <> 1 then
 			 set RespData=	'2|1|2';
-			 set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+			 set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
 			 set RespData = CONCAT(RespData,'|1|请接收人刷工卡确认|0');				    
 			 
 			 leave top;
@@ -866,7 +794,7 @@ top:begin
 	   		 
 	  if(CreatorOperatorId = ReceiveOperatorId) then
 			 set RespData=	'2|1|3';
-			 set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+			 set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
 			 set RespData = CONCAT(RespData,'|1|接收人和退还人|0');				    
 			 set RespData = CONCAT(RespData,'|2|不能是同一个人|0');				    
 			 
@@ -887,11 +815,17 @@ top:begin
 		select org_code,org_name into WorkstationCode,WorkstationName
 		   from work_organization_unit
 			 where record_id = WorkstationId;
+			 
+	  select record_id,production_id,workshop_id,workshop_id_from into LastMoveId,ProductionId,WorkshopId,WorkshopIdFrom
+	 	from production_moving m
+	 	 where m.rfid_no = TargetCardNo
+	 	  order by create_time desc 
+		  limit 1;			
 	  	 			
-		/**
-			 库存 = 移入数 + 报工数 - 移出数 
-		*/	 	 
-		call MES_GetWorkDayAndShiftId(ReqTime,TimeOfOriginWork,ShiftId);
+ 
+		call MES_GetWorkDayAndShiftId(ReqTime,TimeOfOriginWork,ShiftId);		
+		
+		-- 实现移库		
 		insert into production_moving(
 			production_order_id,production_order_no,production_id,production_code,production_name,
 			rfid_no,rfid_card_id,rfid_terminator_id,rfid_controller_group_id,qty,
@@ -908,23 +842,37 @@ top:begin
 			CreatorOperatorId,CreatorEmployeeId,CreatorEmployeeName,m.workshop_id,m.workshop_code,m.workshop_name, -- 移入移出部门倒过来
 			m.create_by_id,m.create_by_code,m.create_by_name,Now(),
 			m.update_by_id,m.update_by_code,m.update_by_name,m.update_time,m.opt_flag,m.record_id
-	 	from production_moving m
-	 	 where m.rfid_no = TargetCardNo
-	 	  order by create_time desc 
-		  limit 1;			
+     from production_moving 
+		 where record_id = LastMoveId;
 					
 		update rfid_card
 		  set stock_qty = BackQty,
 			    card_status = 2
-			where rfid_no = TargetCardNo;			
+			where rfid_no = TargetCardNo;		
+		
+		/**
+			 更新库存，移入部门增加，移出部门相减
+		*/
+   start transaction;			
+	 
+	 update material_stock
+	    set stock_qty = stock_qty + BackQty
+			where material_id = ProductionId
+			  and store_id = WorkshopId;
+				
+	 update material_stock
+	    set stock_qty = stock_qty - BackQty
+			where material_id = ProductionId
+			  and store_id = WorkshopIdFrom;
+				
+	 commit;
 	
 	 set RespData=	'2|1|2';
-	 set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+	 set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
 	 set RespData = CONCAT(RespData,'|1|已退还',BackQty,'个工件|0');				
    
 	 set Success = 0;
-end;
-
+end
 
 
 drop procedure MES_ProcessReturnWipBackToPrevProcedure_2;
@@ -945,7 +893,7 @@ top:begin
 	 
 	 if (ReqDataType <> 4) or (ReqData = '') then
 				set RespData=	'2|1|2';
-				set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+				set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
 				set RespData = CONCAT(RespData,'|1|请输入退还数量|0');				    
 				
 				leave top;
@@ -959,7 +907,7 @@ top:begin
 		
 	 if (BackQty > StockQty) then
 				set RespData=	'2|1|3';
-				set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+				set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
 				set RespData = CONCAT(RespData,'|1|退还数量必须|0');				    
 				set RespData = CONCAT(RespData,'|2|小于等于移库数量|0');				    
 				
@@ -967,7 +915,7 @@ top:begin
 	 end if;
 	 	 
    set RespData=	'2|1|2';
-	 set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+	 set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
 	 set RespData = CONCAT(RespData,'|1|请接收人刷工卡确认|0');				    	 
 	 
 	 set Success = 0;
@@ -1001,7 +949,7 @@ top:begin
 		
 		if(CardStatus<>20) then
 				set RespData=	'2|1|3';
-				set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+				set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
 				set RespData = CONCAT(RespData,'|1|只有移库了的卡|0');					   
 				set RespData = CONCAT(RespData,'|2|才可以退数.|0');					   
 				
@@ -1009,7 +957,7 @@ top:begin
 		end if;	
 		
 		set RespData=	'2|1|2';
-		set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+		set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
 		set RespData = CONCAT(RespData,'|1|请输入退还数量|0');			
 		
 		set Success = 0;
@@ -1023,7 +971,7 @@ create procedure MES_ProcessReturnWipBackToPrevProcedure_0(
 )
 begin
 		set RespData=	'2|1|2';
-		set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+		set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
 		set RespData = CONCAT(RespData,'|1|请刷看板|0');		
 		
 		set Success = 0;
@@ -1052,7 +1000,7 @@ begin
 	  elseif CurrentStep = 1 then --  刷看板
 		    call MES_ProcessIssuePlanToPrevProcedure_1(ReqDataType,CardId,Success,RespData);		
 		elseif CurrentStep = 2 then -- 输入数量
-        call MES_ProcessIssuePlanToPrevProcedure_1(SessionId,CurrentStep,ReqDataType,ReqData,Success,RespData);		
+        call MES_ProcessIssuePlanToPrevProcedure_2(SessionId,CurrentStep,ReqDataType,ReqData,Success,RespData);		
 		end if;
 		
 		if( Success = 0 ) then
@@ -1075,7 +1023,7 @@ create procedure MES_ProcessIssuePlanToPrevProcedure_0(
 )
 begin
 		set RespData=	'2|1|2';
-		set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+		set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
 		set RespData = CONCAT(RespData,'|1|请刷看板|0');		
 		
 		set Success = 0;   
@@ -1088,13 +1036,13 @@ create procedure MES_ProcessIssuePlanToPrevProcedure_1
 		in ReqDataType   int,	
 		in CardId        bigint,		
 		out Success      int,
-		out RespData     varchar(200)   
+		out RespData     varchar(200)
 )
 top:begin
     -- 1.校验数量卡
-		-- 2.提示输入退还数量
+		-- 2.提示派发数量
 		
-		declare CardStatus int default -1;
+		declare CardStatus,DefaultIssueQty int default -1;
 		select -1,'' into Success,RespData;		
 		
 		if(ReqDataType <> 2) then
@@ -1102,22 +1050,25 @@ top:begin
 		   leave top;
 		end if;
 		
-		select card_status into CardStatus
+		select card_status,issue_qty into CardStatus,DefaultIssueQty
 		  from rfid_card
 			where record_id = CardId;
 		
 		if(CardStatus<>20) then
 				set RespData=	'2|1|3';
-				set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+				set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
 				set RespData = CONCAT(RespData,'|1|只有移库了的看板|0');					   
 				set RespData = CONCAT(RespData,'|2|才需要派发.|0');					   
 				
 				leave top;
 		end if;	
 		
-		set RespData=	'2|1|2';
-		set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
-		set RespData = CONCAT(RespData,'|1|请输入派发数量|0');			
+		set RespData=	'2|1|5';
+		set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+    set RespData = CONCAT(RespData,'|1|按确定使用上次数量:|0');			
+    set RespData = CONCAT(RespData,'|2|',DefaultIssueQty,'|0');			
+		set RespData = CONCAT(RespData,'|3|如需自定义派发数量|0');			
+    set RespData = CONCAT(RespData,'|4|先按数字键，再按确定|0');			
 		
 		set Success = 0;
 end;
@@ -1125,53 +1076,67 @@ end;
 
 drop procedure MES_ProcessIssuePlanToPrevProcedure_2;
 create procedure MES_ProcessIssuePlanToPrevProcedure_2(
-    in SessionId     bigint,
+    in SessionId     bigint,    
 		in CurrentStep   int,				
 		in ReqDataType   int,
 		in ReqData       varchar(20),
 		out Success      int,
 		out RespData     varchar(200)
 )
-top:begin
-   --  校验数量，退还的数量不能大于移库的数量	 
+begin
 	 declare RfidNo varchar(20);
-	 declare IssueQty int;	 
+	 declare IssueQty int;
+   declare CardId,TheNewSessionId bigint;	 
+   declare CreateTime,LastProcessTime,ExpireTime datetime default Now();
 	 
 	 select -1,'' into Success,RespData;
 	 
-	 if (ReqDataType <> 4) or (ReqData = '') then
-				set RespData=	'2|1|2';
-				set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
-				set RespData = CONCAT(RespData,'|1|请输入派发数量|0');				    
-				
-				leave top;
-	 end if;
-	 
-	 set IssueQty = cast(ReqData as UNSIGNED);	
 	 select s.req_data into RfidNo
 	    from workstation_session_step s
 		  where s.workstation_session_id = SessionId
 			  and s.step = 1;
+
+   select record_id,issue_qty into CardId,IssueQty
+       from rfid_card
+        where rfid_no = RfidNo
+            order by create_time desc
+            limit 1;  
+
+	 if (ReqDataType = 4) and (ReqData <> '') then
+      set IssueQty = cast(ReqData as UNSIGNED);	
+	 end if; 
+	 
+	 select employee_card_no into RfidNo from workstation_session where record_id = SessionId;
 		
 	 update rfid_card
 	   set issue_qty = IssueQty,
+         card_status = 1,
 				 stock_qty = 0
-		 where rfid_no = RfidNo;
-	 	 
-   set RespData=	'2|1|2';
-	 set RespData = CONCAT(RespData, '|210|128|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
-	 set RespData = CONCAT(RespData,'|1|派发完成|0');				    	 
-	 
-	 set Success = 0;
+		 where record_id = CardId;
+
+   set ExpireTime = DATE_ADD(CreateTime,interval 1 minute);
+   insert into workstation_session(workstation_id,session_type,current_step,operator_id,employee_id,employee_name,employee_card_no,GID,DID,create_time,last_process_time,expire_time) 
+      select workstation_id,session_type,0,operator_id,employee_id,employee_name,employee_card_no,GID,DID,CreateTime,LastProcessTime,ExpireTime
+         from workstation_session ws
+        where record_id = SessionId;
+
+   set TheNewSessionId = LAST_INSERT_ID();
+   
+   insert into workstation_session_step(workstation_session_id,step,req_time,req_data_type,req_data,resp_data,resp_time)
+      values (TheNewSessionId,0,CreateTime,1,RfidNo,RespData,Now());      
+			
+   set RespData=	'2|1|4';
+	 set RespData = CONCAT(RespData, '|210|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+	 set RespData = CONCAT(RespData,'|1|已给',RfidNO,'|0');				    	 
+   set RespData = CONCAT(RespData,'|2|派发',IssueQty,'个.|0');				    	 
+   set RespData = CONCAT(RespData,'|3|继续请刷其他看板.|0');		
 end;
-
-
 
 drop procedure MES_ProcessSessionStep;
 create procedure MES_ProcessSessionStep(
     in   SessionId            bigint,       -- Session的Id
     in   SessionType          int,          
-    inout  PrevStep             int,          -- 前一步骤
+    inout  PrevStep           int,          -- 前一步骤
     in   WorkstationId        bigint,       -- 工位
     in   GID                  int,
     in   DID                  int,
@@ -1219,7 +1184,7 @@ top:begin
         call MES_ProcessReturnWipBackToPrevProcedure(SessionId,PrevStep,WorkstationId,GID,DID,ReqDataType,ReqData,CardId,ReqTime,RespData);				
     elseif SessionType = 1 then -- 如果是"给前工程发卡"
        call MES_ProcessIssuePlanToPrevProcedure(SessionId,PrevStep,WorkstationId,GID,DID,ReqDataType,ReqData,CardId,ReqTime,RespData);
-			 call MES_Debug('MES_ProcessIssuePlanToPrevProcedure', LogId);
+			-- call MES_Debug('MES_ProcessIssuePlanToPrevProcedure', LogId);
     end if;  
 end;
 
