@@ -1,11 +1,10 @@
-drop procedure MES_DoMoveWipByQtyCard;
-create procedure MES_DoMoveWipByQtyCard(
+create procedure MES_DoMoveWip(
   /*
-    MES_DoMoveWipByQtyCard: 从上车间【移入】到本车间
+    MES_DoMoveWip: 从上车间【移入】到本车间，或者从本车间外发
   */
-  in    WorkstationId        bigint,      -- 移入工位
-  in    LastBusinessId       bigint,      -- 报工记录
-  in    CardId               bigint,      -- 工程内看板卡的Id
+  in    WorkstationId        bigint,      -- 发生工位(工程看板为【移入工位】，外发看板为【移出工位】)
+  in    LastBusinessId       bigint,      -- 报工记录: -1 表示是外发，其他表示工程内移库
+  in    CardId               bigint,      -- 看板卡的Id  
   in    ReqTime              datetime,    -- 发生时间
   out   MovedQty             int          -- 返回结果：移库数量
 )
@@ -15,17 +14,30 @@ begin
 	declare WorkstationCode,WorkshopCode,WorkshopCodeFrom,RfidNo,ProductionCode varchar(20);
 	declare WorkstationName,WorkshopName,WorkshopNameFrom,ProductionName varchar(50);
 	declare WorkshopId,ProductionId,WorkshopIdFrom bigint;	
-
-    -- 上次的报工记录相关信息
-    select rfid_no, stock_qty,production_id,production_code,production_name, workshop_id,workshop_code,workshop_name
-	   into RfidNo,MovedQty,ProductionId,ProductionCode,ProductionName,WorkshopIdForm,WorkshopCodeFrom,WorkshopNameFrom
-	from rfid_card where record_id = CardId;				
-	
-	-- 获取移入车间信息
-	select w.org_code,w.org_name,w.rfid_controller_id,w.rfid_terminator_id,w.wocg_code,w.parent_id,w.parent_code,w.parent_name 
-		into WorkstationCode,WorkstationName,CurGID,CurDID,WorkshopId,WorkshopCode,WorkshopName
-	from work_organization_unit w
-	where w.record_id = WorkstationId;
+    
+    if LastBusinessId = -1 then  
+		-- 移入车间
+		select rfid_no, stock_qty,production_id,production_code,production_name, workshop_id,workshop_code,workshop_name
+		        into RfidNo,MovedQty,ProductionId,ProductionCode,ProductionName,WorkshopId,WorkshopCode,WorkshopName
+		from rfid_card where record_id = CardId;				
+		
+		-- 移出车间
+		select w.org_code,w.org_name,w.rfid_controller_id,w.rfid_terminator_id,w.wocg_code,w.parent_id,w.parent_code,w.parent_name 
+			   into WorkstationCode,WorkstationName,CurGID,CurDID,WorkshopIdForm,WorkshopCodeFrom,WorkshopNameFrom
+		from work_organization_unit w
+		where w.record_id = WorkstationId;
+	else
+		-- 移出车间
+		select rfid_no, stock_qty,production_id,production_code,production_name, workshop_id,workshop_code,workshop_name
+	   	       into RfidNo,MovedQty,ProductionId,ProductionCode,ProductionName,WorkshopIdForm,WorkshopCodeFrom,WorkshopNameFrom
+		from rfid_card where record_id = CardId;				
+		
+		-- 移入车间
+		select w.org_code,w.org_name,w.rfid_controller_id,w.rfid_terminator_id,w.wocg_code,w.parent_id,w.parent_code,w.parent_name 
+			   into WorkstationCode,WorkstationName,CurGID,CurDID,WorkshopId,WorkshopCode,WorkshopName
+		from work_organization_unit w
+		where w.record_id = WorkstationId;	    
+	end if;
 
 	-- 计算工作日与白晚班
     call MES_GetWorkDayAndShiftId(ReqTime,TimeOfOriginWork,ShiftId);

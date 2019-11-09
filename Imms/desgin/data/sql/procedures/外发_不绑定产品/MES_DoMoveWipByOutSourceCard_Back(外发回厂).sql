@@ -24,7 +24,8 @@ begin
 	where record_id = CardId;	
     
     call MES_GetWorkDayAndShiftId(ReqTime,TimeOfOriginWork,ShiftId);
-
+    
+	
 	
 				 
 	insert into production_moving(

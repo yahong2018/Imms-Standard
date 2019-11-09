@@ -10,7 +10,7 @@ create procedure MES_DoReportWip_0(
 begin  
   declare StockQty,IssueQty,ShiftId,PrevOperationIndex,CurGID,CurGID int;
   declare TimeOfOriginWork datetime;
-  declare WorkshopId,ProductionId,PrevMaterialId bigint;
+  declare WorkshopId,ProductionId,PrevMaterialId,LastBusinessId bigint;
   declare WorkshopCode,ProductionCode,WorkstationCode,WocgCode,RfidNo varchar(20);
   declare WorkshopName,ProductionName,WorkstationName varchar(50);
 	    
@@ -48,6 +48,7 @@ begin
       null,null,null,null,0,
       ReqTime,TimeOfOriginWork,ShiftId,ReportQty,IssueQty
   );
+  set LastBusinessId = LAST_INSERT_ID();
 
   -- 调整完成品库存
   update material_stock
@@ -72,7 +73,8 @@ begin
   -- 更新状态和卡的库存数量
   update rfid_card
     set card_status = 10  -- 0. 未使用   1. 已派发     10. 已报工   20. 已移库收货 
-       ,stock_qty = IssueQty 
+       ,stock_qty = IssueQty  
+       ,last_business_id = LastBusinessId
   where record_id = CardId;
     
 end
