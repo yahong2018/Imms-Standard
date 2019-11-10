@@ -8,8 +8,20 @@ create procedure MES_DoMoveWip
   out   RespData             varchar(200)  
 )
 begin
-    declare WorkshopType,MovedQty int;
+    declare WorkshopType,MovedQty,OpIndex,PreOpIndex int;
     declare BindRecordId,LastBusinessId bigint;
+
+    select workshop_type,operation_index into WorkshopType,OpIndex
+      from work_organization_unit
+     where record_id =(
+         select parent_id from work_organization_unit where record_id = WorkstaitonId
+    );
+
+    select prev_operation_index,last_business_id into  PreOpIndex,LastBusinessId
+      from work_organization_unit
+    where record_id = (
+      select workshop_id from rfid_card where record_Id = CardId
+    );
 
     if CardStatus <> 10 then
         set RespData=	'2|1|3';
@@ -20,15 +32,13 @@ begin
         leave top;
     end if;
     
-    if CardType = 3 then  
+    if (CardType = 3) and (WorkshopType = 3) then  
+        
+        
         -- 外发移库
         call MES_DoMoveWip(WorkstaitonId,-1,CardId,ReqTime,MovedQty);
     else  
          -- 工程内
-        select last_business_id into LastBusinessId 
-          from rfid_card
-        where record_id = CardId;
-
         if(ifnull(LastBusinessId,-1) = -1) then
             set RespData=	'2|1|3';
             set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150'); 
