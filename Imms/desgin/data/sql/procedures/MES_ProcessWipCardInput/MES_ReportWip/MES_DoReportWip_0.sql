@@ -5,12 +5,13 @@ create procedure MES_DoReportWip_0(
   in    WorkstaitonId        int,              -- 报工工位
   in    CardId               int,              -- RFID
   in    ReqTime              datetime,         -- 报工时间
-  out   ReportQty            int               -- 结果：报工数量
+  out   ReportQty            int,              -- 结果：报工数量
+  out   LastBusinessId       bigint
 )
 begin  
   declare StockQty,IssueQty,ShiftId,PrevOperationIndex,CurGID,CurGID int;
   declare TimeOfOriginWork datetime;
-  declare WorkshopId,ProductionId,PrevMaterialId,LastBusinessId bigint;
+  declare WorkshopId,ProductionId,PrevMaterialId bigint;
   declare WorkshopCode,ProductionCode,WorkstationCode,WocgCode,RfidNo varchar(20);
   declare WorkshopName,ProductionName,WorkstationName varchar(50);
 	    
@@ -72,7 +73,7 @@ begin
   
   -- 更新状态和卡的库存数量
   update rfid_card
-    set card_status = 10  -- 0. 未使用   1. 已派发     10. 已报工   20. 已移库收货 
+    set card_status = 10  -- 0. 未使用   1. 已派发  2.已退回  3.已绑定    10. 已报工   20. 已移库收货 
        ,stock_qty = IssueQty  
        ,last_business_id = LastBusinessId
   where record_id = CardId;

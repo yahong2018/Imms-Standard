@@ -1,6 +1,7 @@
-create procedure MES_DoMoveWip
+create procedure MES_MoveWip
 (
   in    WorkstaitonId        bigint,              -- 报工工位
+  in    WorkshopType         int,
   in    CardId               bigint,              -- RFID  
   in    CardType             int,
   in    CardStatus           int,
@@ -8,35 +9,16 @@ create procedure MES_DoMoveWip
   out   RespData             varchar(200)  
 )
 begin
-    declare WorkshopType,MovedQty,OpIndex,PreOpIndex int;
+    declare MovedQty int;
     declare BindRecordId,LastBusinessId bigint;
-
-    select workshop_type,operation_index into WorkshopType,OpIndex
-      from work_organization_unit
-     where record_id =(
-         select parent_id from work_organization_unit where record_id = WorkstaitonId
-    );
-
-    select prev_operation_index,last_business_id into  PreOpIndex,LastBusinessId
-      from work_organization_unit
-    where record_id = (
-      select workshop_id from rfid_card where record_Id = CardId
-    );
-
-    if CardStatus <> 10 then
-        set RespData=	'2|1|3';
-        set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150'); 
-        set RespData = CONCAT(RespData,'|1|只有报工的看板|0');            
-        set RespData = CONCAT(RespData,'|2|才可以移库|0');            
-
-        leave top;
-    end if;
-    
-    if (CardType = 3) and (WorkshopType = 3) then  
+   
+    select c.last_business_id into LastBusinessId
+      from rfid_card c
+    where c.record_Id = CardId;
         
-        
-        -- 外发移库
-        call MES_DoMoveWip(WorkstaitonId,-1,CardId,ReqTime,MovedQty);
+    if (CardType = 3) and (WorkshopType = 3) then   -- 外发移库
+        set LastBusinessId = -1;
+        call MES_DoMoveWip_0(WorkstaitonId,CardId,ReqTime,MovedQty,LastBusinessId);
     else  
          -- 工程内
         if(ifnull(LastBusinessId,-1) = -1) then
@@ -48,7 +30,7 @@ begin
             leave top;
         end if;
 
-        call MES_DoMoveWip(WorkstationId,LastBusinessId,CardId,ReqTime,MovedQty);        
+        call MES_DoMoveWip_0(WorkstationId,CardId,ReqTime,MovedQty,LastBusinessId);        
     end if;
 
     if (CardType = 3) then    

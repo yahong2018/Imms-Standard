@@ -79,7 +79,7 @@ create table work_organization_unit
 
     operation_index        int                         not null default 0,   -- 对于车间来说，工序编号必须唯一
     prev_operation_index   int                         not null default 0,    
-    workshop_type          int                         not null default 0,   -- 车间类型: 0. 内部车间   3.外发前工程车间   4.外发车间   5.外发后工程车间
+    workshop_type          int                         not null default 0,   -- 车间类型: 1. 内部车间   3.外发前工程车间   4.外发车间   5.外发后工程车间
     
     rfid_controller_id     int                         not null default 0,
     rfid_terminator_id     int                         not null default 0,
@@ -209,8 +209,8 @@ create table material_stock
 
     qty_stock               int                         not null,  -- 在库
     qty_move_in             int                         not null,  -- 转入（半成品） *
-    qty_return_in           int                         not null,  -- 退回（从下部门退回到本部门）
-    qty_return_out          int                         not null,  -- 退出（从本部门退回到上部门）
+    qty_back_in             int                         not null,  -- 退回（从下部门退回到本部门）
+    qty_back_out            int                         not null,  -- 退出（从本部门退回到上部门）
     qty_consume_good        int                         not null,  -- 良品消耗
     qty_consume_defect      int                         not null,  -- 不良消耗
     qty_good                int                         not null,  -- 良品数
@@ -243,7 +243,7 @@ create table rfid_card
     kanban_no              varchar(20)                 not null,        
     rfid_no                varchar(20)                 not null,
     card_type              int                         not null,       --  卡类别: 1.员工卡     2.数量卡    3.委外加工卡
-    card_status            int                         not null,       --  0. 未使用   1. 已派发(已绑定)   2.已退回     10. 已报工   20. 已移库收货(已外发)   30.已回厂     255.已作废
+    card_status            int                         not null,       --  0. 未使用   1. 已派发   2.已退回   3.已绑定   10. 已报工   20. 已移库收货(已外发)   30.已回厂     255.已作废
 
     production_id          bigint                      not null,       -- （工艺数量卡）所代表的产品
     production_code        varchar(20)                 not null,
@@ -593,7 +593,7 @@ create table outsource_workstation_bind
     attach_time             datetime                      not null,       -- 绑定时间
     out_time                datetime                      null,           -- 外发时间
     back_time               datetime                      null,           -- 回厂时间
-    bind_status             int                           not null,       -- 1.已绑定   10.已经有绑定的卡报工  20.已外发    30.已回厂
+    bind_status             int                           not null,       -- 3.已绑定   10.已经有绑定的卡报工  20.已外发    30.已回厂
 
     primary key(record_id)
 );
