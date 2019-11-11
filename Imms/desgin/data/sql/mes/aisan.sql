@@ -1,4 +1,3 @@
-
 drop table system_parameter;
 drop table system_logs;
 drop view v_rfid_controller;
