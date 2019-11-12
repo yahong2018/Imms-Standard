@@ -8,8 +8,10 @@ create procedure MES_VerifyCard
 begin
     declare LogId bigint;
 		
-    select -1,-1,'' into CardType,CardId,RespMessage;		
-    call MES_GetCardType(RfidNo,CardType,CardId);		
+    select -1,-1,'' into CardType,CardId,RespMessage;	
+
+    call MES_Debug('MES_GetCardType',LogId);	
+    call MES_GetCardType(RfidNo,CardType,CardId);
 		   
     if not CardType in(1,2,3) then
 	    set RespMessage=	'2|1|4';

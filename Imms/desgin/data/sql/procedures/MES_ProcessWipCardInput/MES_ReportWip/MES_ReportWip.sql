@@ -1,5 +1,5 @@
 create procedure MES_ReportWip(
-  in    WorkstaitonId        bigint,              -- 报工工位
+  in    WorkstationId        bigint,              -- 报工工位
   in    WorkshopType         int,  
   in    CardId               bigint,              -- RFID  
   in    CardType             int,
@@ -9,12 +9,13 @@ create procedure MES_ReportWip(
 )
 top:begin
     declare ReportQty int;
-    declare BindId,OutSourceCardProductionId,QtyCardProductionId,LastBusinessId  bigint;    
+    declare BindId,OutSourceCardProductionId,QtyCardProductionId,LastBusinessId,LogId  bigint;    
     declare QtyCardProductionCode varchar(20);
     
     set RespData = '';   
 
-    if WorkshopType in (1,5) then  -- 工程内车间、外发后工程车间  
+    if WorkshopType in (1,5) then  -- 工程内车间、外发后工程车间 
+        call MES_Debug('MES_ReportWip:工程内车间、外发后工程车间 ',LogId);  
         call MES_ReportWip_0(WorkstationId,CardId,ReqTime,ReportQty,LastBusinessId);        
     elseif(WorkshoType = 3) then   -- 外发前工程车间的工程内看板报工
         select production_id,production_code into QtyCardProductionId,QtyCardProductionCode
@@ -37,15 +38,17 @@ top:begin
             leave top;
         end if;
 
-        -- 进行报工                
+        -- 进行报工 
+        call MES_Debug('MES_ReportWip_1:外发前工程车间的工程内看板报工 ',LogId);                 
         call MES_ReportWip_1(WorkstationId,BindId,CardId,ReqTime,ReportQty,LastBusinessId);   
     end if;
 
     if(WorkshopType = 5) then -- 外发回厂
-         /*   1.  进行报工 已经执行了
+         /*  1.  进行报工 已经执行了
              2.  进行移库    
              3.  修改工位绑定状态
         */
+        call MES_Debug('MES_MoveWip_0:外发回厂 ',LogId);                 
         call MES_MoveWip_0(WorkstationId,WorkshopType,CardId,ReqTime,ReportQty,LastBusinessId);  -- 移库
         
         update outsource_workstation_bind

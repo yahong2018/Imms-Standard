@@ -199,6 +199,7 @@ create table bom
 create table material_stock
 (
     record_id               bigint    auto_increment    not null,
+    material_id             bigint                      not null,
     material_code           varchar(20)                 not null,
     material_name           varchar(50)                 not null,
 

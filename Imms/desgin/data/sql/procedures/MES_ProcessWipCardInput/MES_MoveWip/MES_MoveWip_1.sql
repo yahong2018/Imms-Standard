@@ -3,7 +3,7 @@ create procedure MES_MoveWip_1(
     in RfidNo                    varchar(20),
     in CurDID                    int,
     in CurGID                    int,
-    in MoveQty                   int,
+    in MovedQty                  int,
     
     in ProductionId              bigint,
     in ProductionCode            varchar(20),
@@ -70,11 +70,12 @@ begin
 	-- 修改卡工程内看板的状态    
 	update rfid_card c
 	   set c.card_status = MoveType,
-           c.last_buinsess_id = LastBusinessId
+           c.last_business_id = LastBusinessId,
+           c.stock_qty = MovedQty
 	where c.record_id = CardId;
 	
 	-- 调整车间在制品库存
-    if MoveType = 2 then
+    if MoveType = 20 then
         update material_stock s
             set s.qty_stock = s.qty_stock + MovedQty,	    -- 库存
                 s.qty_move_in = s.qty_move_in + MovedQty,	-- 从上部门转入	
@@ -94,7 +95,7 @@ begin
                 s.update_by_name='数据采集平台'						 
         where s.material_id = ProductionId
         and s.store_id = WorkshopIdFrom;   -- 转出
-    elseif(MoveType = 20)  then
+    elseif(MoveType = 2)  then
         update material_stock s
             set s.qty_stock = s.qty_stock + MovedQty,	    -- 库存
                 s.qty_back_in = s.qty_back_in + MovedQty,	-- 从下部门退回本部门	

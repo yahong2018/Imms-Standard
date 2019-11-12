@@ -5,8 +5,6 @@ create procedure MES_BackWipToPrev_3
 	in ReqDataType   int,
 	in ReqData       varchar(20),
 	in CardId        bigint,
-	in CurGID        int,
-	in CurDID        int,
 	in WorkstationId bigint,
 	in ReqTime       datetime,
 	out Success      int,
@@ -18,11 +16,11 @@ top:begin
 	-- 2. 接收人和退还人不能是同一个人 
 	declare CreatorOperatorId,ReceiveOperatorId,LogId,LastBusinessId,ProductionId,WorkshopId,WorkshopIdFrom bigint;
     declare TargetQtyCardId bigint;
-	declare CreatorCardNo,ReceiveCardNo,CreatorEmployeeId,TargetCardNo,ReceiveEmployeeId,WorkstationCode varchar(20);
-	declare CreatorEmployeeName,ReceiveEmployeeName,WorkstationName varchar(50);
-	declare BackQty,ShiftId int;
+	declare CreatorCardNo,ReceiveCardNo,CreatorEmployeeId,TargetCardNo,ReceiveEmployeeId,WorkstationCode,WorkshopCode,WorkshopCodeFrom,ProductionCode varchar(20);
+	declare CreatorEmployeeName,ReceiveEmployeeName,WorkstationName,WorkshopName,WorkshopNameFrom,ProductionName varchar(50);
+	declare BackQty,ShiftId,CurGID,CurDID int;
 	declare TimeOfOriginWork datetime;
-	
+
 	select -1,'',ReqData into Success,RespData,ReceiveCardNo;
 	
 	if ReqDataType <> 1 then
@@ -60,23 +58,28 @@ top:begin
 	 where s.workstation_session_id = SessionId
 	   and s.step = 1;
 					
-	select org_code,org_name into WorkstationCode,WorkstationName
-		from work_organization_unit
+	select org_code,org_name,rfid_controller_id,rfid_terminator_id 
+	         into WorkstationCode,WorkstationName,CurGID,CurDID
+	  from work_organization_unit
 	where record_id = WorkstationId;
 			
-	select record_id,last_business_id,production_id,workshop_id,workshop_id_from 
-	   into TargetQtyCardId,LastBusinessId,ProductionId,WorkshopId,WorkshopIdFrom
+	select record_id,last_business_id,production_id,production_code,production_name,workshop_id,workshop_code,workshop_name
+	   into TargetQtyCardId,LastBusinessId,ProductionId,ProductionCode,ProductionName,WorkshopId,WorkshopCode,WorkshopName
  	from rfid_card c
     where c.rfid_no = TargetCardNo
 	  and c.card_status <> 255;
 
-	call MES_DoMoveWip_1(   TargetQtyCardId,TargetCardNo,CurDID,CurGID,BackQty,
+	select workshop_id,workshop_code,workshop_name into WorkshopIdFrom,WorkshopCodeFrom,WorkshopNameFrom
+	   from production_moving
+	where record_id = LastBusinessId;
+
+	call MES_MoveWip_1(     TargetQtyCardId,TargetCardNo,CurDID,CurGID,BackQty,
 							ProductionId,ProductionCode,ProductionName,
 							WorkstationId,WorkstationCode,WorkstationName,
 							WorkshopId,WorkshopCode,WorkshopName,
 							WorkshopIdFrom,WorkshopCodeFrom,WorkshopNameFrom,
 							ReceiveOperatorId,ReceiveEmployeeId,ReceiveEmployeeName,
-							OutOperatorId,OutEmployeeId,OutEmployeeName,								
+							CreatorOperatorId,CreatorEmployeeId,CreatorEmployeeName,								
 							ReqTime,
 							2, -- 从下部门退回上部门
 							LastBusinessId

@@ -12,11 +12,17 @@ top:begin
     declare LogId,SessionId  bigint;
 
     select -1,-1,'' into SessionId,Step,RespData;	
+
+    call MES_Debug('MES_GetWorkstationSession',LogId);	
     call MES_GetWorkstationSession(WorkstationId,SessionId,PrevStep,SessionType);	
+
+    call MES_Debug('MES_CreateNewSession',LogId);	
     if (SessionId = -1) and ReqDataType in(1,2,3) then    
         call MES_CreateNewSession(WorkstationId,ReqDataType,ReqData,CardId,ReqTime,SessionId);			
         set PrevStep = -1;    
-    end if;    
+    end if; 
+
+    call MES_Debug('MES_ProcessSessionStep',LogId);	
     if (SessionId <> -1) then
       call MES_ProcessSessionStep(SessionId,SessionType,WorkstationId,ReqDataType,ReqData,CardId,ReqTime,PrevStep,RespData); 				
         

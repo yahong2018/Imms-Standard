@@ -3,8 +3,6 @@ create procedure MES_BackWipToPrev
 	in SessionId     bigint,
 	in CurrentStep   int,
 	in WorkstationId bigint,
-	in GID           int,
-	in DID           int,
 	in ReqDataType   int,
 	in ReqData       varchar(20),
 	in CardId        bigint,
@@ -12,7 +10,7 @@ create procedure MES_BackWipToPrev
 	out RespData     varchar(200)
 )
 top:begin
-    declare Success int;
+    declare Success,GID,DID int;
     select -1,'' into Success,RespData;		
 		
     if (CurrentStep = 0) then  
@@ -22,7 +20,7 @@ top:begin
 	elseif CurrentStep = 2 then -- 保存退还数量
         call MES_BackWipToPrev_2(SessionId,CurrentStep,ReqDataType,ReqData,Success,RespData);
 	elseif CurrentStep = 3 then -- 保存接收人工卡
-		call MES_BackWipToPrev_3(SessionId,CurrentStep,ReqDataType,ReqData,CardId,GID,DID,WorkstationId,ReqTime,Success,RespData);
+		call MES_BackWipToPrev_3(SessionId,CurrentStep,ReqDataType,ReqData,CardId,WorkstationId,ReqTime,Success,RespData);
 	end if;
 		
 	if( Success <> 0 ) then

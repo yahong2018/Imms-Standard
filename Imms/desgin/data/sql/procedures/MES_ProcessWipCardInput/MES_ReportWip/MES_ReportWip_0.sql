@@ -1,5 +1,5 @@
 create procedure MES_ReportWip_0(  
-  in    WorkstaitonId        int,              -- 报工工位
+  in    WorkstationId        int,              -- 报工工位
   in    CardId               int,              -- RFID
   in    ReqTime              datetime,         -- 报工时间
   out   ReportQty            int,              -- 结果：报工数量
@@ -8,7 +8,7 @@ create procedure MES_ReportWip_0(
 begin  
     declare StockQty,IssueQty,ShiftId,PrevOperationIndex,CurDID,CurGID int;
     declare TimeOfOriginWork datetime;
-    declare WorkshopId,ProductionId,PrevMaterialId bigint;
+    declare WorkshopId,ProductionId,PrevMaterialId,LogId bigint;
     declare WorkshopCode,ProductionCode,WorkstationCode,WocgCode,RfidNo varchar(20);
     declare WorkshopName,ProductionName,WorkstationName varchar(50);
         
@@ -17,7 +17,7 @@ begin
     select production_id,production_code,production_name,rfid_no,issue_qty,issue_qty - stock_qty
         into ProductionId,ProductionCode,ProductionName,RfidNo,IssueQty,ReportQty 
     from rfid_card 
-    where card_id = CardId;
+    where record_id = CardId;
 
     select wst.org_code,wst.org_name,wst.parent_id,wst.parent_code,wst.parent_name,wst.wocg_code,wst.rfid_controller_id,wst.rfid_terminator_id, wss.prev_operation_index
         into WorkstationCode,WorkstationName,WorkshopId,WorkshopCode,WorkshopName,WocgCode,CurGID,CurDID,PrevOperationIndex
@@ -59,7 +59,7 @@ begin
     if(PrevOperationIndex<>-1) then
         select prev_material_id  into PrevMaterialId 
           from material
-         where material_id = ProductionId;
+         where record_id = ProductionId;
 
         update material_stock
             set qty_stock = qty_stock - ReportQty,                  -- 转入【半成品】的库存

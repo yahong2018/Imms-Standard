@@ -12,7 +12,7 @@ top:begin
     select -1,'' into Success,RespData;		
     
     if(ReqDataType <> 2) then
-        call MES_ProcessReturnWipBackToPrevProcedure_0(Success,RespData);
+        call MES_BackWipToPrev_0(Success,RespData);
         leave top;
     end if;
     

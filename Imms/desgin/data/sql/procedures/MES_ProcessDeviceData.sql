@@ -20,13 +20,16 @@ top:begin
         call MES_SqlExceptionHandler(StrPara1,DataType,GID,DID,DataGatherTime,ErroCode,ErrorMsg,RespData);
     end;  
 
-    select '' into RespData;	
+    select '' into RespData;
+
+    call MES_Debug('MES_VerifyWorkstation',LogId);	
 
     call MES_VerifyWorkstation(GID,DID,WorkstationId,RespData);	
     if WorkstationId = -1 then     
         leave top;
     end if;
 
+    call MES_Debug('MES_VerifyCard',LogId);
     if(DataType = 1) then  -- 刷卡输入    
         call MES_VerifyCard(StrPara1,CardType,CardId,RespData);		
         if not (CardType in(0,1,2,3)) then		  
@@ -37,5 +40,6 @@ top:begin
         set ReqDataType = 4;   -- 键盘输入
     end if;
 
+    call MES_Debug('MES_ProcessSession',LogId);
     call MES_ProcessSession(WorkstationId,ReqDataType,StrPara1,CardId,DataGatherTime,RespData);
 end;
