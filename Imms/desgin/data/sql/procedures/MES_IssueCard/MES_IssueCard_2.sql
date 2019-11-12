@@ -17,11 +17,13 @@ begin
 	select s.req_data into RfidNo
 	  from workstation_session_step s
 	where s.workstation_session_id = SessionId
-	  and s.step = 1;
+	  and s.step = 1
+    order by record_id desc
+    limit 1;
 
     select record_id,issue_qty into CardId,IssueQty
       from rfid_card
-     where rfid_no = RfidNo
+    where rfid_no = RfidNo
        and card_status <> 255;
     
 	if (ReqDataType = 4) and (ReqData <> '') then
@@ -45,9 +47,10 @@ begin
     set TheNewSessionId = LAST_INSERT_ID();
    
     insert into workstation_session_step(workstation_session_id,step,req_time,req_data_type,req_data,resp_data,resp_time)
-      values (TheNewSessionId,0,CreateTime,1,RfidNo,RespData,Now());      
-			
-    set RespData=	'2|1|4';
+      values (TheNewSessionId,0,CreateTime,1,RfidNo,RespData,Now());   
+
+    set Success = 0;
+    set RespData= '2|1|4';
 	set RespData = CONCAT(RespData, '|210|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
 	set RespData = CONCAT(RespData,'|1|已给',RfidNo,'|0');				    	 
     set RespData = CONCAT(RespData,'|2|派发',IssueQty,'个.|0');				    	 

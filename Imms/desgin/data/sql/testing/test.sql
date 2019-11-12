@@ -570,7 +570,7 @@ select * from workstation_session_step;
         给前工程发卡
 *****************************************************************************************************/ 
 --
--- 1. 刷工卡，显示菜单： "1.工件退回   2.给前工程发看板" 
+-- -1. 刷工卡，显示菜单： "1.工件退回   2.给前工程发看板" 
 --
 truncate system_logs;
 set         
@@ -589,16 +589,55 @@ select * from workstation_session;
 select * from workstation_session_step;
  
 --
--- 2. 员工输入"2"，然后按确定，系统提示： "请刷看板" 
+-- 0. 员工输入"2"，然后按确定，系统提示： "请刷看板" 
 --
 truncate system_logs;
 set         
 		@GID=3, 
-		@DID=1,  -- 压铸	
+		@DID=8,  -- 压铸	
 		@DataType=3, --  键盘	
 		@DataGatherTime='2019/11/12 08:30:59',
 		@DataMakeTime='2019/11/12 08:31:02',
 		@StrPara1='2', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+select log_value from system_logs;
+select * from workstation_session;
+select * from workstation_session_step;
+
+ 
+--
+-- 1. 员工刷看板，系统提示： "请输入派发数量" 
+--
+truncate system_logs;
+set         
+		@GID=3, 
+		@DID=8,  -- 压铸	
+		@DataType=1, --  刷卡	
+		@DataGatherTime='2019/11/12 08:30:59',
+		@DataMakeTime='2019/11/12 08:31:02',
+		@StrPara1='YZ001', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+select log_value from system_logs;
+select * from workstation_session;
+select * from workstation_session_step;
+ 
+--
+-- 2. 员工输入数量（如果需要），按【确定】键，系统提示： "已派发xx个，继续请刷其他看板" 
+--
+truncate system_logs;
+set         
+		@GID=3, 
+		@DID=8,  -- 压铸	
+		@DataType=3, --  键盘	
+		@DataGatherTime='2019/11/12 08:30:59',
+		@DataMakeTime='2019/11/12 08:31:02',
+		@StrPara1='98', 
 		@Resp=''
 		;		
 call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);

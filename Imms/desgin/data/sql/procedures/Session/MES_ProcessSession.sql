@@ -22,7 +22,7 @@ top:begin
         set PrevStep = -1;    
     end if; 
 
-    call MES_Debug('MES_ProcessSessionStep',LogId);	
+    call MES_Debug(CONCAT('MES_ProcessSessionStep--> WorkstationId:',WorkstationId,',SessionId:',SessionId,',PrevStep:',PrevStep,',ReqDataType:',ReqDataType,',ReqData:',ReqData),LogId);	
     if (SessionId <> -1) then
       call MES_ProcessSessionStep(SessionId,SessionType,WorkstationId,ReqDataType,ReqData,CardId,ReqTime,PrevStep,RespData); 				
         

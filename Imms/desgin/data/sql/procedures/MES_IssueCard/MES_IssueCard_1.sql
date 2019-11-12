@@ -12,19 +12,20 @@ top:begin
     select -1,'' into Success,RespData;		
     
     if(ReqDataType <> 2) then
-        call MES_ProcessIssuePlanToPrevProcedure_0(Success,RespData);
+        call MES_IssueCard_0(Success,RespData);
         leave top;
     end if;
     
     select card_status,issue_qty into CardStatus,DefaultIssueQty
         from rfid_card
-        where record_id = CardId;
+    where record_id = CardId;
     
-    if(CardStatus<>20) then
-        set RespData=	'2|1|3';
+    if (not(CardStatus in(0,20))) then
+        set RespData=	'2|1|4';
         set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
-        set RespData = CONCAT(RespData,'|1|只有移库了的看板|0');					   
-        set RespData = CONCAT(RespData,'|2|才需要派发.|0');					   
+        set RespData = CONCAT(RespData,'|1|没有派发过的看板|0');					   
+        set RespData = CONCAT(RespData,'|2|和已经移库的看板|0');					   
+        set RespData = CONCAT(RespData,'|3|才可以派发.|0');					   
         
         leave top;
     end if;	
