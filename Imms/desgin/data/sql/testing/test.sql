@@ -649,26 +649,117 @@ select * from workstation_session_step;
 /****************************************************************************************************
         E/V 前工程 绑定外发卡 
 *****************************************************************************************************/ 
+truncate system_logs;
+-- truncate workstation_session;
+-- truncate workstation_session_step;
 
+set         
+		@GID=11, -- E/V前工程
+		@DID=1,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime='2019/11/13 08:30:59',
+		@DataMakeTime='2019/11/13 08:31:02',
+		@StrPara1='EV101',  -- 外发看板
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+select log_value from system_logs;
+select * from workstation_session;
+select * from workstation_session_step;
 
 
 /****************************************************************************************************
         E/V 前工程 报工
 *****************************************************************************************************/ 
+truncate system_logs;
+set         
+		@GID=11, -- E/V前工程
+		@DID=1,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime='2019/11/13 08:30:59',
+		@DataMakeTime='2019/11/13 08:31:02',
+		@StrPara1='EV001', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+select log_value from system_logs;
+select * from workstation_session;
+select * from workstation_session_step;
 
+truncate system_logs;
+set         
+		@GID=11, -- E/V前工程
+		@DID=1,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime='2019/11/13 08:30:59',
+		@DataMakeTime='2019/11/13 08:31:02',
+		@StrPara1='EV002', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+select log_value from system_logs;
+select * from workstation_session;
+select * from workstation_session_step;
 
 /****************************************************************************************************
         E/V 外发
 *****************************************************************************************************/ 
-
+truncate system_logs;
+set         
+		@GID=11, -- E/V前工程
+		@DID=1,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime='2019/11/13 08:30:59',
+		@DataMakeTime='2019/11/13 08:31:02',
+		@StrPara1='EV101', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+select log_value from system_logs;
+select * from workstation_session;
+select * from workstation_session_step;
 
 /****************************************************************************************************
         E/V 回厂
 *****************************************************************************************************/ 
 
-
+truncate system_logs;
+set         
+		@GID=2, -- E/V后工程
+		@DID=1,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime='2019/11/13 08:30:59',
+		@DataMakeTime='2019/11/13 08:31:02',
+		@StrPara1='EV101', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+select log_value from system_logs;
+select * from workstation_session;
+select * from workstation_session_step;
 
 /****************************************************************************************************
         E/V 后工程报工
 *****************************************************************************************************/ 
+
+truncate system_logs;
+set         
+		@GID=2, -- E/V后工程
+		@DID=1,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime='2019/11/13 08:30:59',
+		@DataMakeTime='2019/11/13 08:31:02',
+		@StrPara1='EV201', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+select log_value from system_logs;
+select * from workstation_session;
+select * from workstation_session_step;
 

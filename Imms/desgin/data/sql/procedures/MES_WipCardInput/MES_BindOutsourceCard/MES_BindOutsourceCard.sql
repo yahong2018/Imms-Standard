@@ -16,9 +16,9 @@ begin
               outsource_card_no = CardNo,
               attach_time = Now()
         where record_id = BindRecordId;
-    else              
-        insert into outsource_workstation_bind(outsource_card_id,outsource_card_no,workstation_id,workstation_code,workstation_name,attach_time,bind_status)
-            select CardId,CardNo,WorkstationId,workstation_code,workstation_name,Now(),3
+    else
+        insert into outsource_workstation_bind(outsource_card_id,outsource_card_no,workstation_id,workstation_code,workstation_name,workshop_id,workshop_code,workshop_name,attach_time,bind_status)
+            select CardId,CardNo,WorkstationId,org_code,org_name,parent_id,parent_code,parent_name,Now(),3
               from work_organization_unit 
               where record_id = WorkstationId;                
                                                                         

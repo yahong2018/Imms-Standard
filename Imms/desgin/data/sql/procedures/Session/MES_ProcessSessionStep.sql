@@ -24,7 +24,7 @@ top:begin
 			call MES_DisplayMenu(RespData);			
 			leave top;
 		elseif (ReqDataType in (2,3)) then
-			call MES_Debug('MES_ProcessWipCardInput',LogId);	
+			call MES_Debug('MES_WipCardInput',LogId);	
 
 			update workstation_session  set current_step = 255 where record_id = SessionId; -- 这些Session只有一步      
 			call MES_WipCardInput(WorkstationId,ReqDataType,ReqData,CardId,ReqTime,RespData);   

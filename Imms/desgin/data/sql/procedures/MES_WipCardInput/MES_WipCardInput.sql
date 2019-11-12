@@ -89,7 +89,7 @@ top:begin
         end if;
 
         call MES_Debug('MES_BindOutsourceCard:外发绑卡',LogId);	
-        call MES_BindOutsourceCard(WorkstationId,CardId,CardNo,RespData);
+        call MES_BindOutsourceCard(WorkstationId,CardId,RfidNo,RespData);
     elseif(CardType = 3) and (CardStatus = 10) then  -- 外发移库
         if(WorkshopType <> 3) then
             set RespData=	'2|1|3';

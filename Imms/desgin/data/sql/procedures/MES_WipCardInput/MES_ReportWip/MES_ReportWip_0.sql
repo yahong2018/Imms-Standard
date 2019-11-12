@@ -6,7 +6,7 @@ create procedure MES_ReportWip_0(
   out   LastBusinessId       bigint
 )
 begin  
-    declare StockQty,IssueQty,ShiftId,PrevOperationIndex,CurDID,CurGID int;
+    declare StockQty,IssueQty,ShiftId,PrevOperationIndex,CurDID,CurGID,WorkshopType,CardType,TheNewCardStatus int;
     declare TimeOfOriginWork datetime;
     declare WorkshopId,ProductionId,PrevMaterialId,LogId bigint;
     declare WorkshopCode,ProductionCode,WorkstationCode,WocgCode,RfidNo varchar(20);
@@ -14,13 +14,14 @@ begin
         
     call MES_GetWorkDayAndShiftId(ReqTime,TimeOfOriginWork,ShiftId);
 
-    select production_id,production_code,production_name,rfid_no,issue_qty,issue_qty - stock_qty
-        into ProductionId,ProductionCode,ProductionName,RfidNo,IssueQty,ReportQty 
+    select production_id,production_code,production_name,rfid_no,issue_qty,issue_qty - stock_qty,card_type
+        into ProductionId,ProductionCode,ProductionName,RfidNo,IssueQty,ReportQty,CardType 
     from rfid_card 
     where record_id = CardId;
 
-    select wst.org_code,wst.org_name,wst.parent_id,wst.parent_code,wst.parent_name,wst.wocg_code,wst.rfid_controller_id,wst.rfid_terminator_id, wss.prev_operation_index
-        into WorkstationCode,WorkstationName,WorkshopId,WorkshopCode,WorkshopName,WocgCode,CurGID,CurDID,PrevOperationIndex
+    select wst.org_code,wst.org_name,wst.parent_id,wst.parent_code,wst.parent_name,wst.wocg_code,wst.rfid_controller_id,wst.rfid_terminator_id, 
+           wss.prev_operation_index,wss.workshop_type
+        into WorkstationCode,WorkstationName,WorkshopId,WorkshopCode,WorkshopName,WocgCode,CurGID,CurDID,PrevOperationIndex,WorkshopType
     from work_organization_unit wst join work_organization_unit wss on wst.parent_id = wss.record_id
     where wst.record_id = WorkstationId;
 
@@ -69,8 +70,13 @@ begin
     end if; 
 
     -- 更新状态和卡的库存数量
+    set TheNewCardStatus = 10;
+    if (WorkshopType = 5) and (CardType = 3) then
+       set TheNewCardStatus = 30;  -- 0. 未使用   1. 已派发  2.已退回  3.已绑定    10. 已报工   20. 已移库收货  30.已外发回厂
+    end if;    
+
     update rfid_card
-    set card_status = 10  -- 0. 未使用   1. 已派发  2.已退回  3.已绑定    10. 已报工   20. 已移库收货 
+    set card_status = TheNewCardStatus  
         ,stock_qty = IssueQty  
         ,last_business_id = LastBusinessId
     where record_id = CardId;
