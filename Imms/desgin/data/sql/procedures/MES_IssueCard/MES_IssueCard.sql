@@ -10,7 +10,7 @@ create procedure MES_IssueCard(
     in ReqTime       datetime,
     out RespData     varchar(200)
 )
-begin
+top:begin
     declare Success int;
     select -1,'' into Success,RespData;		
 		

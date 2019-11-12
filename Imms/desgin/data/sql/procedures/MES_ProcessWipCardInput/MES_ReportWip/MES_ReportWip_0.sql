@@ -1,7 +1,4 @@
-create procedure MES_DoReportWip_0(  
-  /*
-      MES_DoReportWip_0: 非外发前工程报工，除了E/V前工程外的车间进行生产报工，包括外发回厂的报工。
-  */
+create procedure MES_ReportWip_0(  
   in    WorkstaitonId        int,              -- 报工工位
   in    CardId               int,              -- RFID
   in    ReqTime              datetime,         -- 报工时间
@@ -9,7 +6,7 @@ create procedure MES_DoReportWip_0(
   out   LastBusinessId       bigint
 )
 begin  
-    declare StockQty,IssueQty,ShiftId,PrevOperationIndex,CurGID,CurGID int;
+    declare StockQty,IssueQty,ShiftId,PrevOperationIndex,CurDID,CurGID int;
     declare TimeOfOriginWork datetime;
     declare WorkshopId,ProductionId,PrevMaterialId bigint;
     declare WorkshopCode,ProductionCode,WorkstationCode,WocgCode,RfidNo varchar(20);
@@ -18,12 +15,12 @@ begin
     call MES_GetWorkDayAndShiftId(ReqTime,TimeOfOriginWork,ShiftId);
 
     select production_id,production_code,production_name,rfid_no,issue_qty,issue_qty - stock_qty
-        into ProductionId,ProducitonCode,ProductionName,RfidNo,IssueQty,ReportQty 
+        into ProductionId,ProductionCode,ProductionName,RfidNo,IssueQty,ReportQty 
     from rfid_card 
     where card_id = CardId;
 
     select wst.org_code,wst.org_name,wst.parent_id,wst.parent_code,wst.parent_name,wst.wocg_code,wst.rfid_controller_id,wst.rfid_terminator_id, wss.prev_operation_index
-        into WorkstatioinCode,WorkstationName,WorkshopId,WorkshopCode,WorkshopName,WocgCode,CurGID,CurDID,PrevOperationIndex
+        into WorkstationCode,WorkstationName,WorkshopId,WorkshopCode,WorkshopName,WocgCode,CurGID,CurDID,PrevOperationIndex
     from work_organization_unit wst join work_organization_unit wss on wst.parent_id = wss.record_id
     where wst.record_id = WorkstationId;
 

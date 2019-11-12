@@ -1,7 +1,7 @@
 create procedure  MES_GetCardType(
- in  CardNo     varchar(20),
- out CardType   int, 
- out CardId     bigint
+    in  CardNo     varchar(20),
+    out CardType   int, 
+    out CardId     bigint
 )
 begin
    select -1,-1 into CardType,CardId;
@@ -11,8 +11,8 @@ begin
       where rfid_no = CardNo;
 
    if(CardId = -1) then   -- 员工卡
-      select record_id,1 into CardId,CardType 
-         from  operator
-         where employee_card_no = CardNo;
+        select record_id,1 into CardId,CardType 
+          from  operator
+        where employee_card_no = CardNo;
    end if;           
 end;

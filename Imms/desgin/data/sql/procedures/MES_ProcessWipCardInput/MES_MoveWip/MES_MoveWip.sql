@@ -8,7 +8,7 @@ create procedure MES_MoveWip
   in    ReqTime              datetime,            -- 移库时间
   out   RespData             varchar(200)  
 )
-begin
+top:begin
     declare MovedQty int;
     declare BindRecordId,LastBusinessId bigint;
    
@@ -18,7 +18,7 @@ begin
         
     if (CardType = 3) and (WorkshopType = 3) then   -- 外发移库
         set LastBusinessId = -1;
-        call MES_DoMoveWip_0(WorkstaitonId,CardId,ReqTime,MovedQty,LastBusinessId);
+        call MES_MoveWip_0(WorkstaitonId,CardId,ReqTime,MovedQty,LastBusinessId);
     else  
          -- 工程内
         if(ifnull(LastBusinessId,-1) = -1) then
@@ -30,7 +30,7 @@ begin
             leave top;
         end if;
 
-        call MES_DoMoveWip_0(WorkstationId,CardId,ReqTime,MovedQty,LastBusinessId);        
+        call MES_MoveWip_0(WorkstationId,CardId,ReqTime,MovedQty,LastBusinessId);        
     end if;
 
     if (CardType = 3) then    

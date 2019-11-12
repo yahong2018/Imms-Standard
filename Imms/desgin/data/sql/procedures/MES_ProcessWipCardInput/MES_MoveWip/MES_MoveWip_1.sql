@@ -1,4 +1,4 @@
-create procedure MES_DoMoveWip_1(
+create procedure MES_MoveWip_1(
     in CardId                    bigint,
     in RfidNo                    varchar(20),
     in CurDID                    int,
@@ -33,7 +33,7 @@ create procedure MES_DoMoveWip_1(
 
     in MoveType                  int,   -- 2.退回    20. 转入
     
-    inout LastBusinessId         bigint,
+    inout LastBusinessId         bigint
 )
 begin
     declare TimeOfOriginWork datetime;
@@ -59,9 +59,9 @@ begin
 			ReceiveOperatorId,ReceiveEmployeeId,ReceiveEmployeeName,
             ReqTime,TimeOfOriginWork,ShiftId,
 			WorkstationId,WorkstationCode,WorkstationName,WorkshopId,WorkshopCode,WorkshopName,
-            OutOperatorId,OutEmployeeId,OutEmployeeName
-			WorkshopIdFrom,WorkshopCodeFrom,WorkshopNameFrom
-				1,'SYS','数据采集平台',Now(),			
+            OutOperatorId,OutEmployeeId,OutEmployeeName,
+			WorkshopIdFrom,WorkshopCodeFrom,WorkshopNameFrom,
+			1,'SYS','数据采集平台',Now(),			
 			null,null,null,null,0,LastBusinessId
 	);
 

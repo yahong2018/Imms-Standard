@@ -15,7 +15,7 @@ top:begin
     set RespData = '';   
 
     if WorkshopType in (1,5) then  -- 工程内车间、外发后工程车间  
-        call MES_DoReportWip_0(WorkstationId,CardId,ReqTime,ReportQty,LastBusinessId);        
+        call MES_ReportWip_0(WorkstationId,CardId,ReqTime,ReportQty,LastBusinessId);        
     elseif(WorkshoType = 3) then   -- 外发前工程车间的工程内看板报工
         select production_id,production_code into QtyCardProductionId,QtyCardProductionCode
            from rfid_card
@@ -38,7 +38,7 @@ top:begin
         end if;
 
         -- 进行报工                
-        call MES_DoReportWip_1(WorkstationId,BindId,CardId,ReqTime,ReportQty,LastBusinessId);   
+        call MES_ReportWip_1(WorkstationId,BindId,CardId,ReqTime,ReportQty,LastBusinessId);   
     end if;
 
     if(WorkshopType = 5) then -- 外发回厂
@@ -46,7 +46,7 @@ top:begin
              2.  进行移库    
              3.  修改工位绑定状态
         */
-        call MES_DoMoveWip_0(WorkstationId,WorkshopType,CardId,ReqTime,ReportQty,LastBusinessId);  -- 移库
+        call MES_MoveWip_0(WorkstationId,WorkshopType,CardId,ReqTime,ReportQty,LastBusinessId);  -- 移库
         
         update outsource_workstation_bind
           set bind_status = 30,

@@ -1,4 +1,4 @@
-create procedure MES_BackWipBackToPrev_0(
+create procedure MES_BackWipToPrev_0(
     out Success      int,
 	out RespData     varchar(200)
 )

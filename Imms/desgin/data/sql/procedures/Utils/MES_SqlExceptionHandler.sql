@@ -6,14 +6,14 @@ create procedure MES_SqlExceptionHandler(
     in GatherTime       datetime,   
     in ErrorCode        varchar(5),
     in ErrorMsg         varchar(500),
-    out RespMessage     varchar(500)
+    out RespMessage     varchar(200)
 )
 begin
     declare LogMessage varchar(4000);
     declare LogId bigint;
     set LogId = -1;    
 
-    set LogMessage = CONCAT('StrPara1:',StrPara1,'DataType:',DataType,',GID:',GID,',DID:',DID,',GatherTime:',GatherTime,'ErrorCode:',ErrorCode,',ErrorMessage:',ErrorMsg);
+    set LogMessage = CONCAT('StrPara1:',StrPara1,',DataType:',DataType,',GID:',GID,',DID:',DID,',GatherTime:',GatherTime,'ErrorCode:',ErrorCode,',ErrorMessage:',ErrorMsg);
     call MES_Debug(LogMessage,LogId);
 
     set RespMessage = '2|1|3';

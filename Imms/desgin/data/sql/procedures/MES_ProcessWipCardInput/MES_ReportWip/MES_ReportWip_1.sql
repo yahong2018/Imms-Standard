@@ -1,4 +1,4 @@
-create procedure MES_DoReportWip_1
+create procedure MES_ReportWip_1
 (
     /*
         MES_DoReportWip_1: 外发前工程报工，E/V前工程的车间进行生产报工。
@@ -15,7 +15,7 @@ begin
     declare OutSoruceCardNo,OutSourceCardNo,RfidNo varchar(20);
 
     -- 进行正常报工
-    call MES_DoReportWip_0(WorkstationId,CardId,ReqTime,ReportQty,LastBusinessId);
+    call MES_ReportWip_0(WorkstationId,CardId,ReqTime,ReportQty,LastBusinessId);
 
     -- 更新外发工位的绑定状态
     select record_id,outsource_card_id,outsource_card_no 

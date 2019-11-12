@@ -33,17 +33,3 @@
 */
 
 
-drop procedure MES_ProcessIssuePlanToPrevProcedure;
-
-
-drop procedure MES_ProcessIssuePlanToPrevProcedure_0;
-
-
-drop procedure MES_ProcessIssuePlanToPrevProcedure_1;
-
-
-drop procedure MES_ProcessIssuePlanToPrevProcedure_2;
-
-
-
-

@@ -1,4 +1,4 @@
-create procedure MES_BackWipBackToPrev_3
+create procedure MES_BackWipToPrev_3
 (    
 	in SessionId     bigint,
 	in CurrentStep   int,				

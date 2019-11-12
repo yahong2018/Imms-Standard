@@ -1,4 +1,4 @@
-create procedure MES_BackWipBackToPrev_1
+create procedure MES_BackWipToPrev_1
 (    
     in ReqDataType   int,	
     in CardId        bigint,		

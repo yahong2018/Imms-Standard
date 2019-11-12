@@ -1,4 +1,4 @@
-create procedure MES_CreateSessionTypeSelectMenu(  
+create procedure MES_DisplayMenu(  
   out    RespData              varchar(200)
 )
 begin

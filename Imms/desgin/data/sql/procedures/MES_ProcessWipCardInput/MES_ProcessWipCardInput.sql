@@ -7,7 +7,7 @@ create procedure MES_ProcessWipCardInput(
     out    RespData            varchar(200)
 )
 top:begin    
-    declare CardStatus,WorkshopType,WorkshopOpIndex,WorkshopPreIndex,CardOpIndex,CardPreIndex, int;
+    declare CardStatus,WorkshopType,WorkshopOpIndex,WorkshopPreIndex,CardOpIndex,CardPreOpIndex int;
     declare CardWorkshopId,WorkshopId bigint;
     declare CardWorkshopName varchar(50);
 
@@ -71,34 +71,43 @@ top:begin
    --     call return_back
     elseif(CardType = 3) and (CardStatus = 1) then  -- 外发绑卡
         if(WorkshopType <> 3) then
-                set RespData=	'2|1|3';
-                set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150'); 
-                set RespData = CONCAT(RespData,'|1|只有外发前工程车间|0');            
-                set RespData = CONCAT(RespData,'|2|才可以绑定外发看板|0');            
+            set RespData=	'2|1|3';
+            set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150'); 
+            set RespData = CONCAT(RespData,'|1|只有外发前工程车间|0');            
+            set RespData = CONCAT(RespData,'|2|才可以绑定外发看板|0');            
 
-                leave top;    
+            leave top;    
         end if;
 
-        call MES_DoBindOutsourceCard(WorkstationId,CardId,CardNo,RespData);
+        if(WorkshopOpIndex <> CardPreOpIndex) then        
+            set RespData=	'2|1|3';
+            set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150'); 
+            set RespData = CONCAT(RespData,'|1|该外发看板不能|0');            
+            set RespData = CONCAT(RespData,'|2|在本车间绑卡|0');            
+
+            leave top;              
+        end if;
+
+        call MES_BindOutsourceCard(WorkstationId,CardId,CardNo,RespData);
     elseif(CardType = 3) and (CardStatus = 10) then  -- 外发移库
         if(WorkshopType <> 3) then
-                set RespData=	'2|1|3';
-                set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150'); 
-                set RespData = CONCAT(RespData,'|1|只有外发前工程车间|0');            
-                set RespData = CONCAT(RespData,'|2|才可以外发|0');            
+            set RespData=	'2|1|3';
+            set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150'); 
+            set RespData = CONCAT(RespData,'|1|只有外发前工程车间|0');            
+            set RespData = CONCAT(RespData,'|2|才可以外发|0');            
 
-                leave top;           
+            leave top;           
         end if;
 
         if not exists(
             select * from outsource_workstation_bind where workstation_id = WorkstationId and outsource_card_id = CardId and bind_status = 10
         ) then 
-                set RespData=	'2|1|3';
-                set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150'); 
-                set RespData = CONCAT(RespData,'|1|必须在所绑定工位|0');            
-                set RespData = CONCAT(RespData,'|2|才可以打卡外发|0');            
+            set RespData=	'2|1|3';
+            set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150'); 
+            set RespData = CONCAT(RespData,'|1|必须在所绑定工位|0');            
+            set RespData = CONCAT(RespData,'|2|才可以打卡外发|0');            
 
-                leave top;                   
+            leave top;                   
         end if;        
 
         call MES_MoveWip(WorkstationId,WorkshopType,CardId,CardType,CardStatus,ReqTime,RespData);
@@ -112,5 +121,4 @@ top:begin
 
         call MES_ReportWip(WorkstationId,WorkshopType,CardId,CardType,CardStatus,ReqTime,RespData); 
     end if;
-
 end;

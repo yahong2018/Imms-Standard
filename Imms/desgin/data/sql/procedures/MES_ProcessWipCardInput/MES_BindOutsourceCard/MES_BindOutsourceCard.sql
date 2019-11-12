@@ -1,4 +1,4 @@
-create procedure MES_DoBindOutsourceCard
+create procedure MES_BindOutsourceCard
 (
   in      WorkstationId        bigint,  
   in      CardId               bigint,

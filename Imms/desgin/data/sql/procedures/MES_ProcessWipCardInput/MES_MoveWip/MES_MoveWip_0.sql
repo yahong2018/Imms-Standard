@@ -1,12 +1,9 @@
-create procedure MES_DoMoveWip_0(
-  /*
-    MES_DoMoveWip: 从上车间【移入】到本车间，或者从本车间外发
-  */
+create procedure MES_MoveWip_0(
   in    WorkstationId        bigint,      -- 发生工位(工程看板为【移入工位】，外发看板为【移出工位】)  
   in    CardId               bigint,      -- 看板卡的Id  
   in    ReqTime              datetime,    -- 发生时间
   out   MovedQty             int,          -- 返回结果：移库数量
-  inout LastBusinessId       bigint,      -- 报工记录: -1 表示是外发，其他表示工程内移库
+  inout LastBusinessId       bigint        -- 报工记录: -1 表示是外发，其他表示工程内移库
 )
 begin    
     declare CurGID,CurDID int;
@@ -22,13 +19,13 @@ begin
 		
 		-- 移出车间
 		select w.org_code,w.org_name,w.rfid_controller_id,w.rfid_terminator_id,w.wocg_code,w.parent_id,w.parent_code,w.parent_name 
-			   into WorkstationCode,WorkstationName,CurGID,CurDID,WorkshopIdForm,WorkshopCodeFrom,WorkshopNameFrom
+			   into WorkstationCode,WorkstationName,CurGID,CurDID,WorkshopIdFrom,WorkshopCodeFrom,WorkshopNameFrom
 		from work_organization_unit w
 		where w.record_id = WorkstationId;
 	else
 		-- 移出车间
 		select c.rfid_no, c.stock_qty,c.production_id,c.production_code,c.production_name, c.workshop_id,c.workshop_code,c.workshop_name
-	   	       into RfidNo,MovedQty,ProductionId,ProductionCode,ProductionName,WorkshopIdForm,WorkshopCodeFrom,WorkshopNameFrom
+	   	       into RfidNo,MovedQty,ProductionId,ProductionCode,ProductionName,WorkshopIdFrom,WorkshopCodeFrom,WorkshopNameFrom
 		from rfid_card c where c.record_id = CardId;				
 		
 		-- 移入车间
@@ -38,7 +35,7 @@ begin
 		where w.record_id = WorkstationId;	    
 	end if;
 
-	call MES_DoMoveWip_1(CardId,RfidNo,CurDID,CurGID,MovedQty,
+	call MES_MoveWip_1(CardId,RfidNo,CurDID,CurGID,MovedQty,
 	                     ProductionId,ProductionCode,ProductionName,
 						 WorkstationId,WorkstationCode,WorkstationName,
 						 WorkshopId,WorkshopCode,WorkshopName,
@@ -47,6 +44,6 @@ begin
 						 1,'SYS','数据采集平台',						 
 						 ReqTime,
 						 20, -- 从上部门移库到下部门
-						 LastBusinessId,
+						 LastBusinessId
 	);
 end;
