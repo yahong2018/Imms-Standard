@@ -1,4 +1,4 @@
-create procedure MES_ProcessWipCardInput(     
+create procedure MES_WipCardInput(     
     in     WorkstationId       bigint,
     in     CardType            int,           -- 1. 工卡    2. 工程内看板    3.外发看板   4.键盘输入
     in     RfidNo              varchar(20),

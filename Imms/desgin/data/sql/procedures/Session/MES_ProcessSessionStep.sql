@@ -27,7 +27,7 @@ top:begin
 			call MES_Debug('MES_ProcessWipCardInput',LogId);	
 
 			update workstation_session  set current_step = 255 where record_id = SessionId; -- 这些Session只有一步      
-			call MES_ProcessWipCardInput(WorkstationId,ReqDataType,ReqData,CardId,ReqTime,RespData);   
+			call MES_WipCardInput(WorkstationId,ReqDataType,ReqData,CardId,ReqTime,RespData);   
 			set PrevStep = 0;
 			
 			leave top;
