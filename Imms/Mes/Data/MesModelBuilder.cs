@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Imms.Mes.Data
 {
-    public  class MesModelBuilder:ICustomModelBuilder
+    public class MesModelBuilder : ICustomModelBuilder
     {
         public void BuildModel(ModelBuilder modelBuilder)
         {
@@ -17,7 +17,7 @@ namespace Imms.Mes.Data
 
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.EquipmentConfigure());
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.OperatorConfigure());
-            
+
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.MaterialTypeConfigure());
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.MaterialConfigure());
 
@@ -25,10 +25,10 @@ namespace Imms.Mes.Data
 
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.WorkOrganizationUnitConfigure());
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.WorkshopConfigure());
-            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.WorkstationConfigure());        
+            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.WorkstationConfigure());
 
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.RfidCardConfigure());
-            
+
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.ProductionOrderConfigure());
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.ProductionOrderProgressConfigure());
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.QualityCheckConfigure());
@@ -36,6 +36,7 @@ namespace Imms.Mes.Data
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.ProductionMovingConfigure());
 
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.ProductSummaryConfigure());
+            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.MaterialStockConfigure());
 
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.WorkstationLoginConfigure());
         }

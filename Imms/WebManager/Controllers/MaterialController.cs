@@ -56,6 +56,12 @@ namespace Imms.WebManager.Controllers
         }
     }
 
+
+    [Route("api/imms/material/materialStock")]
+    public class MaterialStockController:SimpleCRUDController<MaterialStock>{
+        public MaterialStockController()=>this.Logic = new SimpleCRUDLogic<MaterialStock>();
+    }
+
     public class MaterialSyncItem
     {
         public string MaterialCode { get; set; }

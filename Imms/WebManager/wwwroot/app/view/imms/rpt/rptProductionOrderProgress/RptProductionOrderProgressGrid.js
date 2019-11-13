@@ -1,7 +1,7 @@
 Ext.define("app.view.imms.rpt.rptProductionOrderProgress.RptProductionOrderProgressGrid", {
     extend: "app.ux.dbgrid.DbGrid",
     xtype: "app_view_imms_rpt_rptProductionOrderProgress_RptProductionOrderProgressGrid",
-    requires: ["app.model.imms.rpt.ManufacturingSummaryModel", "app.store.imms.rpt.ManufacturingSummaryStore"],
+    requires: ["app.model.imms.mfc.ProductSummaryModel", "app.store.imms.mfc.ProductSummaryStore"],
     columns: [
         { text: "品号", dataIndex: "productionCode", width: 120, align: "center", menuDisabled: true },
         // { text: "品名", dataIndex: "productionName", width: 220, align: "center", menuDisabled: true },
@@ -82,9 +82,9 @@ Ext.define("app.view.imms.rpt.rptProductionOrderProgress.RptProductionOrderProgr
     constructor: function (config) {
         var theStore;
         if (config.filter) {
-            theStore = Ext.create({ xtype: 'imms_rpt_ManufacturingSummaryStore', autoLoad: false, pageSize: 0 });            
+            theStore = Ext.create({ xtype: 'imms_mfc_ProductSummaryStore', autoLoad: false, pageSize: 0 });            
         } else {
-            theStore = Ext.create({ xtype: 'imms_rpt_ManufacturingSummaryStore' });
+            theStore = Ext.create({ xtype: 'imms_mfc_ProductSummaryStore' });
         }
         var configBase = { store: theStore };
         Ext.applyIf(config, configBase);
@@ -93,8 +93,6 @@ Ext.define("app.view.imms.rpt.rptProductionOrderProgress.RptProductionOrderProgr
     },
     listeners:{
         afterrender:function(){
-            debugger;
-
             if(this.filter){
                 this.store.clearCustomFilter();
                 this.store.addCustomFilter(this.filter());

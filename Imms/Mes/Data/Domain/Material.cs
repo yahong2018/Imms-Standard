@@ -25,8 +25,15 @@ namespace Imms.Mes.Data.Domain
         public string StoreCode { get; set; }
         public string StoreName { get; set; }
 
-        public int StockQty { get; set; }
-        public int BadQty { get; set; }
+        public int QtyStock { get; set; }
+        public int QtyMoveIn { get; set; }
+        public int QtyBackIn { get; set; }
+        public int QtyBackOut { get; set; }
+        public int QtyConsumeGood { get; set; }
+        public int QtyConsumeDefect { get; set; }
+        public int QtyGood { get; set; }
+        public int QtyDefect { get; set; }
+        public int QtyMoveOut { get; set; }
     }
 
     public class Bom : TrackableEntity<long>
@@ -81,8 +88,16 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.StoreId).HasColumnName("store_id");
             builder.Property(e => e.StoreCode).HasColumnName("store_code");
             builder.Property(e => e.StoreName).HasColumnName("store_name");
-            builder.Property(e => e.StockQty).HasColumnName("stock_qty");
-            builder.Property(e => e.BadQty).HasColumnName("bad_qty");
+
+            builder.Property(e => e.QtyStock).HasColumnName("qty_stock");
+            builder.Property(e => e.QtyMoveIn).HasColumnName("qty_move_in");
+            builder.Property(e => e.QtyBackIn).HasColumnName("qty_back_in");
+            builder.Property(e => e.QtyBackOut).HasColumnName("qty_back_out");
+            builder.Property(e => e.QtyConsumeGood).HasColumnName("qty_consume_good");
+            builder.Property(e => e.QtyConsumeDefect).HasColumnName("qty_consume_defect");
+            builder.Property(e => e.QtyGood).HasColumnName("qty_good");
+            builder.Property(e => e.QtyDefect).HasColumnName("qty_defect");
+            builder.Property(e => e.QtyMoveOut).HasColumnName("qty_move_out"); 
         }
     }
 
@@ -111,8 +126,8 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.MaterialQty).HasColumnName("material_qty");
             builder.Property(e => e.ComponentQty).HasColumnName("component_qty");
 
-            builder.Property(e=>e.ParentBomNo).HasColumnName("parent_bom_no");
-            builder.Property(e=>e.ParentBomId).HasColumnName("parent_bom_id");
+            builder.Property(e => e.ParentBomNo).HasColumnName("parent_bom_no");
+            builder.Property(e => e.ParentBomId).HasColumnName("parent_bom_id");
         }
     }
 }
