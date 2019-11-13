@@ -14,24 +14,16 @@ Ext.define("app.view.imms.mfc.rfidCard.RfidCardDetailForm", {
         { name: "productionId", xtype: "hidden" },
         { name: "workshopId", xtype: "hidden" },
         {
-            xtype: "container",
-            layout: "hbox",
-            margin: '0 0 3 ',
-            items: [
-                {
-                    name: "kanbanNo",
-                    xtype: "textfield",
-                    fieldLabel: "看板编号",
-                    allowBlank: false,
-                },
-                {
-                    name: "rfidNo",
-                    xtype: "textfield",
-                    fieldLabel: "RFID卡号",
-                    allowBlank: false,
-                    margin: '0 5 0 20',
-                },
-            ]
+            name: "kanbanNo",
+            xtype: "textfield",
+            fieldLabel: "看板编号",
+            allowBlank: false,
+        },
+        {
+            name: "rfidNo",
+            xtype: "textfield",
+            fieldLabel: "RFID卡号",
+            allowBlank: false,
         },
         {
             xtype: "container",
@@ -41,16 +33,34 @@ Ext.define("app.view.imms.mfc.rfidCard.RfidCardDetailForm", {
                 {
                     name: "cardType",
                     xtype: "textfield",
-                    fieldLabel: "类型",
+                    fieldLabel: "看板类型",
                     allowBlank: false,
                 },
                 {
+                    xtype: "label",
+                    text: "2.工程内看板  3.外发看板",
+                    flex: 0.8,
+                    margin: '8 0 5 5', 
+                }
+            ]
+        },
+        {
+            xtype: "container",
+            layout: "hbox",
+            margin: '0 0 3 ',
+            items: [
+                {
                     name: "cardStatus",
                     xtype: "textfield",
-                    fieldLabel: "状态",
+                    fieldLabel: "看板状态",
                     allowBlank: false,
-                    margin: '0 5 0 20',
                 },
+                {
+                    xtype: "label",
+                    text: "0.未使用 1.已派发 2.已退回 3.已绑定 20.已移库(外发) 30.已回厂 255.已作废",
+                    flex: 0.8,
+                    margin: '0 0 0 5', 
+                }
             ]
         },
         {
@@ -106,7 +116,7 @@ Ext.define("app.view.imms.mfc.rfidCard.RfidCardDetailForm", {
                 {
                     name: "stockQty",
                     xtype: "textfield",
-                    fieldLabel: "库存数量",
+                    fieldLabel: "完工数量",
                     allowBlank: false,
                     margin: '0 0 0 20',
                 }
