@@ -10,7 +10,7 @@ begin
   set TimeOfOriginWork = ReqTime;
 	set ShiftId = 0;
 	
-  if (ReqHour <= 8) and (ReqMinute<30) then
+  if (ReqHour < 8) or (ReqHour = 8 and ReqMinute < 30) then
     set TimeOfOriginWork = date_add(ReqTime, interval -1 day);    
     set ShiftId = 1;
   end if;

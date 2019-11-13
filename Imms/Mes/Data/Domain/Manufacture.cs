@@ -51,8 +51,8 @@ namespace Imms.Mes.Data.Domain
         public string ProductionName { get; set; }
 
         public DateTime TimeOfOrigin { get; set; }
-        public DateTime TimeOfOriginWork{get;set;}
-        public int ShiftId{get;set;}
+        public DateTime TimeOfOriginWork { get; set; }
+        public int ShiftId { get; set; }
 
         public int Qty { get; set; }
         public string RfidCardNo { get; set; }
@@ -69,6 +69,22 @@ namespace Imms.Mes.Data.Domain
         public virtual Workshop Workshop { get; set; }
         public virtual ProductionOrder ProductionOrder { get; set; }
     }
+
+    public class ProductSummary : Entity<long>
+    {
+        public DateTime ProductDate { get; set; }
+        public long WorkshopId { get; set; }
+        public string WorkshopCode { get; set; }
+        public string WorkshopName { get; set; }
+        public long ProductionId { get; set; }
+        public string ProductionCode { get; set; }
+        public string ProductionName { get; set; }
+        public int QtyGood_0 { get; set; }
+        public int QtyDefect_0 { get; set; }
+        public int QtyGood_1 { get; set; }
+        public int QtyDefect_1 { get; set; }
+    }
+
 
     public class Defect : Entity<long>
     {
@@ -94,8 +110,8 @@ namespace Imms.Mes.Data.Domain
         public string DefectName { get; set; }
 
         public DateTime TimeOfOrigin { get; set; }
-        public DateTime TimeOfOriginWork{get;set;}
-        public int ShiftId{get;set;}
+        public DateTime TimeOfOriginWork { get; set; }
+        public int ShiftId { get; set; }
 
         public int Qty { get; set; }
         public string WocgCode { get; set; }
@@ -198,9 +214,9 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.WorkshopCodeFrom).HasColumnName("workshop_code_from");
             builder.Property(e => e.WorkshopNameFrom).HasColumnName("workshop_name_from");
 
-            builder.Property(e=>e.OperatorIdFrom).HasColumnName("operator_id_from");
-            builder.Property(e=>e.EmployeeIdFrom).HasColumnName("employee_id_from");
-            builder.Property(e=>e.EmployeeNameFrom).HasColumnName("employee_name_from");
+            builder.Property(e => e.OperatorIdFrom).HasColumnName("operator_id_from");
+            builder.Property(e => e.EmployeeIdFrom).HasColumnName("employee_id_from");
+            builder.Property(e => e.EmployeeNameFrom).HasColumnName("employee_name_from");
 
             builder.Property(e => e.PrevProgressRecordId).HasColumnName("prev_progress_record_id");
 
@@ -240,8 +256,8 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.RfidControllerId).HasColumnName("rfid_controller_id");
 
             builder.Property(e => e.TimeOfOrigin).HasColumnName("time_of_origin");
-            builder.Property(e=>e.TimeOfOriginWork).HasColumnName("time_of_origin_work");
-            builder.Property(e=>e.ShiftId).HasColumnName("shift_id");
+            builder.Property(e => e.TimeOfOriginWork).HasColumnName("time_of_origin_work");
+            builder.Property(e => e.ShiftId).HasColumnName("shift_id");
 
             builder.Property(e => e.Qty).HasColumnName("qty");
             builder.Property(e => e.RfidCardNo).HasColumnName("rfid_card_no");
@@ -255,6 +271,32 @@ namespace Imms.Mes.Data.Domain
             builder.HasOne(e => e.Production).WithMany().HasForeignKey(e => e.ProductionId).HasConstraintName("production_id");
             builder.HasOne(e => e.Workstation).WithMany().HasForeignKey(e => e.WorkstationId).HasConstraintName("workstation_id");
             builder.HasOne(e => e.Workshop).WithMany().HasForeignKey(e => e.WorkshopId).HasConstraintName("workshop_id");
+        }
+    }
+
+    public class ProductSummaryConfigure : EntityConfigure<ProductSummary>
+    {
+        protected override void InternalConfigure(EntityTypeBuilder<ProductSummary> builder)
+        {
+            base.InternalConfigure(builder);
+            builder.ToTable("product_summary");
+            ImmsDbContext.RegisterEntityTable<ProductionOrder>("product_summary");
+
+            builder.Property(e => e.ProductDate).HasColumnName("product_date");
+
+            builder.Property(e => e.WorkshopId).HasColumnName("workshop_id");
+            builder.Property(e => e.WorkshopCode).HasColumnName("workshop_code");
+            builder.Property(e => e.WorkshopName).HasColumnName("workshop_name");
+
+            builder.Property(e => e.ProductionId).HasColumnName("production_id");
+            builder.Property(e => e.ProductionCode).HasColumnName("production_code");
+            builder.Property(e => e.ProductionName).HasColumnName("production_name");
+
+            builder.Property(e => e.QtyGood_0).HasColumnName("qty_good_0");
+            builder.Property(e => e.QtyDefect_0).HasColumnName("qty_defect_0");
+
+            builder.Property(e => e.QtyGood_1).HasColumnName("qty_good_1");
+            builder.Property(e => e.QtyDefect_1).HasColumnName("qty_defect_1");
         }
     }
 
@@ -295,8 +337,8 @@ namespace Imms.Mes.Data.Domain
             builder.ToTable("defect");
             ImmsDbContext.RegisterEntityTable<Defect>("defect");
 
-            builder.Property(e=>e.DefectCode).HasColumnName("defect_code");
-            builder.Property(e=>e.DefectName).HasColumnName("defect_name");
+            builder.Property(e => e.DefectCode).HasColumnName("defect_code");
+            builder.Property(e => e.DefectName).HasColumnName("defect_name");
 
         }
     }
@@ -317,8 +359,8 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.ProductionName).HasColumnName("production_name");
 
             builder.Property(e => e.TimeOfOrigin).HasColumnName("time_of_origin");
-            builder.Property(e=>e.TimeOfOriginWork).HasColumnName("time_of_origin_work");
-            builder.Property(e=>e.ShiftId).HasColumnName("shift_id");
+            builder.Property(e => e.TimeOfOriginWork).HasColumnName("time_of_origin_work");
+            builder.Property(e => e.ShiftId).HasColumnName("shift_id");
 
             builder.Property(e => e.WorkshopId).HasColumnName("workshop_id");
             builder.Property(e => e.WorkshopCode).HasColumnName("workshop_code");
@@ -328,7 +370,7 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.DefectCode).HasColumnName("defect_code");
             builder.Property(e => e.DefectName).HasColumnName("defect_name");
             builder.Property(e => e.Qty).HasColumnName("qty");
-            builder.Property(e=>e.WocgCode).HasColumnName("wocg_code");            
+            builder.Property(e => e.WocgCode).HasColumnName("wocg_code");
 
             builder.HasOne(e => e.ProductionOrder).WithMany(e => e.QualityChecks).HasForeignKey(e => e.ProductionOrderId).HasConstraintName("production_order_id");
             builder.HasOne(e => e.Production).WithMany().HasForeignKey(e => e.ProductionId).HasConstraintName("production_id");

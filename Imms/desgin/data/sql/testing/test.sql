@@ -26,8 +26,9 @@ truncate table work_organization_unit;
 truncate table operator;
 truncate table material;
 truncate table bom;
-truncate table material_stock;
 truncate table rfid_card;
+
+truncate table material_stock;
 truncate table production_order;
 truncate table product_summary;
 truncate table production_order_progress;
@@ -416,8 +417,8 @@ set
 		@GID=3, -- 压铸
 		@DID=1,	
 		@DataType=1, --  刷卡数据 				
-		@DataGatherTime='2019/11/12 08:30:59',
-		@DataMakeTime='2019/11/12 08:31:02',
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
 		@StrPara1='YZ001', 
 		@Resp=''
 		;		
@@ -435,8 +436,8 @@ set
 		@GID=3, 
 		@DID=8,  -- 粗加工	
 		@DataType=1, --  刷卡数据 				
-		@DataGatherTime='2019/11/12 08:30:59',
-		@DataMakeTime='2019/11/12 08:31:02',
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
 		@StrPara1='YZ001', 
 		@Resp=''
 		;		
@@ -457,8 +458,8 @@ set
 		@GID=3, 
 		@DID=1,  -- 压铸	
 		@DataType=1, --  刷工卡			
-		@DataGatherTime='2019/11/12 08:30:59',
-		@DataMakeTime='2019/11/12 08:31:02',
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
 		@StrPara1='GK002', 
 		@Resp=''
 		;		
@@ -477,8 +478,8 @@ set
 		@GID=3, 
 		@DID=1,  -- 压铸	
 		@DataType=3, --  键盘	
-		@DataGatherTime='2019/11/12 08:30:59',
-		@DataMakeTime='2019/11/12 08:31:02',
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
 		@StrPara1='1', 
 		@Resp=''
 		;		
@@ -496,8 +497,8 @@ set
 		@GID=3, 
 		@DID=1,  -- 压铸	
 		@DataType=1, --  刷卡
-		@DataGatherTime='2019/11/12 08:30:59',
-		@DataMakeTime='2019/11/12 08:31:02',
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
 		@StrPara1='YZ001', 
 		@Resp=''
 		;		
@@ -516,8 +517,8 @@ set
 		@GID=3, 
 		@DID=1,  -- 压铸	
 		@DataType=3, --  键盘
-		@DataGatherTime='2019/11/12 08:30:59',
-		@DataMakeTime='2019/11/12 08:31:02',
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
 		@StrPara1='50', 
 		@Resp=''
 		;		
@@ -535,8 +536,8 @@ set
 		@GID=3, 
 		@DID=1,  -- 压铸	
 		@DataType=1, --  刷卡
-		@DataGatherTime='2019/11/12 08:30:59',
-		@DataMakeTime='2019/11/12 08:31:02',
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
 		@StrPara1='GK001', 
 		@Resp=''
 		;		
@@ -554,8 +555,8 @@ set
 		@GID=3, -- 粗加工
 		@DID=8,	
 		@DataType=1, --  刷卡数据 				
-		@DataGatherTime='2019/11/12 08:30:59',
-		@DataMakeTime='2019/11/12 08:31:02',
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
 		@StrPara1='CJG01', 
 		@Resp=''
 		;		
@@ -577,8 +578,8 @@ set
 		@GID=3, 
 		@DID=8,  -- 压铸	
 		@DataType=1, --  刷工卡			
-		@DataGatherTime='2019/11/12 08:30:59',
-		@DataMakeTime='2019/11/12 08:31:02',
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
 		@StrPara1='GK002', 
 		@Resp=''
 		;		
@@ -596,8 +597,8 @@ set
 		@GID=3, 
 		@DID=8,  -- 压铸	
 		@DataType=3, --  键盘	
-		@DataGatherTime='2019/11/12 08:30:59',
-		@DataMakeTime='2019/11/12 08:31:02',
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
 		@StrPara1='2', 
 		@Resp=''
 		;		
@@ -616,8 +617,8 @@ set
 		@GID=3, 
 		@DID=8,  -- 压铸	
 		@DataType=1, --  刷卡	
-		@DataGatherTime='2019/11/12 08:30:59',
-		@DataMakeTime='2019/11/12 08:31:02',
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
 		@StrPara1='YZ001', 
 		@Resp=''
 		;		
@@ -635,8 +636,8 @@ set
 		@GID=3, 
 		@DID=8,  -- 压铸	
 		@DataType=3, --  键盘	
-		@DataGatherTime='2019/11/12 08:30:59',
-		@DataMakeTime='2019/11/12 08:31:02',
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
 		@StrPara1='98', 
 		@Resp=''
 		;		

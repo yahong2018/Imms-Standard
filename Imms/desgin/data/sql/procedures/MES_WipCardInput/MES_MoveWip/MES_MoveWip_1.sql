@@ -38,6 +38,7 @@ create procedure MES_MoveWip_1(
 begin
     declare TimeOfOriginWork datetime;
     declare ShiftId  int;
+    declare StockRecordId bigint;
 
     -- 计算工作日与白晚班
     call MES_GetWorkDayAndShiftId(ReqTime,TimeOfOriginWork,ShiftId);
@@ -73,6 +74,8 @@ begin
            c.last_business_id = LastBusinessId,
            c.stock_qty = MovedQty
 	where c.record_id = CardId;
+
+    call MES_AssureMaterialStock(ProductionId,ProductionCode,ProductionName,WorkshopId,WorkshopCode,WorkshopName,StockRecordId);
 	
 	-- 调整车间在制品库存
     if MoveType = 20 then
@@ -83,8 +86,7 @@ begin
                 s.update_by_id = 1,
                 s.update_by_code = 'SYS',
                 s.update_by_name='数据采集平台'					 
-        where s.material_id = ProductionId
-        and s.store_id = WorkshopId;    -- 转入
+        where record_id = StockRecordId;  -- 转入
             
         update material_stock s
             set s.qty_stock = s.qty_stock - MovedQty,        -- 库存
@@ -103,8 +105,7 @@ begin
                 s.update_by_id = 1,
                 s.update_by_code = 'SYS',
                 s.update_by_name='数据采集平台'					 
-        where s.material_id = ProductionId
-        and s.store_id = WorkshopId;    -- 转入
+        where record_id = StockRecordId; -- 转入
             
         update material_stock s
             set s.qty_stock = s.qty_stock - MovedQty,        -- 库存

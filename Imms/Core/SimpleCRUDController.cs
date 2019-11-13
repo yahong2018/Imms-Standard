@@ -14,8 +14,8 @@ namespace Imms
     public abstract class SimpleCRUDController<T> : Controller where T : class, IEntity
     {
         public SimpleCRUDLogic<T> Logic { get; set; }
-        public GetDataSourceDelegate<T> GetDataSourceHandler { get; protected set; }
-        public FilterDataSourceDelegate<T> FilterDataSourceHandler { get; protected set; }
+        public GetDataSourceDelegate<T> DataSourceGetHandler { get; protected set; }
+        public FilterDataSourceDelegate<T> DataSourceFilterHandler { get; protected set; }
 
         [Route("create"), HttpPost]
         public T Create(T item)
@@ -43,7 +43,7 @@ namespace Imms
             int page, start, limit;
             string filterStr;
             GetQueryParameters(out page, out start, out limit, out filterStr);
-            ExtJsResult result = Logic.GetAllWithExtResult(page, start, limit, filterStr, this.GetDataSourceHandler, this.FilterDataSourceHandler);
+            ExtJsResult result = Logic.GetAllWithExtResult(page, start, limit, filterStr, this.DataSourceGetHandler, this.DataSourceFilterHandler);
 
             return result;
         }

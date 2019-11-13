@@ -11,6 +11,8 @@ top:begin
     declare CardWorkshopId,WorkshopId,LogId bigint;
     declare CardWorkshopName varchar(50);
 
+    set RespData = '';
+
     select c.workshop_id,c.workshop_name,c.card_status,w.operation_index,w.prev_operation_index
          into CardWorkshopId,CardWorkshopName,CardStatus,CardOpIndex,CardPreOpIndex
       from rfid_card c join work_organization_unit w on c.workshop_id = w.record_id

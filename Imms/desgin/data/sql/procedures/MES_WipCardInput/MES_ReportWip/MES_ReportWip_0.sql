@@ -8,7 +8,7 @@ create procedure MES_ReportWip_0(
 begin  
     declare StockQty,IssueQty,ShiftId,PrevOperationIndex,CurDID,CurGID,WorkshopType,CardType,TheNewCardStatus int;
     declare TimeOfOriginWork datetime;
-    declare WorkshopId,ProductionId,PrevMaterialId,LogId bigint;
+    declare WorkshopId,ProductionId,PrevMaterialId,LogId,StockRecordId bigint;
     declare WorkshopCode,ProductionCode,WorkstationCode,WocgCode,RfidNo varchar(20);
     declare WorkshopName,ProductionName,WorkstationName varchar(50);
         
@@ -50,11 +50,12 @@ begin
     set LastBusinessId = LAST_INSERT_ID();
 
     -- 调整完成品库存
+    call MES_AssureMaterialStock(ProductionId,ProductionCode,ProductionName,WorkshopId,WorkshopCode,WorkshopName,StockRecordId);
+
     update material_stock
         set qty_stock = qty_stock + ReportQty,
             qty_good = qty_good + ReportQty
-    where material_id = ProductionId
-    and store_id = WorkshopId;
+    where record_id = StockRecordId;
 
     -- 调整投入半成品的库存
     if(PrevOperationIndex<>-1) then

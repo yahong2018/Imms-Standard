@@ -4,6 +4,8 @@ using System.Linq.Dynamic.Core;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+using System;
 
 namespace Imms.Data
 {
@@ -79,41 +81,41 @@ namespace Imms.Data
             GetDataSourceDelegate<T> getDataSource = getDataSourceHandler;
             if (getDataSource == null)
             {
-                getDataSource = this.GetDataSource;
+                getDataSource = this.DefaultDataSourceGetHandler;
             }
             FilterDataSourceDelegate<T> filter = filterHandler;
             if (filter == null)
             {
-                filter = this.FilterDataSource;
+                filter = this.DefaultDataSourceFilter;
             }
-            
+
             T result = null;
             CommonRepository.UseDbContext(dbContext =>
             {
                 IQueryable<T> dataSource = filter(getDataSource(dbContext), filterList);
-                result = dataSource.FirstOrDefault();               
+                result = dataSource.FirstOrDefault();
             });
             return result;
         }
 
 
-        public ExtJsResult GetAllWithExtResult(int page, int start, int limit, string filterStr, GetDataSourceDelegate<T> getDataSourceHandler = null, FilterDataSourceDelegate<T> filterHandler = null)
+        public ExtJsResult GetAllWithExtResult(int page, int start, int limit, string filterStr, GetDataSourceDelegate<T> dataSourceGetHandler = null, FilterDataSourceDelegate<T> filterHandler = null)
         {
             FilterExpression[] filterList = filterStr.ToObject<FilterExpression[]>();
-            return this.GetAllWithExtResult(page, start, limit, filterList, getDataSourceHandler, filterHandler);
+            return this.GetAllWithExtResult(page, start, limit, filterList, dataSourceGetHandler, filterHandler);
         }
 
-        public ExtJsResult GetAllWithExtResult(int page, int start, int limit, FilterExpression[] filterList, GetDataSourceDelegate<T> getDataSourceHandler = null, FilterDataSourceDelegate<T> filterHandler = null)
+        public ExtJsResult GetAllWithExtResult(int page, int start, int limit, FilterExpression[] filterList, GetDataSourceDelegate<T> dataSourceGetHandler = null, FilterDataSourceDelegate<T> filterHandler = null)
         {
-            GetDataSourceDelegate<T> getDataSource = getDataSourceHandler;
+            GetDataSourceDelegate<T> getDataSource = dataSourceGetHandler;
             if (getDataSource == null)
             {
-                getDataSource = this.GetDataSource;
+                getDataSource = this.DefaultDataSourceGetHandler;
             }
             FilterDataSourceDelegate<T> filter = filterHandler;
             if (filter == null)
             {
-                filter = this.FilterDataSource;
+                filter = this.DefaultDataSourceFilter;
             }
 
             ExtJsResult result = new ExtJsResult();
@@ -130,7 +132,7 @@ namespace Imms.Data
                     dataSource = dataSource.Take(limit);
                 }
                 List<T> list = dataSource.ToList();
-                int count = this.FilterDataSource(this.GetDataSource(dbContext), filterList).Count();
+                int count = this.DefaultDataSourceFilter(this.DefaultDataSourceGetHandler(dbContext), filterList).Count();
                 // if (filterList != null && filterList.Length > 0)
                 // {
                 //     count = this.FilterDataSource(this.GetDataSource(dbContext), filterList).Count();
@@ -146,12 +148,12 @@ namespace Imms.Data
             return result;
         }
 
-        protected virtual IQueryable<T> GetDataSource(DbContext dbContext)
+        public IQueryable<T> DefaultDataSourceGetHandler(DbContext dbContext)
         {
             return dbContext.Set<T>();
         }
 
-        protected virtual IQueryable<T> FilterDataSource(IQueryable<T> query, FilterExpression[] expressions)
+        public IQueryable<T> DefaultDataSourceFilter(IQueryable<T> query, FilterExpression[] expressions)
         {
             if (expressions != null)
             {
@@ -161,7 +163,7 @@ namespace Imms.Data
                 return query.Where(whereString, values);
             }
             return query;
-        }
+        }        
 
         private string BuildWhereString(FilterExpression[] filterList)
         {

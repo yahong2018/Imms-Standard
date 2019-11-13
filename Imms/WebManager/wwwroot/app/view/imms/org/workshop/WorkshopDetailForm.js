@@ -39,9 +39,9 @@ Ext.define("app.view.imms.org.workshop.WorkshopDetailForm", {
                     width:150,
                 },{
                     xtype:"label",
-                    text:"0. 内部车间 3.外发前工程车间 4.外发车间 5.外发后工程车间",
+                    text:"1. 内部车间 3.外发前工程车间 4.外发车间 5.外发后工程车间",
                     flex:0.8,
-                    margin:"5 0 3 3"
+                    margin:"8 0 3 3"
                 }
             ]
         },

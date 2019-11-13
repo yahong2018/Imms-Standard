@@ -3,6 +3,6 @@ Ext.define("app.store.imms.rpt.ManufacturingSummaryStore",{
     model:"app.model.imms.rpt.ManufacturingSummaryModel",
     alias:"widget.imms_rpt_ManufacturingSummaryStore",
     dao:{
-        selectUrl:"imms/mfc/productionOrderProgress/getProductProgressSummary"
+        selectUrl:"imms/mfc/productSummary/getAll"
     } 
 });

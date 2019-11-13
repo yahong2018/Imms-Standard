@@ -163,217 +163,25 @@ namespace Imms.WebManager.Controllers
         public ProductionOrderController() => this.Logic = new SimpleCRUDLogic<ProductionOrder>();
     }
 
-    public class ManufactureSummaryItem
+    [Route("api/imms/mfc/productSummary")]
+    public class ProductSummaryController : SimpleCRUDController<ProductSummary>
     {
-        public string ProductionCode { get; set; }
-        public string ProductionName { get; set; }
-        public string WorkshopCode { get; set; }
-        public DateTime DateOfOrigin { get; set; }
-        public int QtyTotal { get; set; }
-        public int QtyDay { get; set; }
-        public int QtyNight { get; set; }
+        public ProductSummaryController()
+        {
+            this.Logic = new SimpleCRUDLogic<ProductSummary>();
+            this.DataSourceFilterHandler = this.ProductSummaryQueryFilterHandler;
+        }
+
+        private IQueryable<ProductSummary> ProductSummaryQueryFilterHandler(IQueryable<ProductSummary> query, FilterExpression[] expressions){
+            IQueryable<ProductSummary> result = this.Logic.DefaultDataSourceFilter(query,expressions);
+            return result.OrderByDescending(x=>x.ProductDate);            
+        }
     }
 
     [Route("api/imms/mfc/productionOrderProgress")]
     public class ProductionOrderProgressController : SimpleCRUDController<ProductionOrderProgress>
     {
         public ProductionOrderProgressController() => this.Logic = new SimpleCRUDLogic<ProductionOrderProgress>();
-
-        private void ParseShift(List<ProductionOrderProgress> progressList)
-        {
-            foreach (ProductionOrderProgress item in progressList)
-            {
-                ManufactureSummaryItem summaryItem = new ManufactureSummaryItem();
-
-            }
-        }
-
-
-        [Route("getProductProgressSummary"), HttpGet]
-        public ActionResult<string> GetProductProgressSummary(int isToday = 0)
-        {
-            if (isToday == 1)
-            {
-                return this.GetTodayProductSummary();
-            }
-
-            int page, start, limit;
-            string filterStr;
-            this.GetQueryParameters(out page, out start, out limit, out filterStr);
-            SimpleCRUDLogic<ProductionOrderProgress> progressLogic = new SimpleCRUDLogic<ProductionOrderProgress>();
-            List<ProductionOrderProgress> progressList = (List<ProductionOrderProgress>)progressLogic.GetAllWithExtResult(0, 0, 0, filterStr).RootProperty;
-            var resultList = progressList
-                   .Select(x => new { x.RecordId, x.ProductionId, x.ProductionCode, x.ProductionName, x.WorkshopId, x.WorkshopName, x.WorkshopCode, x.Qty, x.TimeOfOriginWork })
-                   .GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopId, x.WorkshopCode, x.WorkshopName, x.TimeOfOriginWork })
-                   .Select(group => new ProductionSummaryItem
-                   {
-                       TimeOfOriginWork = group.Key.TimeOfOriginWork,
-                       ProductionId = group.Key.ProductionId,
-                       ProductionCode = group.Key.ProductionCode,
-                       ProductionName = group.Key.ProductionName,
-                       WorkshopId = group.Key.WorkshopId,
-                       WorkshopCode = group.Key.WorkshopCode,
-                       WorkshopName = group.Key.WorkshopName,
-                       FinishedQty = group.Sum(x => x.Qty),
-                       BadQty = 0,
-                       MoveInQty = 0,
-                       MoveOutQty = 0
-                   }).ToList();
-
-            SimpleCRUDLogic<QualityCheck> qualityLogic = new SimpleCRUDLogic<QualityCheck>();
-            List<QualityCheck> qualityList = (List<QualityCheck>)qualityLogic.GetAllWithExtResult(0, 0, 0, filterStr).RootProperty;
-            var qualityGroupList = qualityList
-                   .Select(x => new { x.RecordId, x.ProductionId, x.ProductionCode, x.ProductionName, x.WorkshopId, x.WorkshopName, x.WorkshopCode, x.Qty, x.TimeOfOriginWork })
-                   .GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopId, x.WorkshopCode, x.WorkshopName, x.TimeOfOriginWork })
-                   .Select(group => new ProductionSummaryItem
-                   {
-                       TimeOfOriginWork = group.Key.TimeOfOriginWork,
-                       ProductionId = group.Key.ProductionId,
-                       ProductionCode = group.Key.ProductionCode,
-                       ProductionName = group.Key.ProductionName,
-                       WorkshopId = group.Key.WorkshopId,
-                       WorkshopCode = group.Key.WorkshopCode,
-                       WorkshopName = group.Key.WorkshopName,
-                       FinishedQty = 0,
-                       BadQty = group.Sum(x => x.Qty),
-                       MoveInQty = 0,
-                       MoveOutQty = 0
-                   }).ToList();
-
-            foreach (var item in qualityGroupList)
-            {
-                var resultItem = resultList.FirstOrDefault(x => x.ProductionId == item.ProductionId && x.WorkshopId == item.WorkshopId);
-                if (resultItem == null)
-                {
-                    resultList.Add(item);
-                }
-                else
-                {
-                    resultItem.BadQty = item.BadQty;
-                }
-            }
-
-            SimpleCRUDLogic<ProductionMoving> moveLogic = new SimpleCRUDLogic<ProductionMoving>();
-            List<ProductionMoving> moveList = (List<ProductionMoving>)moveLogic.GetAllWithExtResult(0, 0, 0, filterStr).RootProperty;
-            var moveInGroupList = moveList
-                   .Select(x => new { x.RecordId, x.ProductionId, x.ProductionCode, x.ProductionName, x.WorkshopId, x.WorkshopName, x.WorkshopCode, x.Qty, x.TimeOfOriginWork })
-                   .GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopId, x.WorkshopCode, x.WorkshopName, x.TimeOfOriginWork })
-                   .Select(group => new ProductionSummaryItem
-                   {
-                       TimeOfOriginWork = group.Key.TimeOfOriginWork,
-                       ProductionId = group.Key.ProductionId,
-                       ProductionCode = group.Key.ProductionCode,
-                       ProductionName = group.Key.ProductionName,
-                       WorkshopId = group.Key.WorkshopId,
-                       WorkshopCode = group.Key.WorkshopCode,
-                       WorkshopName = group.Key.WorkshopName,
-                       FinishedQty = 0,
-                       BadQty = 0,
-                       MoveInQty = group.Sum(x => x.Qty),
-                       MoveOutQty = 0
-                   }).ToList();
-
-            foreach (var item in moveInGroupList)
-            {
-                var resultItem = resultList.FirstOrDefault(x => x.ProductionId == item.ProductionId && x.WorkshopId == item.WorkshopId && x.TimeOfOriginWork == item.TimeOfOriginWork);
-                if (resultItem == null)
-                {
-                    resultList.Add(item);
-                }
-                else
-                {
-                    resultItem.MoveInQty = item.MoveInQty;
-                }
-            }
-
-            var moveOutGroupList = moveList
-                               .Select(x => new { x.RecordId, x.ProductionId, x.ProductionCode, x.ProductionName, x.WorkshopIdFrom, x.WorkshopNameFrom, x.WorkshopCodeFrom, x.Qty, x.TimeOfOriginWork })
-                               .GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopIdFrom, x.WorkshopCodeFrom, x.WorkshopNameFrom, x.TimeOfOriginWork })
-                               .Select(group => new ProductionSummaryItem
-                               {
-                                   TimeOfOriginWork = group.Key.TimeOfOriginWork,
-                                   ProductionId = group.Key.ProductionId,
-                                   ProductionCode = group.Key.ProductionCode,
-                                   ProductionName = group.Key.ProductionName,
-                                   WorkshopId = group.Key.WorkshopIdFrom,
-                                   WorkshopCode = group.Key.WorkshopCodeFrom,
-                                   WorkshopName = group.Key.WorkshopNameFrom,
-                                   FinishedQty = 0,
-                                   BadQty = 0,
-                                   MoveInQty = 0,
-                                   MoveOutQty = group.Sum(x => x.Qty)
-                               }).ToList();
-
-            foreach (var item in moveOutGroupList)
-            {
-                var resultItem = resultList.FirstOrDefault(x => x.ProductionId == item.ProductionId && x.WorkshopId == item.WorkshopId && x.TimeOfOriginWork == item.TimeOfOriginWork);
-                if (resultItem == null)
-                {
-                    resultList.Add(item);
-                }
-                else
-                {
-                    resultItem.MoveOutQty = item.MoveOutQty;
-                }
-            }
-
-            foreach (var item in resultList)
-            {
-                item.StockQty = item.MoveInQty + item.FinishedQty - item.MoveOutQty;
-            }
-
-            return resultList.ToJson();
-        }
-
-        private ActionResult<string> GetTodayProductSummary()
-        {
-            string result = null;
-            CommonRepository.UseDbContext(dbContext =>
-            {
-                DateTime beginDate = DateTime.Today;
-                DateTime endDate = beginDate.AddDays(1);
-
-                var progressList = dbContext.Set<ProductionOrderProgress>()
-                    .Where(x => x.TimeOfOrigin >= beginDate
-                                && x.TimeOfOrigin < endDate
-                    ).ToList();
-
-                var resultList = progressList
-                   .GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopId, x.WorkshopCode, x.WorkshopName })
-                   .Select(group => new
-                   {
-                       group.Key.ProductionId,
-                       group.Key.ProductionCode,
-                       group.Key.ProductionName,
-                       group.Key.WorkshopId,
-                       group.Key.WorkshopCode,
-                       group.Key.WorkshopName,
-                       Qty = group.Sum(x => x.Qty),
-                       DataType = 2
-                   }).ToList();
-
-                var movingList = dbContext.Set<ProductionMoving>()
-                          .Where(x => x.TimeOfOrigin >= beginDate && x.TimeOfOrigin < endDate)
-                          .ToList();
-                var movingGroupList = movingList.GroupBy(x => new { x.ProductionCode, x.ProductionName, x.ProductionId, x.WorkshopId, x.WorkshopCode, x.WorkshopName })
-                   .Select(group => new
-                   {
-                       group.Key.ProductionId,
-                       group.Key.ProductionCode,
-                       group.Key.ProductionName,
-                       group.Key.WorkshopId,
-                       group.Key.WorkshopCode,
-                       group.Key.WorkshopName,
-                       Qty = group.Sum(x => x.Qty),
-                       DataType = 1
-                   }).ToList();
-
-                resultList.AddRange(movingGroupList);
-                result = resultList.ToJson();
-            });
-
-            return result;
-        }
 
         [Route("reportInstroeByErp"), HttpPost]
         public int ReportInstoreByERP([FromBody] InstoreItem instoreItem)

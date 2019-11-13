@@ -35,6 +35,8 @@ namespace Imms.Mes.Data
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.DefectConfigure());
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.ProductionMovingConfigure());
 
+            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.ProductSummaryConfigure());
+
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.WorkstationLoginConfigure());
         }
     }

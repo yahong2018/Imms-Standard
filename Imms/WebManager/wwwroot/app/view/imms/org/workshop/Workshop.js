@@ -14,7 +14,7 @@ Ext.define("app.view.imms.org.workshop.Workshop", {
         {
             dataIndex: "workshopType", text: "车间类别", width: 200,renderer: function(value) {
                 {
-                    var lables = ["0. 内部车间", "", "", "3.外发前工程车间", "4.外发车间", "5.外发后工程车间"]
+                    var lables = ["", "1. 内部车间", "", "3.外发前工程车间", "4.外发车间", "5.外发后工程车间"]
                     //  0. 内部车间   3.外发前工程车间   4.外发车间   5.外发后工程车间
                     return lables[value];
                 }

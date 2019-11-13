@@ -22,7 +22,6 @@ Ext.define('app.view.main.Main', {
 	initComponent: function () {
 		Ext.setGlyphFontFamily('FontAwesome');
 		
-
 		this.callParent(arguments);
 	},
 
@@ -60,10 +59,10 @@ Ext.define('app.view.main.Main', {
 		afterrender: function () {
 			this.startTask();
 
-			var summaryGrid = this.down("maincenter");
-			summaryGrid = summaryGrid.down("gridpanel");
-			summaryGrid.summaryStore = Ext.create({ xtype: "imms_mfc_ProductSummaryStore", autoLoad: false });
-			summaryGrid.store.loadTodayReportData(summaryGrid.summaryStore);
+			// var summaryGrid = this.down("maincenter");
+			// summaryGrid = summaryGrid.down("gridpanel");
+			// summaryGrid.summaryStore = Ext.create({ xtype: "imms_mfc_ProductSummaryStore", autoLoad: false });
+			// summaryGrid.store.loadTodayReportData(summaryGrid.summaryStore);
 		}
 	},
 
