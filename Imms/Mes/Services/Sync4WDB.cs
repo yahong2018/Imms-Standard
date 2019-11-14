@@ -16,8 +16,6 @@ namespace Imms.Mes.Services
     {
         private IHttpClientFactory _factory;
         public DateTime NextRunTime { get; set; } = DateTime.Now;
-        // public WDBSynchronizer Synchronizer { get; set; } = new WDBSynchronizer();
-
         public Sync4WDBService(IHttpClientFactory factory)
         {
             this._factory = factory;
@@ -47,11 +45,6 @@ namespace Imms.Mes.Services
             WDBSynchronizer synchronizer = new WDBSynchronizer(this._factory);
             return synchronizer.SyncData();
         }
-
-        // public HttpClient GetHttpClient4WDB()
-        // {
-        //     return this._factory.CreateClient("SYNC_DATA_WDB");
-        // }
     }
 
     public class WDBSynchronizer
@@ -66,7 +59,8 @@ namespace Imms.Mes.Services
         public string LoginUrl { get; set; }
         public string InstoreSyncUrl { get; set; }
         public string MoveSyncUrl { get; set; }
-        public string QuanlityCheckSyncUrl { get; set; }
+        public string QualityCheckSyncUrl { get; set; }
+        public string BomSyncUrl { get; set; }
         public int AccountId { get; set; } = 63;
 
         public SystemParameter last_sync_progress_param { get; set; }   //内部入库数据的最后Id
@@ -88,12 +82,14 @@ namespace Imms.Mes.Services
                 {
                     this.dbContext = Imms.GlobalConstants.DbContextFactory.GetContext();
 
-                    this.GetLoginParameter(); //获取参数
+                    this.Initarameters(); //获取参数
                     this.LoginToWDB();    //登录
-                    this.DoSyncInstoreData(); //入库报工
-                    this.DoSyncInstoreWWData(); //委外入库
-                    this.DoSyncMovingData();   //移库
-                    this.DoSyncQualityCheckdata();  //品质
+                    this.PushInstoreData(); //入库报工
+                    this.PushInstoreWWData(); //委外入库
+                    this.PushMovingData();   //移库
+                    this.PushQualityCheckdata();  //品质
+
+                    this.GetBom(); //同步BOM的数据
                 }
 
                 result = new BusinessException(GlobalConstants.EXCEPTION_CODE_NO_ERROR, "成功同步");
@@ -116,7 +112,7 @@ namespace Imms.Mes.Services
             return result;
         }
 
-        private void GetLoginParameter()
+        private void Initarameters()
         {
             this.ParameterList = this.dbContext.Set<SystemParameter>().Where(x => x.ParameterClassCode == "B003").ToList();
             this.ServerHost = this.ParameterList.Single(x => x.ParameterCode == "server_host").ParameterValue;
@@ -130,7 +126,8 @@ namespace Imms.Mes.Services
             this.LoginUrl = this.ParameterList.Single(x => x.ParameterCode == "login_url").ParameterValue;
             this.InstoreSyncUrl = this.ParameterList.Single(x => x.ParameterCode == "progress_report_url").ParameterValue;
             this.MoveSyncUrl = this.ParameterList.Single(x => x.ParameterCode == "moving_report_url").ParameterValue;
-            this.QuanlityCheckSyncUrl = this.ParameterList.Single(x => x.ParameterCode == "qualitycheck_report_url").ParameterValue;
+            this.QualityCheckSyncUrl = this.ParameterList.Single(x => x.ParameterCode == "qualitycheck_report_url").ParameterValue;
+            this.BomSyncUrl = this.ParameterList.Single(x => x.ParameterClassCode == "bom_get_url").ParameterValue;
             string strAccountId = this.ParameterList.Single(x => x.ParameterCode == "account_id").ParameterValue;
             int tempAccountid = 0;
             if (int.TryParse(strAccountId, out tempAccountid))
@@ -170,15 +167,46 @@ namespace Imms.Mes.Services
             return this._loginResult;
         }
 
-        private void DoSyncQualityCheckdata()
+        private void GetBom()
         {
-            if (string.IsNullOrEmpty(this.QuanlityCheckSyncUrl))
+            if (string.IsNullOrEmpty(this.BomSyncUrl))
             {
                 return;
             }
+            //
+            //TODO:在这里进行BOM同步的开发
+            //
+
+            // this.dbContext.Set<Material>().Where(x=>x)            
+        }
+
+        private void PushQualityCheckdata()
+        {
+            if (string.IsNullOrEmpty(this.QualityCheckSyncUrl))
+            {
+                return;
+            }
+
+            List<QualitySyncItem> itemList;
+            long lastRecordId = this.GetQualitySyncData(out itemList);
+            if (itemList.Count == 0)
+            {
+                return;
+            }
+
+            this.ReportToErp(this.last_sync_qualitycheck_param, this.QualityCheckSyncUrl, new QualitySyncData()
+            {
+                beId = this.AccountId,
+                doctypeId = 4,
+                prodpwt = itemList.ToArray()
+            }, lastRecordId);
+        }
+
+        private long GetQualitySyncData(out List<QualitySyncItem> itemList)
+        {
             long last_sync_id = long.Parse(this.last_sync_qualitycheck_param.ParameterValue);
             List<QualityCheck> dataList = this.dbContext.Set<QualityCheck>().Where(x => x.RecordId > last_sync_id).ToList();
-            var itemList = dataList.Select(x => new QualitySyncItem
+            itemList = dataList.Select(x => new QualitySyncItem
             {
                 procode = x.ProductionCode,
                 unitcode = "pcs",
@@ -187,61 +215,24 @@ namespace Imms.Mes.Services
                 udfbldm = x.DefectCode,
                 udfblbm = x.WorkshopCode + "_BAD",
                 loccode = x.WorkshopCode,
-            }).ToArray();
+            }).ToList();
 
             itemList = new QualitySyncItem[]{
                 new QualitySyncItem(){procode="5010-08120",unitcode="pcs",qty=23,loccode="THR",udfbldm="01",udfblbm="THR_BAD",wcgcode="THR01"}
-            };
+            }.ToList();
 
-            QualitySyncData data = new QualitySyncData();
-            data.beId = this.AccountId;
-            data.doctypeId = 4;
-            data.prodpwt = itemList;
-            try
+            if (dataList.Count > 0)
             {
-
-                string strData = data.ToJson();
-                string reportUrl = this.ServerHost + "/" + this.QuanlityCheckSyncUrl;
-                using (HttpClient client = this._factory.CreateClient())
-                {
-                    client.DefaultRequestHeaders.Add("authorization", "Bearer " + this._loginResult.access_token);
-                    client.DefaultRequestHeaders.Add("client_id", this._loginParameter.client_id);
-                    client.DefaultRequestHeaders.Add("cache-control", "no-cache");
-                    GlobalConstants.DefaultLogger.Info("开始同步不良入库数据：" + strData);
-
-                    HttpResponseMessage responseMessage = client.PostAsync(reportUrl, new JsonContent(data)).GetAwaiter().GetResult();
-                    responseMessage.EnsureSuccessStatusCode();
-                    string respContent = responseMessage.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-                    GlobalConstants.DefaultLogger.Info("收到返回不良入库同步的结果：" + respContent);
-                }
-
-                if (dataList.Count > 0)
-                {
-                    long lastRecordId = dataList.Max(x => x.RecordId);
-                    string strLastRecordId = lastRecordId.ToString();
-                    if (strLastRecordId != this.last_sync_qualitycheck_param.ParameterValue)
-                    {
-                        this.last_sync_qualitycheck_param.ParameterValue = strLastRecordId;
-                        GlobalConstants.ModifyEntityStatus(this.last_sync_qualitycheck_param, dbContext);
-                        this.dbContext.SaveChanges();
-                    }
-                }
+                return dataList.Max(x => x.RecordId);
             }
-            catch (Exception ex)
-            {
-                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_CUSTOM, "同步品质数据失败：" + ex.Message);
-            }
+            return -1;
         }
 
-        private void DoSyncMovingData()
+        private long GetMovingSyncData(out List<MoveSyncItem> itemList)
         {
-            if (string.IsNullOrEmpty(this.MoveSyncUrl))
-            {
-                return;
-            }
             long last_sync_id = long.Parse(this.last_sync_move_param.ParameterValue);
             List<ProductionMoving> dataList = this.dbContext.Set<ProductionMoving>().Where(x => x.RecordId > last_sync_id && x.WorkshopCode != "EV_1").ToList();
-            var itemList = dataList.GroupBy(x => new { x.WorkshopCode, x.ProductionCode, x.WorkshopCodeFrom })
+            itemList = dataList.GroupBy(x => new { x.WorkshopCode, x.ProductionCode, x.WorkshopCodeFrom })
             .Select(group => new MoveSyncItem
             {
                 loccode = group.Key.WorkshopCodeFrom,
@@ -249,59 +240,46 @@ namespace Imms.Mes.Services
                 procode = group.Key.ProductionCode,
                 qty = group.Sum(x => x.Qty),
                 unitcode = "pcs"
-            }).ToArray();
+            }).ToList();
 
             itemList = new MoveSyncItem[]{
                 new MoveSyncItem(){procode="1411-06880",unitcode="pcs",qty=23,loccode="B02",aloccode="THR"}
-            };
+            }.ToList();
 
-            MoveSyncData data = new MoveSyncData();
-            data.beId = this.AccountId;
-            data.movet = itemList;
-            try
+            if (dataList.Count > 0)
             {
-                string strData = data.ToJson();
-                string reportUrl = this.ServerHost + "/" + this.MoveSyncUrl;
-                using (HttpClient client = this._factory.CreateClient())
-                {
-                    client.DefaultRequestHeaders.Add("authorization", "Bearer " + this._loginResult.access_token);
-                    client.DefaultRequestHeaders.Add("client_id", this._loginParameter.client_id);
-                    client.DefaultRequestHeaders.Add("cache-control", "no-cache");
-                    GlobalConstants.DefaultLogger.Info("开始同步移库数据：" + strData);
-
-                    HttpResponseMessage responseMessage = client.PostAsync(reportUrl, new JsonContent(data)).GetAwaiter().GetResult();
-                    responseMessage.EnsureSuccessStatusCode();
-                    string respContent = responseMessage.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-
-                    GlobalConstants.DefaultLogger.Info("收到移库同步的返回结果：" + respContent);
-                }
-                if (dataList.Count > 0)
-                {
-                    long lastRecordId = dataList.Max(x => x.RecordId);
-                    string strLastRecordId = lastRecordId.ToString();
-                    if (strLastRecordId != this.last_sync_move_param.ParameterValue)
-                    {
-                        this.last_sync_move_param.ParameterValue = strLastRecordId;
-                        GlobalConstants.ModifyEntityStatus(this.last_sync_move_param, dbContext);
-                        this.dbContext.SaveChanges();
-                    }
-                }
+                return dataList.Max(x => x.RecordId);
             }
-            catch (Exception ex)
-            {
-                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_CUSTOM, "同步移库数据失败：" + ex.Message);
-            }
+            return -1;
         }
 
-        private void DoSyncInstoreData()
+        private void PushMovingData()
         {
-            if (string.IsNullOrEmpty(this.InstoreSyncUrl))
+            if (string.IsNullOrEmpty(this.MoveSyncUrl))
             {
                 return;
             }
+
+            List<MoveSyncItem> itemList;
+            long lastRecordId = this.GetMovingSyncData(out itemList);
+            if (itemList.Count == 0)
+            {
+                return;
+            }
+
+            this.ReportToErp(this.last_sync_move_param, this.MoveSyncUrl, new MoveSyncData()
+            {
+                beId = this.AccountId,
+                movet = itemList.ToArray(),
+            }, lastRecordId);
+        }
+
+
+        private long GetInstoreData(out List<InstoreSyncItem> itemList)
+        {
             long last_sync_id = long.Parse(this.last_sync_progress_param.ParameterValue);
             List<ProductionOrderProgress> dataList = this.dbContext.Set<ProductionOrderProgress>().Where(x => x.RecordId > last_sync_id && x.WorkshopCode != "EV_2").ToList();
-            var itemList = dataList.GroupBy(x => new { x.WorkshopCode, x.ProductionCode, x.WocgCode })
+            itemList = dataList.GroupBy(x => new { x.WorkshopCode, x.ProductionCode, x.WocgCode })
             .Select(group => new InstoreSyncItem
             {
                 loccode = group.Key.WorkshopCode,
@@ -309,108 +287,128 @@ namespace Imms.Mes.Services
                 wcgcode = group.Key.WocgCode,
                 qty = group.Sum(x => x.Qty),
                 unitcode = "pcs"
-            }).ToArray();
+            }).ToList();
 
             itemList = new InstoreSyncItem[]{
                  new InstoreSyncItem(){procode="5010-08120",unitcode="pcs",qty=23,loccode="THR",wcgcode="THR01"}
-            };
+            }.ToList();
 
-            InstoreSyncData data = new InstoreSyncData();
-            data.beId = this.AccountId;
-            data.prodpwt = itemList;
-
-            try
+            if (dataList.Count > 0)
             {
-                string strData = data.ToJson();
-                string reportUrl = this.ServerHost + "/" + this.InstoreSyncUrl;
-                using (HttpClient client = this._factory.CreateClient())
-                {
-                    client.DefaultRequestHeaders.Add("authorization", "Bearer " + this._loginResult.access_token);
-                    client.DefaultRequestHeaders.Add("client_id", this._loginParameter.client_id);
-                    client.DefaultRequestHeaders.Add("cache-control", "no-cache");
-                    GlobalConstants.DefaultLogger.Info("开始同步入库报工数据：" + strData);
-
-                    HttpResponseMessage responseMessage = client.PostAsync(reportUrl, new JsonContent(data)).GetAwaiter().GetResult();
-                    responseMessage.EnsureSuccessStatusCode();
-                    string respContent = responseMessage.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-
-                    GlobalConstants.DefaultLogger.Info("收到入库数据同步的返回结果：" + respContent);
-                }
-                if (dataList.Count > 0)
-                {
-                    long lastRecordId = dataList.Max(x => x.RecordId);
-                    string strLastRecordId = lastRecordId.ToString();
-                    if (strLastRecordId != this.last_sync_progress_param.ParameterValue)
-                    {
-                        this.last_sync_progress_param.ParameterValue = strLastRecordId;
-                        GlobalConstants.ModifyEntityStatus(this.last_sync_progress_param, dbContext);
-                        this.dbContext.SaveChanges();
-                    }
-                }
+                return dataList.Max(x => x.RecordId);
             }
-            catch (Exception ex)
-            {
-                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_CUSTOM, "同步入库数据失败：" + ex.Message);
-            }
+            return -1;
         }
 
-        private void DoSyncInstoreWWData()
+        private void PushInstoreData()
         {
             if (string.IsNullOrEmpty(this.InstoreSyncUrl))
             {
                 return;
             }
+            List<InstoreSyncItem> itemList;
+            long lastRecordId = GetInstoreData(out itemList);
+            if (itemList.Count == 0)
+            {
+                return;
+            }
+
+            this.ReportToErp(this.last_sync_progress_param, this.InstoreSyncUrl, new InstoreSyncData()
+            {
+                beId = this.AccountId,
+                prodpwt = itemList.ToArray()
+            }, lastRecordId);
+        }
+
+
+        private long GetInstoreWWData(out List<InstoreSyncItemWW> itemList)
+        {
             long last_sync_id = long.Parse(this.last_sync_progress_ww_param.ParameterValue);
             List<ProductionOrderProgress> dataList = this.dbContext.Set<ProductionOrderProgress>().Where(x => x.RecordId > last_sync_id && x.WorkshopCode == "EV_2").ToList();
-            var itemList = dataList.GroupBy(x => new { x.WorkshopCode, x.ProductionCode })
+            itemList = dataList.GroupBy(x => new { x.WorkshopCode, x.ProductionCode })
             .Select(group => new InstoreSyncItemWW
             {
                 loccode = group.Key.WorkshopCode,
                 procode = group.Key.ProductionCode,
                 qty = group.Sum(x => x.Qty),
                 unitcode = "pcs"
-            }).ToArray();
+            }).ToList();
 
             itemList = new InstoreSyncItemWW[]{
                 new InstoreSyncItemWW(){procode="5010-08120",unitcode="pcs",qty=23,loccode="HJG"}
-            };
+            }.ToList();
 
-            InstoreSyncDataWW data = new InstoreSyncDataWW();
-            data.beId = this.AccountId;
-            data.pdcorespwt = itemList;
+            if (dataList.Count > 0)
+            {
+                return dataList.Max(x => x.RecordId);
+            }
+            return -1;
+        }
+
+        private void PushInstoreWWData()
+        {
+            if (string.IsNullOrEmpty(this.InstoreSyncUrl))
+            {
+                return;
+            }
+            List<InstoreSyncItemWW> itemList;
+            long lastRecordId = this.GetInstoreWWData(out itemList);
+            if (itemList.Count == 0)
+            {
+                return;
+            }
+
+            this.ReportToErp(this.last_sync_progress_ww_param, this.InstoreSyncUrl, new InstoreSyncDataWW()
+            {
+                beId = this.AccountId,
+                pdcorespwt = itemList.ToArray()
+            }, lastRecordId);
+        }
+
+        private void ReportToErp(SystemParameter syncParameter, string url, object data, long lastRecord)
+        {
+            if (lastRecord <= 0)
+            {
+                return;
+            }
             try
             {
-                string strData = data.ToJson();
-                string reportUrl = this.ServerHost + "/" + this.InstoreSyncUrl;
+                string reportUrl = this.ServerHost + "/" + url;
                 using (HttpClient client = this._factory.CreateClient())
                 {
-                    client.DefaultRequestHeaders.Add("authorization", "Bearer " + this._loginResult.access_token);
-                    client.DefaultRequestHeaders.Add("client_id", this._loginParameter.client_id);
-                    client.DefaultRequestHeaders.Add("cache-control", "no-cache");
-                    GlobalConstants.DefaultLogger.Info("开始同委外报工数据：" + strData);
-
-                    HttpResponseMessage responseMessage = client.PostAsync(reportUrl, new JsonContent(data)).GetAwaiter().GetResult();
-                    responseMessage.EnsureSuccessStatusCode();
-                    string respContent = responseMessage.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-
-                    GlobalConstants.DefaultLogger.Info("收到委外入库数据的结果：" + respContent);
+                    GlobalConstants.DefaultLogger.Info("开始同步数据：\n" + data.ToString());
+                    FillAuthorizationHeader(client);
+                    string respContent = this.SendData(client, reportUrl, data);
+                    GlobalConstants.DefaultLogger.Info("收到同步的结果：\n" + respContent);
                 }
-                if (dataList.Count > 0)
+
+                string strLastRecordId = lastRecord.ToString();
+                if (strLastRecordId != syncParameter.ParameterValue)
                 {
-                    long lastRecordId = dataList.Max(x => x.RecordId);
-                    string strLastRecordId = lastRecordId.ToString();
-                    if (strLastRecordId != this.last_sync_progress_ww_param.ParameterValue)
-                    {
-                        this.last_sync_progress_ww_param.ParameterValue = strLastRecordId;
-                        GlobalConstants.ModifyEntityStatus(this.last_sync_progress_ww_param, dbContext);
-                        this.dbContext.SaveChanges();
-                    }
+                    syncParameter.ParameterValue = strLastRecordId;
+                    GlobalConstants.ModifyEntityStatus(syncParameter, this.dbContext);
+                    this.dbContext.SaveChanges();
                 }
             }
             catch (Exception ex)
             {
-                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_CUSTOM, "同步委外入库数据失败：" + ex.Message);
+                GlobalConstants.DefaultLogger.Error("同步失败：" + ex.Message);
+                GlobalConstants.DefaultLogger.Error(ex.StackTrace);
             }
+        }
+
+        private string SendData(HttpClient client, string url, object data)
+        {
+            HttpResponseMessage responseMessage = client.PostAsync(url, new JsonContent(data)).GetAwaiter().GetResult();
+            responseMessage.EnsureSuccessStatusCode();
+            return responseMessage.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+        }
+
+        private void FillAuthorizationHeader(HttpClient client)
+        {
+            client.DefaultRequestHeaders.Add("authorization", "Bearer " + this._loginResult.access_token);
+            client.DefaultRequestHeaders.Add("client_id", this._loginParameter.client_id);
+            client.DefaultRequestHeaders.Add("cache-control", "no-cache");
         }
     }
 

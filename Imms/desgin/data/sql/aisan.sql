@@ -41,15 +41,16 @@ insert into system_parameter(record_id,parameter_class_code,parameter_class_name
 insert into system_parameter(record_id,parameter_class_code,parameter_class_name,parameter_code,parameter_name,parameter_value) values(9,'B003', '与万达宝ERP对接','progress_report_url','报工数据同步地址','jsf/rfws/aisa/savepc');
 insert into system_parameter(record_id,parameter_class_code,parameter_class_name,parameter_code,parameter_name,parameter_value) values(10,'B003','与万达宝ERP对接','moving_report_url','移库数据同步地址','jsf/rfws/aisa/savemove');
 insert into system_parameter(record_id,parameter_class_code,parameter_class_name,parameter_code,parameter_name,parameter_value) values(11,'B003','与万达宝ERP对接','qualitycheck_report_url','品质数据同步地址','');
+insert into system_parameter(record_id,parameter_class_code,parameter_class_name,parameter_code,parameter_name,parameter_value) values(12,'B003','与万达宝ERP对接','bom_get_url','BOM查询地址','jsf/rfws/erp/aisa/common/getBomInfo');
 
-insert into system_parameter(record_id,parameter_class_code,parameter_class_name,parameter_code,parameter_name,parameter_value) values(12,'B003','与万达宝ERP对接','account_id','账套Id','63');
+insert into system_parameter(record_id,parameter_class_code,parameter_class_name,parameter_code,parameter_name,parameter_value) values(13,'B003','与万达宝ERP对接','account_id','账套Id','63');
 
-insert into system_parameter(record_id,parameter_class_code,parameter_class_name,parameter_code,parameter_name,parameter_value) values(13,'B003','与万达宝ERP对接','last_sync_id_progress','最后报工数据同步的Id','1');
-insert into system_parameter(record_id,parameter_class_code,parameter_class_name,parameter_code,parameter_name,parameter_value) values(14,'B003','与万达宝ERP对接','last_sync_id_progress_ww','最后委外数据同步的Id','1');
-insert into system_parameter(record_id,parameter_class_code,parameter_class_name,parameter_code,parameter_name,parameter_value) values(15,'B003','与万达宝ERP对接','last_sync_id_move','最后移库数据同步的Id','1');
-insert into system_parameter(record_id,parameter_class_code,parameter_class_name,parameter_code,parameter_name,parameter_value) values(16,'B003','与万达宝ERP对接','last_sync_id_qualitycheck','最后品质数据同步的Id','1');
+insert into system_parameter(record_id,parameter_class_code,parameter_class_name,parameter_code,parameter_name,parameter_value) values(14,'B003','与万达宝ERP对接','last_sync_id_progress','最后报工数据同步的Id','1');
+insert into system_parameter(record_id,parameter_class_code,parameter_class_name,parameter_code,parameter_name,parameter_value) values(15,'B003','与万达宝ERP对接','last_sync_id_progress_ww','最后委外数据同步的Id','1');
+insert into system_parameter(record_id,parameter_class_code,parameter_class_name,parameter_code,parameter_name,parameter_value) values(16,'B003','与万达宝ERP对接','last_sync_id_move','最后移库数据同步的Id','1');
+insert into system_parameter(record_id,parameter_class_code,parameter_class_name,parameter_code,parameter_name,parameter_value) values(17,'B003','与万达宝ERP对接','last_sync_id_qualitycheck','最后品质数据同步的Id','1');
 
-insert into system_parameter(record_id,parameter_class_code,parameter_class_name,parameter_code,parameter_name,parameter_value) values(17,'B003','与万达宝ERP对接','sync_cycle_minutes','自动同步间隔（分钟）','120');
+insert into system_parameter(record_id,parameter_class_code,parameter_class_name,parameter_code,parameter_name,parameter_value) values(18,'B003','与万达宝ERP对接','sync_cycle_minutes','自动同步间隔（分钟）','120');
 
 
 --

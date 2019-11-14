@@ -13,6 +13,10 @@ namespace Imms.Mes.Data.Domain
         public string MaterialCode { get; set; }
         public string MaterialName { get; set; }
         public string Description { get; set; }
+
+        public long PrevMaterialId { get; set; }
+        public string PrevMaterialCode { get; set; }
+        public string PrevMaterialName { get; set; }
     }
 
     public class MaterialStock : TrackableEntity<long>
@@ -70,6 +74,10 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.Description).HasColumnName("description").HasMaxLength(250);
             builder.Property(e => e.MaterialName).IsRequired().HasColumnName("material_name").HasMaxLength(50);
             builder.Property(e => e.MaterialCode).IsRequired().HasColumnName("material_code").HasMaxLength(20);
+
+            builder.Property(e => e.PrevMaterialId).HasColumnName("prev_material_id");
+            builder.Property(e => e.PrevMaterialCode).HasColumnName("prev_material_code");
+            builder.Property(e=>e.PrevMaterialName).HasColumnName("prev_material_name");
         }
     }
 
@@ -97,7 +105,7 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.QtyConsumeDefect).HasColumnName("qty_consume_defect");
             builder.Property(e => e.QtyGood).HasColumnName("qty_good");
             builder.Property(e => e.QtyDefect).HasColumnName("qty_defect");
-            builder.Property(e => e.QtyMoveOut).HasColumnName("qty_move_out"); 
+            builder.Property(e => e.QtyMoveOut).HasColumnName("qty_move_out");
         }
     }
 
