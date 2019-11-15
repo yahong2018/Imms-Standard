@@ -76,7 +76,7 @@ Ext.define('app.view.main.Main', {
 		xtype: 'mainmenutree',
 		region: 'west',
 		title: '导航菜单',
-		width: 220,
+		width: 180,
 		collapsible: true,
 		split: true
 	}, {

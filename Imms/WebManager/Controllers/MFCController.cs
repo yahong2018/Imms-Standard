@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Imms.Core;
 using Imms.Data;
+using Imms.Mes.Data;
 using Imms.Mes.Data.Domain;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -407,7 +408,7 @@ namespace Imms.WebManager.Controllers
     [Route("api/imms/mfc/qualityCheck")]
     public class QualityCheckController : SimpleCRUDController<QualityCheck>
     {
-        public QualityCheckController() => this.Logic = new SimpleCRUDLogic<QualityCheck>();
+        public QualityCheckController() => this.Logic = new QualityCheckLogic();
     }
 
     [Route("api/imms/mfc/defect")]
