@@ -51,19 +51,23 @@ top:begin
 	select cast(s.req_data as UNSIGNED) into BackQty
 	from workstation_session_step  s 
 		where s.workstation_session_id = SessionId
-		  and s.step = 2;	 
+		  and s.step = 2
+	 order by s.req_time desc
+	limit 1;	 
 		
 	select s.req_data into TargetCardNo
 	  from workstation_session_step  s 
 	 where s.workstation_session_id = SessionId
-	   and s.step = 1;
+	   and s.step = 1
+	 order by s.req_time desc
+	 limit 1;
 					
 	select org_code,org_name,rfid_controller_id,rfid_terminator_id 
 	         into WorkstationCode,WorkstationName,CurGID,CurDID
 	  from work_organization_unit
 	where record_id = WorkstationId;
 			
-	select record_id,last_business_id,production_id,production_code,production_name,workshop_id,workshop_code,workshop_name
+	select c.record_id,c.last_business_id,c.production_id,c.production_code,c.production_name,c.workshop_id,c.workshop_code,c.workshop_name
 	   into TargetQtyCardId,LastBusinessId,ProductionId,ProductionCode,ProductionName,WorkshopId,WorkshopCode,WorkshopName
  	from rfid_card c
     where c.rfid_no = TargetCardNo

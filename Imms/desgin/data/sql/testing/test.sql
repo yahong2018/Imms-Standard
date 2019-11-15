@@ -94,8 +94,58 @@ insert into work_organization_unit(org_code,org_name,org_type,workshop_type,
                                    create_by_id,create_by_code,create_by_name,create_time)
                              values('CJG_01','粗加工1线',@OrgType,1,
                                     @WORKSHOP_KEY,'CJG','粗加工',
-                                    1,-1,3,8,'CJG_01',
+                                    2,1,3,2,'CJG_01',
                                     1,'C00001','刘永红',Now());
+
+
+--
+-- MC加工
+--
+set @OrgType = 'ORG_WORK_SHOP';
+insert into work_organization_unit(org_code,org_name,org_type,workshop_type,
+                                   parent_id,parent_code,parent_name,
+                                   operation_index,prev_operation_index,rfid_controller_id,rfid_terminator_id,wocg_code,
+                                   create_by_id,create_by_code,create_by_name,create_time)
+                             values('MC','MC加工',@OrgType,1,
+                                    0,'','',
+                                    3,2,-1,-1,'',
+                                    1,'C00001','刘永红',Now());
+set @WORKSHOP_KEY = LAST_INSERT_ID();
+
+set @OrgType = 'ORG_WORK_STATION';
+insert into work_organization_unit(org_code,org_name,org_type,workshop_type,
+                                   parent_id,parent_code,parent_name,
+                                   operation_index,prev_operation_index,rfid_controller_id,rfid_terminator_id,wocg_code,
+                                   create_by_id,create_by_code,create_by_name,create_time)
+                             values('MC_01','MC工1线',@OrgType,1,
+                                    @WORKSHOP_KEY,'MC','MC加工',
+                                    3,2,3,3,'MC_01',
+                                    1,'C00001','刘永红',Now());
+
+
+--
+-- MC加工
+--
+set @OrgType = 'ORG_WORK_SHOP';
+insert into work_organization_unit(org_code,org_name,org_type,workshop_type,
+                                   parent_id,parent_code,parent_name,
+                                   operation_index,prev_operation_index,rfid_controller_id,rfid_terminator_id,wocg_code,
+                                   create_by_id,create_by_code,create_by_name,create_time)
+                             values('THR','THR组合',@OrgType,1,
+                                    0,'','',
+                                    4,3,-1,-1,'',
+                                    1,'C00001','刘永红',Now());
+set @WORKSHOP_KEY = LAST_INSERT_ID();
+
+set @OrgType = 'ORG_WORK_STATION';
+insert into work_organization_unit(org_code,org_name,org_type,workshop_type,
+                                   parent_id,parent_code,parent_name,
+                                   operation_index,prev_operation_index,rfid_controller_id,rfid_terminator_id,wocg_code,
+                                   create_by_id,create_by_code,create_by_name,create_time)
+                             values('THR_01','THR1线',@OrgType,1,
+                                    @WORKSHOP_KEY,'THR','THR',
+                                    4,3,3,4,'THR_01',
+                                    1,'C00001','刘永红',Now());                                    
 
 -- ----------------------------------------------------------------------------------------------------------------------------------
 
@@ -217,6 +267,14 @@ set @PreMaterialId = LAST_INSERT_ID();
 insert into material (material_code,material_name,prev_material_id,prev_material_code,prev_material_name,create_by_id,create_by_code,create_by_name,create_time)
     values('A02','A_粗加工',@PreMaterialId,'A01','A_压铸',1,'C00001','刘永红',Now());
 
+set @PreMaterialId = LAST_INSERT_ID();
+insert into material (material_code,material_name,prev_material_id,prev_material_code,prev_material_name,create_by_id,create_by_code,create_by_name,create_time)
+    values('A03','A_MC加工',@PreMaterialId,'A02','A_粗加工',1,'C00001','刘永红',Now());
+
+set @PreMaterialId = LAST_INSERT_ID();
+insert into material (material_code,material_name,prev_material_id,prev_material_code,prev_material_name,create_by_id,create_by_code,create_by_name,create_time)
+    values('A04','A_THR组装',@PreMaterialId,'A03','A_THR组装',1,'C00001','刘永红',Now());
+
 insert into material (material_code,material_name,prev_material_id,prev_material_code,prev_material_name,create_by_id,create_by_code,create_by_name,create_time)
     values('B01','B_切断',-1,'','',1,'C00001','刘永红',Now());
 
@@ -291,10 +349,42 @@ insert into rfid_card(
 )values(
     'CJG01','CJG01',2,1,
     2,'A02','A_粗加工',
-    3,'CJG','粗加工',
+    2,'CJG','粗加工',
     100,0,-1,
     1,'C00001','刘永红',Now()
 );
+
+
+insert into rfid_card(
+    kanban_no,rfid_no,card_type,card_status,
+    production_id,production_code,production_name,
+    workshop_id,workshop_code,workshop_name,
+    issue_qty,stock_qty,last_business_id,
+    create_by_id,create_by_code,create_by_name,create_time
+)values(
+    'MC01','MC01',2,1,
+    3,'A03','A_MC加工',
+    3,'MC','MC加工',
+    100,0,-1,
+    1,'C00001','刘永红',Now()
+);
+
+
+insert into rfid_card(
+    kanban_no,rfid_no,card_type,card_status,
+    production_id,production_code,production_name,
+    workshop_id,workshop_code,workshop_name,
+    issue_qty,stock_qty,last_business_id,
+    create_by_id,create_by_code,create_by_name,create_time
+)values(
+    'THR01','THR01',2,1,
+    4,'A04','A_THR加工',
+    4,'THR','THR加工',
+    100,0,-1,
+    1,'C00001','刘永红',Now()
+);
+
+
 
 insert into rfid_card(
     kanban_no,rfid_no,card_type,card_status,

@@ -15,7 +15,7 @@ top:begin
 		
     if (CurrentStep = 0) and (ReqDataType = 4) then  
         call MES_BackWipToPrev_0(Success,RespData);		
-	elseif (CurrentStep = 1) and (ReqDataType = 1) then --  保存看板
+	elseif (CurrentStep = 1) and (ReqDataType = 2) then --  保存看板
 	    call MES_BackWipToPrev_1(ReqDataType,CardId,Success,RespData);		
 	elseif (CurrentStep = 2) and (ReqDataType = 4) then -- 保存退还数量
         call MES_BackWipToPrev_2(SessionId,CurrentStep,ReqDataType,ReqData,Success,RespData);

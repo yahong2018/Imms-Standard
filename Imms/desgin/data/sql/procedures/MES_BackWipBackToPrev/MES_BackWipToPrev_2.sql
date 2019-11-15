@@ -27,7 +27,9 @@ top:begin
     select s.req_data,c.issue_qty,c.stock_qty into RfidNo,IssueQty,StockQty
 	  from workstation_session_step  s join rfid_card c on s.req_data = c.rfid_no
     where s.workstation_session_id = SessionId
-	  and s.step = 1;
+	  and s.step = 1
+      order by s.req_time desc
+    limit 1;
 		
 	if (BackQty > StockQty) then
         set RespData=	'2|1|3';
