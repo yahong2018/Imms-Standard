@@ -1,3 +1,5 @@
+drop procedure MES_ProcessDeviceData;
+
 create procedure MES_ProcessDeviceData( 
  in	GID            int,
  in	DID            int,
@@ -9,7 +11,7 @@ create procedure MES_ProcessDeviceData(
 )
 top:begin    
     declare WorkstationId,CardId,LogId bigint default -1;
-    declare CardType,ReqDataType int default -1;
+    declare CardType,ReqDataType,TemplateIndex int default -1;
     declare ErroCode varchar(5) default '00000';
     declare ErrorMsg text;	
 
@@ -24,15 +26,19 @@ top:begin
 
     call MES_Debug('MES_VerifyWorkstation',LogId);	
 
-    call MES_VerifyWorkstation(GID,DID,WorkstationId,RespData);	
+    call MES_VerifyWorkstation(GID,DID,WorkstationId,TemplateIndex,RespData);	
     if WorkstationId = -1 then     
+        call MES_BuildRespData(TemplateIndex,RespData); 
+        
         leave top;
     end if;
 
     call MES_Debug('MES_VerifyCard',LogId);
     if(DataType = 1) then  -- 刷卡输入    
         call MES_VerifyCard(StrPara1,CardType,CardId,RespData);		
-        if not (CardType in(0,1,2,3)) then		  
+        if not (CardType in(0,1,2,3)) then		
+            call MES_BuildRespData(TemplateIndex,RespData); 
+
             leave top;
         end if;         
         set ReqDataType = CardType;
@@ -42,4 +48,6 @@ top:begin
 
     call MES_Debug('MES_ProcessSession',LogId);
     call MES_ProcessSession(WorkstationId,ReqDataType,StrPara1,CardId,DataGatherTime,RespData);
+
+    call MES_BuildRespData(TemplateIndex,RespData); 
 end;

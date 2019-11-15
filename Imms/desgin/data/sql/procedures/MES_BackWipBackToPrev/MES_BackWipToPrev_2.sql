@@ -1,3 +1,5 @@
+drop procedure MES_BackWipToPrev_2;
+
 create procedure MES_BackWipToPrev_2
 (
     in SessionId     bigint,
@@ -15,9 +17,9 @@ top:begin
 	select -1,'' into Success,RespData;
 	 
 	if (ReqDataType <> 4) or (ReqData = '') then
-        set RespData=	'2|1|2';
-        set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+        set RespData='2';        
         set RespData = CONCAT(RespData,'|1|请输入退还数量|0');				    
+        call MES_OK(RespData);
         
         leave top;
 	end if;
@@ -25,24 +27,24 @@ top:begin
 	set BackQty = cast(ReqData as UNSIGNED);	
 	
     select s.req_data,c.issue_qty,c.stock_qty into RfidNo,IssueQty,StockQty
-	  from workstation_session_step  s join rfid_card c on s.req_data = c.rfid_no
+	  from workstation_session_step s join rfid_card c on s.req_data = c.rfid_no
     where s.workstation_session_id = SessionId
 	  and s.step = 1
       order by s.req_time desc
     limit 1;
 		
 	if (BackQty > StockQty) then
-        set RespData=	'2|1|3';
-        set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+        set RespData='3';        
         set RespData = CONCAT(RespData,'|1|退还数量必须|0');				    
         set RespData = CONCAT(RespData,'|2|小于等于移库数量|0');				    
+        call MES_Error(RespData);
         
         leave top;	 
     end if;
 	 	 
-    set RespData=	'2|1|2';
-	set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+    set RespData='2';	
 	set RespData = CONCAT(RespData,'|1|请接收人刷工卡确认|0');				    	 
+    call MES_OK(RespData);
 	 
 	set Success = 0;
 end;

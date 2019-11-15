@@ -1,3 +1,5 @@
+drop procedure MES_GetWorkDayAndShiftId;
+
 create procedure MES_GetWorkDayAndShiftId(
    in  ReqTime              datetime,
    out TimeOfOriginWork     datetime,

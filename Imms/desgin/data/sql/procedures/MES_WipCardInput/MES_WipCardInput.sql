@@ -1,3 +1,5 @@
+drop procedure MES_WipCardInput;
+
 create procedure MES_WipCardInput(     
     in     WorkstationId       bigint,
     in     CardType            int,           -- 1. 工卡    2. 工程内看板    3.外发看板   4.键盘输入
@@ -18,10 +20,10 @@ top:begin
       from rfid_card c join work_organization_unit w on c.workshop_id = w.record_id
     where c.record_id = CardId;
 
-    select record_id,workshop_type,operation_index,prev_operation_index
+    select w.record_id,w.workshop_type,w.operation_index,w.prev_operation_index
            into WorkshopId, WorkshopType,WorkshopOpIndex,WorkshopPreIndex
-      from work_organization_unit 
-    where record_id = (
+      from work_organization_unit w
+    where w.record_id = (
         select parent_Id from work_organization_unit where record_id = WorkstationId
     ); 
 
@@ -49,10 +51,10 @@ top:begin
 
     if ((CardType = 2) and (CardStatus in (1,2)) and (CardOpIndex = WorkshopOpIndex)) then  -- 工程内报工       
         if(CardWorkshopId <> WorkshopId) then
-            set RespData=	'2|1|3';
-            set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150'); 
+            set RespData='3';            
             set RespData = CONCAT(RespData,'|1|看板可以报工的车间:|0');            
             set RespData = CONCAT(RespData,'|2|',CardWorkshopName,':|0');            
+            call MES_Error(RespData);
 
             leave top;           
         end if;
@@ -60,10 +62,10 @@ top:begin
         call MES_ReportWip(WorkstationId,WorkshopType,CardId,CardType,CardStatus,ReqTime,RespData); 
     elseif(CardType = 2) and (CardStatus in (2,10)) and (CardOpIndex = WorkshopPreIndex) then  -- 工程内移库
         if WorkshopPreIndex <> CardOpIndex then
-            set RespData=	'2|1|3';
-            set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150'); 
+            set RespData='3';            
             set RespData = CONCAT(RespData,'|1|只有上下工序之间|0');            
             set RespData = CONCAT(RespData,'|2|才可以进行移库|0');            
+            call MES_Error(RespData);
 
             leave top;                              
         end if;
@@ -73,19 +75,19 @@ top:begin
    --     call return_back
     elseif(CardType = 3) and (CardStatus = 1) then  -- 外发绑卡
         if(WorkshopType <> 3) then
-            set RespData=	'2|1|3';
-            set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150'); 
+            set RespData= '3';            
             set RespData = CONCAT(RespData,'|1|只有外发前工程车间|0');            
             set RespData = CONCAT(RespData,'|2|才可以绑定外发看板|0');            
+            call MES_Error(RespData);
 
             leave top;    
         end if;
 
         if(WorkshopOpIndex <> CardPreOpIndex) then        
-            set RespData=	'2|1|3';
-            set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150'); 
+            set RespData= '3';            
             set RespData = CONCAT(RespData,'|1|该外发看板不能|0');            
             set RespData = CONCAT(RespData,'|2|在本车间绑卡|0');            
+            call MES_Error(RespData);
 
             leave top;              
         end if;
@@ -94,10 +96,10 @@ top:begin
         call MES_BindOutsourceCard(WorkstationId,CardId,RfidNo,RespData);
     elseif(CardType = 3) and (CardStatus = 10) then  -- 外发移库
         if(WorkshopType <> 3) then
-            set RespData=	'2|1|3';
-            set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150'); 
+            set RespData='3';            
             set RespData = CONCAT(RespData,'|1|只有外发前工程车间|0');            
             set RespData = CONCAT(RespData,'|2|才可以外发|0');            
+            call MES_Error(RespData);
 
             leave top;           
         end if;
@@ -105,10 +107,10 @@ top:begin
         if not exists(
             select * from outsource_workstation_bind where workstation_id = WorkstationId and outsource_card_id = CardId and bind_status = 10
         ) then 
-            set RespData=	'2|1|3';
-            set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150'); 
+            set RespData='3';            
             set RespData = CONCAT(RespData,'|1|必须在所绑定工位|0');            
             set RespData = CONCAT(RespData,'|2|才可以打卡外发|0');            
+            call MES_Error(RespData);
 
             leave top;                   
         end if;        
@@ -117,9 +119,10 @@ top:begin
         call MES_MoveWip(WorkstationId,WorkshopType,CardId,CardType,CardStatus,ReqTime,RespData);
     elseif(CardType = 3) and (CardStatus = 20) then  -- 外发回厂报工
         if WorkshopType <> 5 then 
-            set RespData=	'2|1|2';
-            set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150'); 
+            set RespData=	'2';            
             set RespData = CONCAT(RespData,'|1|非后工程车间|0');            
+            call MES_Error(RespData);
+            
             leave top;        
         end if;
 

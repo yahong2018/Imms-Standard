@@ -1,3 +1,5 @@
+drop procedure MES_MoveWip;
+
 create procedure MES_MoveWip
 (
   in    WorkstationId        bigint,              -- 报工工位
@@ -23,10 +25,10 @@ top:begin
     else  
          -- 工程内
         if(ifnull(LastBusinessId,-1) = -1) then
-            set RespData= '2|1|3';
-            set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150'); 
+            set RespData= '3';            
             set RespData = CONCAT(RespData,'|1|看板移库异常：|0');            
             set RespData = CONCAT(RespData,'|2|不存在报工记录！|0');               
+            call MES_Error(RespData);
 
             leave top;
         end if;
@@ -57,7 +59,7 @@ top:begin
           and bind_status = 10;          
     end if;
 
-    set RespData=	'2|1|2';
-    set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150'); 
+    set RespData=	'2';    
     set RespData = CONCAT(RespData,'|1|已经移库',ifnull(MovedQty,0),'个|0');                
+    call MES_OK(RespData);    
 end;

@@ -1,3 +1,5 @@
+drop procedure MES_BindOutsourceCard;
+
 create procedure MES_BindOutsourceCard
 (
   in      WorkstationId        bigint,  
@@ -27,7 +29,8 @@ begin
         where record_id = CardId;
     end if;
     
-    set RespData=	'2|1|2';
-    set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+    set RespData='2';    
     set RespData = CONCAT(RespData,'|1|已绑定外发看板|0');  
+
+    call MES_OK(RespData);
 end;

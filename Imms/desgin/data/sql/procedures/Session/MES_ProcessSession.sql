@@ -1,3 +1,5 @@
+drop procedure MES_ProcessSession;
+
 create procedure MES_ProcessSession(
     in   WorkstationId        bigint,  
     in   ReqDataType          int,          -- 1. 工卡    2.数量卡   3.委外加工卡    4.键盘输入    

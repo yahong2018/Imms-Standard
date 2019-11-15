@@ -1,3 +1,5 @@
+drop procedure MES_AssureMaterialStock;
+
 create procedure MES_AssureMaterialStock(
     in ProductionId      bigint,
     in ProductionCode    varchar(20),
@@ -10,15 +12,15 @@ create procedure MES_AssureMaterialStock(
 begin    
     set StockRecordId = -1;
 
-    select record_id into StockRecordId 
-      from material_stock 
-    where material_id = ProductionId  and store_id = WorkshopId;
+    select st.record_id into StockRecordId 
+      from material_stock st
+    where st.material_id = ProductionId  and st.store_id = WorkshopId;
 
     if ifnull(StockRecordId,-1) = -1 then
         start transaction;
-            select record_id into StockRecordId 
-            from material_stock 
-            where material_id = ProductionId  and store_id = WorkshopId 
+            select st.record_id into StockRecordId 
+            from material_stock st
+            where st.material_id = ProductionId  and st.store_id = WorkshopId 
               for update;
 
             if ifnull(StockRecordId,-1) = -1 then                
@@ -32,6 +34,6 @@ begin
 
                 set StockRecordId = LAST_INSERT_ID();
             end if;        
-        commit;    
+        commit;    -- 提交事务，释放锁
     end if;
 end;

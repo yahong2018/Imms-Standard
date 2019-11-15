@@ -1,3 +1,5 @@
+drop procedure MES_IssueCard;
+
 create procedure MES_IssueCard(
     in SessionId     bigint,
     in CurrentStep   int,

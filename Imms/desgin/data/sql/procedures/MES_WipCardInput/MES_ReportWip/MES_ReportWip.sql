@@ -1,3 +1,5 @@
+drop procedure MES_ReportWip;
+
 create procedure MES_ReportWip(
   in    WorkstationId        bigint,              -- 报工工位
   in    WorkshopType         int,  
@@ -31,11 +33,11 @@ top:begin
         if (OutSourceCardProductionId = -1) or (not exists( select * from material m
            where m.record_id = OutSourceCardProductionId
              and m.prev_material_id = QtyCardProductionId)) then
-            set RespData=	'2|1|4';
-            set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150'); 
+            set RespData=	'4';            
             set RespData = CONCAT(RespData,'|1|工位没有绑定对应|0');     
             set RespData = CONCAT(RespData,'|2|产品',QtyCardProductionCode,'|0');     
             set RespData = CONCAT(RespData,'|3|的外发看板|0');     
+            call MES_Error(RespData);
 
             leave top;
         end if;
@@ -61,7 +63,7 @@ top:begin
     end if;
 
     -- 返回结果    
-    set RespData=	'2|1|2';
-    set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');  
+    set RespData=	'2';    
     set RespData = CONCAT(RespData,'|1|已报工',ifnull(ReportQty,0),'个|0');     
+    call MES_OK(RespData);
 end;

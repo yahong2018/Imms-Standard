@@ -1,3 +1,5 @@
+drop procedure MES_IssueCard_1;
+
 create procedure MES_IssueCard_1
 (    
     in ReqDataType   int,	
@@ -21,21 +23,21 @@ top:begin
     where record_id = CardId;
     
     if (not(CardStatus in(0,20))) then
-        set RespData=	'2|1|4';
-        set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+        set RespData='4';        
         set RespData = CONCAT(RespData,'|1|没有派发过的看板|0');					   
         set RespData = CONCAT(RespData,'|2|和已经移库的看板|0');					   
         set RespData = CONCAT(RespData,'|3|才可以派发.|0');					   
+        call MES_Error(RespData);
         
         leave top;
     end if;	
     
-    set RespData=	'2|1|5';
-    set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+    set RespData='5';    
     set RespData = CONCAT(RespData,'|1|按确定使用上次数量:|0');			
     set RespData = CONCAT(RespData,'|2|',DefaultIssueQty,'|0');			
 	set RespData = CONCAT(RespData,'|3|如需自定义派发数量|0');			
-    set RespData = CONCAT(RespData,'|4|先按数字键，再按确定|0');			
+    set RespData = CONCAT(RespData,'|4|先按数字键，再按确定|0');
+    call MES_OK(RespData);
 		
 	set Success = 0;
 end;

@@ -1,3 +1,5 @@
+drop procedure MES_IssueCard_2;
+
 create procedure MES_IssueCard_2(
     in SessionId     bigint,    
     in CurrentStep   int,				
@@ -48,11 +50,13 @@ begin
    
     insert into workstation_session_step(workstation_session_id,step,req_time,req_data_type,req_data,resp_data,resp_time)
       values (TheNewSessionId,0,CreateTime,1,RfidNo,RespData,Now());   
+    
+    set RespData= '4';  	
+	  set RespData = CONCAT(RespData,'|1|已给看板',RfidNo,'|0');				    	 
+    set RespData = CONCAT(RespData,'|2|派发',ProductionCode,'|0');				    	 
+    set RespData = CONCAT(RespData,'|3|',IssueQty,'个.|0');
+    set RespData = CONCAT(RespData,'|4|继续请刷其他看板.|0');
+    call MES_OK(RespData);
 
     set Success = 0;
-    set RespData= '2|1|4';
-	set RespData = CONCAT(RespData, '|210|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
-	set RespData = CONCAT(RespData,'|1|已给',RfidNo,'|0');				    	 
-    set RespData = CONCAT(RespData,'|2|派发',IssueQty,'个.|0');				    	 
-    set RespData = CONCAT(RespData,'|3|继续请刷其他看板.|0');		
 end;

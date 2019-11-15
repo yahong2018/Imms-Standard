@@ -1,3 +1,5 @@
+drop procedure MES_BackWipToPrev_3;
+
 create procedure MES_BackWipToPrev_3
 (    
 	in SessionId     bigint,
@@ -89,9 +91,9 @@ top:begin
 							LastBusinessId
 	);				
 	
-	set RespData=	'2|1|2';
-	set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+	set RespData='2';	
 	set RespData = CONCAT(RespData,'|1|已退还',BackQty,'个工件|0');				
+	call MES_OK(RespData);
 
 	set Success = 0;
 end

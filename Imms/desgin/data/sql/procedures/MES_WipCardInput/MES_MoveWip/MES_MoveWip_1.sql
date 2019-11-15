@@ -1,3 +1,5 @@
+drop procedure MES_MoveWip_1;
+
 create procedure MES_MoveWip_1(
     in CardId                    bigint,
     in RfidNo                    varchar(20),

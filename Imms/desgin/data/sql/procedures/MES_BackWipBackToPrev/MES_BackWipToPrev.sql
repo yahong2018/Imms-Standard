@@ -1,3 +1,5 @@
+drop procedure MES_BackWipToPrev;
+
 create procedure MES_BackWipToPrev
 (
 	in SessionId     bigint,

@@ -1,3 +1,5 @@
+drop procedure MES_GetCardType;
+
 create procedure  MES_GetCardType(
     in  CardNo     varchar(20),
     out CardType   int, 

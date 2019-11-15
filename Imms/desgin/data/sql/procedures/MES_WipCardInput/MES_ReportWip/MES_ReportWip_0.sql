@@ -1,3 +1,5 @@
+drop procedure MES_ReportWip_0;
+
 create procedure MES_ReportWip_0(  
   in    WorkstationId        int,              -- 报工工位
   in    CardId               int,              -- RFID
@@ -52,22 +54,22 @@ begin
     -- 调整完成品库存
     call MES_AssureMaterialStock(ProductionId,ProductionCode,ProductionName,WorkshopId,WorkshopCode,WorkshopName,StockRecordId);
 
-    update material_stock
-        set qty_stock = qty_stock + ReportQty,
-            qty_good = qty_good + ReportQty
-    where record_id = StockRecordId;
+    update material_stock st
+        set st.qty_stock = st.qty_stock + ReportQty,
+            st.qty_good = st.qty_good + ReportQty
+    where st.record_id = StockRecordId;
 
     -- 调整投入半成品的库存
     if(PrevOperationIndex<>-1) then
-        select prev_material_id  into PrevMaterialId 
-          from material
-         where record_id = ProductionId;
+        select m.prev_material_id  into PrevMaterialId 
+          from material m
+         where m.record_id = ProductionId;
 
-        update material_stock
-            set qty_stock = qty_stock - ReportQty,                  -- 转入【半成品】的库存
-                qty_consume_good = qty_consume_good + ReportQty     -- 转入【半成品】的消耗
-        where material_id = PrevMaterialId
-          and store_id = WorkshopId;
+        update material_stock st
+            set st.qty_stock = st.qty_stock - ReportQty,                  -- 转入【半成品】的库存
+                st.qty_consume_good = st.qty_consume_good + ReportQty     -- 转入【半成品】的消耗
+        where st.material_id = PrevMaterialId
+          and st.store_id = WorkshopId;
     end if; 
 
     -- 更新状态和卡的库存数量
@@ -76,32 +78,32 @@ begin
        set TheNewCardStatus = 30;  -- 0. 未使用   1. 已派发  2.已退回  3.已绑定    10. 已报工   20. 已移库收货  30.已外发回厂
     end if;    
 
-    update rfid_card
-    set card_status = TheNewCardStatus  
-        ,stock_qty = IssueQty  
-        ,last_business_id = LastBusinessId
-    where record_id = CardId;
+    update rfid_card c
+    set  c.card_status = TheNewCardStatus  
+        ,c.stock_qty = IssueQty  
+        ,c.last_business_id = LastBusinessId
+    where c.record_id = CardId;
 
     -- 更新生产进度
-    if not exists(select * from product_summary
-                   where product_date = TimeOfOriginWork
-                     and production_id = ProductionId
-                     and workshop_id = WorkshopId) then
+    if not exists(select * from product_summary ps
+                   where ps.product_date = TimeOfOriginWork
+                     and ps.production_id = ProductionId
+                     and ps.workshop_id = WorkshopId) then
         insert into product_summary (product_date,workshop_id,workshop_code,workshop_name,production_id,production_code,production_name,qty_good_0,qty_defect_0,qty_good_1,qty_defect_1)
            values(TimeOfOriginWork,WorkshopId,WorkshopCode,WorkshopName,ProductionId,ProductionCode,ProductionName,0,0,0,0);
     end if;
 
     if ShiftId = 0 then
-        update product_summary
-        set qty_good_0 = qty_good_0 + ReportQty
-        where product_date = TimeOfOriginWork
-         and production_id = ProductionId
-         and workshop_id = WorkshopId;
+        update product_summary ps
+          set ps.qty_good_0 = ps.qty_good_0 + ReportQty
+        where ps.product_date = TimeOfOriginWork
+          and ps.production_id = ProductionId
+          and ps.workshop_id = WorkshopId;
     else 
-        update product_summary
-        set qty_good_1 = qty_good_1 + ReportQty
-        where product_date = TimeOfOriginWork
-          and production_id = ProductionId
-          and workshop_id = WorkshopId;
+        update product_summary ps
+          set ps.qty_good_1 = ps.qty_good_1 + ReportQty
+        where ps.product_date = TimeOfOriginWork
+          and ps.production_id = ProductionId
+          and ps.workshop_id = WorkshopId;
     end if;    
 end

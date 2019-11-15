@@ -1,3 +1,5 @@
+drop procedure MES_MoveWip_0;
+
 create procedure MES_MoveWip_0(
   in    WorkstationId        bigint,      -- 发生工位(工程看板为【移入工位】，外发看板为【移出工位】)  
   in    CardId               bigint,      -- 看板卡的Id  
