@@ -1,7 +1,8 @@
-drop procedure MES_Debug;
+drop procedure MES_DebugWithLogId;
 
-create procedure MES_Debug(  
-    in Content varchar(500)    
+create procedure MES_DebugWithLogId(  
+    in Content varchar(500),
+    out LogId  bigint
 )
 begin
     declare LogLevel int;
@@ -15,6 +16,7 @@ begin
     set LogLevel  = -1;
 
     if(LogLevel <= 5) then
-        insert into system_logs(user_id,log_time,log_type,log_level,log_value)  values(0,Now(),'SYS',0,Content);
+        insert into system_logs(user_id,log_time,log_type,log_level,log_value)  values(0,Now(),'SYS',0,Content);                    
+        set LogId = LAST_INSERT_ID();
     end if;
 end

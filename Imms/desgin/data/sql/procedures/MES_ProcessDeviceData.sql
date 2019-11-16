@@ -10,7 +10,7 @@ create procedure MES_ProcessDeviceData(
  out RespData      varchar(200)
 )
 top:begin    
-    declare WorkstationId,CardId,LogId bigint default -1;
+    declare WorkstationId,CardId bigint default -1;
     declare TemplateIndex int default -1;
     declare ErroCode varchar(5) default '00000';
     declare ErrorMsg text;	
@@ -26,7 +26,7 @@ top:begin
 
     select '' into RespData;
     call MES_VerifyWorkstation(GID,DID,WorkstationId,TemplateIndex,RespData);	
-    call MES_Debug(CONCAT('MES_VerifyWorkstation  GID:',GID,',DID:',DID,',WorkstationId:',WorkstationId,',TemplateIndex:',TemplateIndex),LogId);
+    call MES_Debug(CONCAT('MES_VerifyWorkstation  GID:',GID,',DID:',DID,',WorkstationId:',WorkstationId,',TemplateIndex:',TemplateIndex));
 
     if WorkstationId = -1 then  
         call MES_Error(RespData);

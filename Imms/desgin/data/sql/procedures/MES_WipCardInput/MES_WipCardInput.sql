@@ -11,7 +11,7 @@ create procedure MES_WipCardInput(
 )
 top:begin    
     declare CardStatus,WorkshopType,WorkshopOpIndex,WorkshopPreIndex,CardOpIndex,CardPreOpIndex int;
-    declare CardWorkshopId,WorkshopId,LogId bigint;
+    declare CardWorkshopId,WorkshopId bigint;
     declare CardWorkshopName varchar(50);
 
     select '',-1 into RespData,Success;
@@ -58,7 +58,7 @@ top:begin
             
         --     leave top;           
         -- end if;
-        call MES_Debug('MES_ReportWip:工程内报工',LogId);	
+        call MES_Debug('MES_ReportWip:工程内报工');	
         call MES_ReportWip(WorkstationId,WorkshopType,CardId,CardType,CardStatus,ReqTime,Success,RespData); 
     elseif(CardType = 2) and (CardStatus in (2,10)) and (CardOpIndex = WorkshopPreIndex) then  -- 工程内移库
         -- if WorkshopPreIndex <> CardOpIndex then
@@ -69,7 +69,7 @@ top:begin
 
         --     leave top;                              
         -- end if;
-        call MES_Debug('MES_MoveWip:工程内移库',LogId);	
+        call MES_Debug('MES_MoveWip:工程内移库');	
         call MES_MoveWip(WorkstationId,WorkshopType,CardId,CardType,CardStatus,ReqTime,Success,RespData);
    -- elseif(CardType = 2) and (CardStatus = 20) then   退后: 本存储过程不处理后工序退回
    --     call return_back
@@ -90,7 +90,7 @@ top:begin
             leave top;              
         end if;
 
-        call MES_Debug('MES_BindOutsourceCard:外发绑卡',LogId);	
+        call MES_Debug('MES_BindOutsourceCard:外发绑卡');	
         call MES_BindOutsourceCard(WorkstationId,CardId,RfidNo,Success,RespData);
     elseif(CardType = 3) and (CardStatus = 10) then  -- 外发移库
         if(WorkshopType <> 3) then
@@ -111,7 +111,7 @@ top:begin
             leave top;                   
         end if;        
 
-        call MES_Debug('MES_MoveWip:外发移库',LogId);	
+        call MES_Debug('MES_MoveWip:外发移库');	
         call MES_MoveWip(WorkstationId,WorkshopType,CardId,CardType,CardStatus,ReqTime,Success,RespData);
     elseif(CardType = 3) and (CardStatus = 20) then  -- 外发回厂报工
         if WorkshopType <> 5 then 
@@ -121,7 +121,7 @@ top:begin
             leave top;        
         end if;
 
-        call MES_Debug('MES_ReportWip:外发回厂报工',LogId);	
+        call MES_Debug('MES_ReportWip:外发回厂报工');	
         call MES_ReportWip(WorkstationId,WorkshopType,CardId,CardType,CardStatus,ReqTime,Success,RespData); 
     end if;    
 end;

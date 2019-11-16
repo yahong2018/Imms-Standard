@@ -166,9 +166,7 @@ create table material
     material_name          varchar(50)                 not null,
     description            varchar(250)                null,
 
-    prev_material_id       bigint                      not null default -1,
-    prev_material_code     varchar(20)                 not null default '',
-    prev_material_name     varchar(50)                 not null default '',
+    auto_finished_progress int                         not null default 0,  -- 是否自动报工
 
     create_by_id           bigint                      not null,
     create_by_code         varchar(20)                 not null,
@@ -193,7 +191,7 @@ create table bom
     record_id             bigint    auto_increment     not null,
     bom_no                varchar(20)                  not null,
     bom_type              int                          not null,
-    bom_status            int                          not null,
+    bom_status            int                          not null,   -- 0.生效    1.未启用   2.已作废
 
     material_id           bigint                       not null,
     material_code         varchar(20)                  not null,
@@ -205,6 +203,8 @@ create table bom
 
     material_qty          int                          not null,
     component_qty         int                          not null,
+
+    effect_date           datetime                     not null,  -- 出现第二条相同记录的时候，要注意对以前的记录进行判断，将以前记录的状态改变，要做成任务，每天检查系统中的BOM
 
     create_by_id          bigint                       not null,
     create_by_code        varchar(20)                  not null,
@@ -640,3 +640,8 @@ create table outsource_card_bind(
     primary key(record_id)
 );
 
+
+create table global_lock
+(
+     lock_name            varchar(50)                    not null
+);

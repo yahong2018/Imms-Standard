@@ -14,9 +14,7 @@ namespace Imms.Mes.Data.Domain
         public string MaterialName { get; set; }
         public string Description { get; set; }
 
-        public long PrevMaterialId { get; set; }
-        public string PrevMaterialCode { get; set; }
-        public string PrevMaterialName { get; set; }
+        public int  AutoFinishedProgress {get;set;}
     }
 
     public class MaterialStock : TrackableEntity<long>
@@ -59,6 +57,8 @@ namespace Imms.Mes.Data.Domain
 
         public string ParentBomNo { get; set; }
         public long ParentBomId { get; set; }
+
+        public DateTime EffectDate{get;set;}
     }
 
 
@@ -74,10 +74,7 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.Description).HasColumnName("description").HasMaxLength(250);
             builder.Property(e => e.MaterialName).IsRequired().HasColumnName("material_name").HasMaxLength(50);
             builder.Property(e => e.MaterialCode).IsRequired().HasColumnName("material_code").HasMaxLength(20);
-
-            builder.Property(e => e.PrevMaterialId).HasColumnName("prev_material_id");
-            builder.Property(e => e.PrevMaterialCode).HasColumnName("prev_material_code");
-            builder.Property(e=>e.PrevMaterialName).HasColumnName("prev_material_name");
+            builder.Property(e => e.AutoFinishedProgress).HasColumnName("auto_finished_progress");            
         }
     }
 
@@ -136,6 +133,8 @@ namespace Imms.Mes.Data.Domain
 
             builder.Property(e => e.ParentBomNo).HasColumnName("parent_bom_no");
             builder.Property(e => e.ParentBomId).HasColumnName("parent_bom_id");
+
+            builder.Property(e=>e.EffectDate).HasColumnName("effect_date");
         }
     }
 }

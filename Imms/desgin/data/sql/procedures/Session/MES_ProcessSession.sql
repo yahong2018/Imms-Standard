@@ -10,18 +10,18 @@ create procedure MES_ProcessSession(
 top:begin
     declare PrevStep,Step int default 0;  
     declare SessionType,Success int default -1;
-    declare LogId,SessionId,CardId  bigint;
+    declare SessionId,CardId  bigint;
     declare RespHint varchar(200);
     declare CardType,ReqDataType int;
 
     select -1,-1,'','' into SessionId,Step,RespData,RespHint;	
     
     call MES_GetWorkstationSession(WorkstationId,SessionId,PrevStep,SessionType);	
-    call MES_Debug(CONCAT('MES_GetWorkstationSession  WorkstationId:',WorkstationId,',SessionId:',SessionId,',PrevStep:',PrevStep,',SessionType:',SessionType),LogId);	
+    call MES_Debug(CONCAT('MES_GetWorkstationSession  WorkstationId:',WorkstationId,',SessionId:',SessionId,',PrevStep:',PrevStep,',SessionType:',SessionType));	
 
     if(DataType = 1) then  -- 刷卡输入    
         call MES_VerifyCard(ReqData,CardType,CardId,RespData);		
-        call MES_Debug(CONCAT('MES_VerifyCard  ReqData:',ReqData,',CardType:',CardType,',CardId:',CardId),LogId);
+        call MES_Debug(CONCAT('MES_VerifyCard  ReqData:',ReqData,',CardType:',CardType,',CardId:',CardId));
         if not (CardType in(0,1,2,3)) then		            
             if SessionId <> -1 then
                 select s.resp_hint into RespHint from workstation_session_step s where s.workstation_session_id = SessionId and s.step = PrevStep;
@@ -41,7 +41,7 @@ top:begin
     if (SessionId = -1) then    
         if ReqDataType in(1,2,3) then
             call MES_CreateNewSession(WorkstationId,ReqDataType,ReqData,CardId,ReqTime,SessionId);			
-            call MES_Debug(CONCAT('MES_CreateNewSession   WorkstationId:',WorkstationId,',ReqDataType:',ReqDataType,',ReqData:',ReqData,',CardId:',CardId,',SessionId:',SessionId), LogId);	
+            call MES_Debug(CONCAT('MES_CreateNewSession   WorkstationId:',WorkstationId,',ReqDataType:',ReqDataType,',ReqData:',ReqData,',CardId:',CardId,',SessionId:',SessionId));	
 
             set PrevStep = -1;    
         else
@@ -59,23 +59,23 @@ top:begin
         set PrevStep = -1;    
     end if; 
 
-    call MES_Debug(CONCAT('MES_ProcessSessionStep--> WorkstationId:',WorkstationId,',SessionId:',SessionId,',PrevStep:',PrevStep,',ReqDataType:',ReqDataType,',ReqData:',ReqData),LogId);	
+    call MES_Debug(CONCAT('MES_ProcessSessionStep--> WorkstationId:',WorkstationId,',SessionId:',SessionId,',PrevStep:',PrevStep,',ReqDataType:',ReqDataType,',ReqData:',ReqData));	
     
     call MES_ProcessSessionStep(SessionId,PrevStep,SessionType,WorkstationId,ReqDataType,ReqData,CardId,ReqTime,Success,RespHint,RespData);
 
     if Success = 0 then
-        call MES_Debug('MES_ProcessSessionStep  OK',LogId);
+        call MES_Debug('MES_ProcessSessionStep  OK');
         insert into workstation_session_step(workstation_session_id,step,req_time,req_data_type,req_data,resp_hint,resp_data,resp_time)
                values(SessionId,PrevStep,ReqTime,ReqDataType,ReqData,RespHint,RespData,Now());    
     else
-        call MES_Debug(CONCAT('MES_ProcessSessionStep  Fail ---> SessionId:',SessionId,',PrevStep:',PrevStep),LogId);
+        call MES_Debug(CONCAT('MES_ProcessSessionStep  Fail ---> SessionId:',SessionId,',PrevStep:',PrevStep));
         select s.resp_hint into RespHint from workstation_session_step s where s.workstation_session_id = SessionId and s.step = PrevStep;
 
-        call MES_Debug('MES_ProcessSessionStep get Last Hint',LogId);
+        call MES_Debug('MES_ProcessSessionStep get Last Hint');
         if (RespData <> '') and (RespHint <> '') then
             call MES_AddRespMessage(CONCAT('|200|',RespHint),RespData);
 
-            call MES_Debug(CONCAT('MES_ProcessSessionStep Failed:', RespData),LogId);
+            call MES_Debug(CONCAT('MES_ProcessSessionStep Failed:', RespData));
         elseif (RespHint <> '')  then
            set RespData = CONCAT('1|1|',RespHint,'|0');         
         end if;

@@ -10,7 +10,7 @@ create procedure MES_ReportWip_0(
 begin  
     declare StockQty,IssueQty,ShiftId,PrevOperationIndex,CurDID,CurGID,WorkshopType,CardType,TheNewCardStatus int;
     declare TimeOfOriginWork datetime;
-    declare WorkshopId,ProductionId,PrevMaterialId,LogId,StockRecordId bigint;
+    declare WorkshopId,ProductionId,LogId,StockRecordId bigint;
     declare WorkshopCode,ProductionCode,WorkstationCode,WocgCode,RfidNo varchar(20);
     declare WorkshopName,ProductionName,WorkstationName varchar(50);
         
@@ -59,18 +59,12 @@ begin
             st.qty_good = st.qty_good + ReportQty
     where st.record_id = StockRecordId;
 
-    -- 调整投入半成品的库存
-    if(PrevOperationIndex<>-1) then
-        select m.prev_material_id  into PrevMaterialId 
-          from material m
-         where m.record_id = ProductionId;
-
-        update material_stock st
-            set st.qty_stock = st.qty_stock - ReportQty,                  -- 转入【半成品】的库存
-                st.qty_consume_good = st.qty_consume_good + ReportQty     -- 转入【半成品】的消耗
-        where st.material_id = PrevMaterialId
-          and st.store_id = WorkshopId;
-    end if; 
+    call MES_MES_AjustStockByBom(ProductionId,
+                                 CurGID,CurDID,WorkstationId,WorkstationCode,WorkstationName,wocg_code,
+                                 WorkshopId,WorkshopCode,WorkshopName,
+                                 CardId,RfidNo,IssueQty,
+                                 ReportQty,TimeOfOriginWork,ShiftId
+                                );
 
     -- 更新状态和卡的库存数量
     set TheNewCardStatus = 10;

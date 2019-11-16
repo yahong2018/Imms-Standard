@@ -11,10 +11,10 @@ begin
     declare CurGID,CurDID int;
 	declare WorkstationCode,WorkshopCode,WorkshopCodeFrom,RfidNo,ProductionCode varchar(20);
 	declare WorkstationName,WorkshopName,WorkshopNameFrom,ProductionName varchar(50);
-	declare WorkshopId,ProductionId,WorkshopIdFrom,LogId,OutProductionId bigint;	
+	declare WorkshopId,ProductionId,WorkshopIdFrom,OutProductionId bigint;	
     
     if LastBusinessId = -1 then   -- 如果是外发移库
-	    call MES_Debug('MES_MoveWip_0: LastBusinessId is -1',LogId);	
+	    call MES_Debug('MES_MoveWip_0: LastBusinessId is -1');	
 		-- 移入车间
 		select c.rfid_no, c.stock_qty,c.production_id, c.workshop_id,c.workshop_code,c.workshop_name
 		        into RfidNo,MovedQty,OutProductionId,WorkshopId,WorkshopCode,WorkshopName
@@ -31,7 +31,7 @@ begin
 		from work_organization_unit w
 		where w.record_id = WorkstationId;
 	else
-	    call MES_Debug('MES_MoveWip_0: LastBusinessId is not -1',LogId);	
+	    call MES_Debug('MES_MoveWip_0: LastBusinessId is not -1');	
 		-- 移出车间
 		select c.rfid_no, c.stock_qty,c.production_id,c.production_code,c.production_name, c.workshop_id,c.workshop_code,c.workshop_name
 	   	       into RfidNo,MovedQty,ProductionId,ProductionCode,ProductionName,WorkshopIdFrom,WorkshopCodeFrom,WorkshopNameFrom

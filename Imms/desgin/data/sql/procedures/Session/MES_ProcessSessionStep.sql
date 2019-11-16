@@ -14,16 +14,16 @@ create procedure MES_ProcessSessionStep(
     out  RespData             varchar(200)
 )
 top:begin  
-    declare SessionStepId,LogId bigint;
+    declare SessionStepId bigint;
      
 	select '','',-1 into RespHint,RespData,Success;
 
-	call MES_Debug(CONCAT('MES_ProcessSessionStep--> PrevStep:',PrevStep,',ReqDataType:',ReqDataType,'ReqData:',ReqData),LogId);		
+	call MES_Debug(CONCAT('MES_ProcessSessionStep--> PrevStep:',PrevStep,',ReqDataType:',ReqDataType,'ReqData:',ReqData));		
 	
     -- 如果是新Session,就要确定Session的类别
     if (PrevStep = -1) then
 		if ReqDataType = 1 then -- 如果是刷工卡，则提示菜单 1.退件  2.发前工程看板    
-			call MES_Debug('MES_DisplayMenu',LogId);	
+			call MES_Debug('MES_DisplayMenu');	
 
 			call MES_DisplayMenu(RespHint,RespData);		
 			set Success = 0;
@@ -34,7 +34,7 @@ top:begin
 			   leave top;
 			end if;
 
-			call MES_Debug('MES_WipCardInput',LogId);
+			call MES_Debug('MES_WipCardInput');
 			update workstation_session  set current_step = 255 where record_id = SessionId; -- 这些Session只有一步      
 			call MES_WipCardInput(WorkstationId,ReqDataType,ReqData,CardId,ReqTime,Success,RespData);
 			set PrevStep = 0;
@@ -58,11 +58,11 @@ top:begin
   	
   	 -- 如果已经确定了session的类别，则根据PrevStep来确定本次的行动
     if SessionType = 0 then   -- 如果是"退件"	
-	    call MES_Debug('MES_BackWipToPrev',LogId);		 
+	    call MES_Debug('MES_BackWipToPrev');		 
         call MES_BackWipToPrev(SessionId,PrevStep + 1,WorkstationId,ReqDataType,ReqData,CardId,ReqTime,Success,RespHint,RespData);				
-		call MES_Debug('MES_BackWipToPrev END',LogId);	
+		call MES_Debug('MES_BackWipToPrev END');	
     elseif SessionType = 1 then -- 如果是"给前工程发卡"
-	    call MES_Debug('MES_IssueCard',LogId);		
+	    call MES_Debug('MES_IssueCard');		
         call MES_IssueCard(SessionId,PrevStep + 1,WorkstationId,ReqDataType,ReqData,CardId,ReqTime,Success,RespHint,RespData);
     end if;  
 

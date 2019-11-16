@@ -16,7 +16,7 @@ begin
     set LogId = -1;    
 
     set LogMessage = CONCAT('StrPara1:',StrPara1,',DataType:',DataType,',GID:',GID,',DID:',DID,',GatherTime:',GatherTime,',ErrorCode:',ErrorCode,',ErrorMsg:',ErrorMsg);
-    call MES_Debug(LogMessage,LogId);
+    call MES_DebugWithLogId(LogMessage,LogId);
 
     set RespData = '2';
     set RespData = CONCAT(RespData,'|1|系统异常:',LogId,'|0');

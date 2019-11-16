@@ -12,7 +12,7 @@ create procedure MES_ReportWip(
 )
 top:begin
     declare ReportQty int;
-    declare BindId,OutSourceCardProductionId,QtyCardProductionId,LastBusinessId,LogId  bigint;    
+    declare BindId,OutSourceCardProductionId,QtyCardProductionId,LastBusinessId  bigint;    
     declare QtyCardProductionCode,RfidNo varchar(20);
     declare ProductionName varchar(50);
     
@@ -24,7 +24,7 @@ top:begin
     where c.record_id = CardId; 
 
     if (WorkshopType in (1,5)) then  -- 工程内车间、外发后工程车间 
-        call MES_Debug('MES_ReportWip:工程内车间、外发后工程车间 ',LogId);  
+        call MES_Debug('MES_ReportWip:工程内车间、外发后工程车间 ');  
         call MES_ReportWip_0(WorkstationId,CardId,ReqTime,ReportQty,LastBusinessId);
     elseif(WorkshopType = 3) then   -- 外发前工程车间的工程内看板报工
         -- 外发前工程，必须先有相应的绑定记录     
@@ -45,7 +45,7 @@ top:begin
         end if;
 
         -- 进行报工 
-        call MES_Debug('MES_ReportWip_1:外发前工程车间的工程内看板报工 ',LogId);                 
+        call MES_Debug('MES_ReportWip_1:外发前工程车间的工程内看板报工 ');                 
         call MES_ReportWip_1(WorkstationId,BindId,CardId,RfidNo,ReqTime,ReportQty,LastBusinessId);   
     end if;
 
@@ -54,7 +54,7 @@ top:begin
              2.  进行移库    
              3.  修改工位绑定状态
         */
-        call MES_Debug('MES_MoveWip_0:外发回厂 ',LogId);                 
+        call MES_Debug('MES_MoveWip_0:外发回厂 ');                 
         call MES_MoveWip_0(WorkstationId,CardId,ReqTime,ReportQty,LastBusinessId);  -- 移库
         
         update outsource_workstation_bind

@@ -13,11 +13,9 @@ create procedure MES_IssueCard(
     out RespData     varchar(200)
 )
 top:begin    
-    declare LogId bigint;
-
     select -1,'','' into Success,RespData,RespHint;		
 
-    call MES_Debug(CONCAT('MES_IssueCard--> CurrentStep:',CurrentStep,',ReqDataType:',ReqDataType,'ReqData:',ReqData),LogId);		
+    call MES_Debug(CONCAT('MES_IssueCard--> CurrentStep:',CurrentStep,',ReqDataType:',ReqDataType,'ReqData:',ReqData));		
 		
     if (CurrentStep = 0) and (ReqDataType = 4) then  -- 菜单选择
         call MES_IssueCard_0(Success,RespHint,RespData);		

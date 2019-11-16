@@ -13,7 +13,7 @@ create procedure MES_MoveWip
 )
 top:begin
     declare MovedQty int;
-    declare BindRecordId,LastBusinessId,LogId bigint;
+    declare BindRecordId,LastBusinessId bigint;
     declare ProductionName varchar(50);
 
     select '',-1 into RespData,Success;
@@ -24,7 +24,7 @@ top:begin
         
     if (CardType = 3) and (WorkshopType = 3) then   -- 外发移库
         set LastBusinessId = -1;
-        call MES_Debug('MES_MoveWip_0:外发移库',LogId);	
+        call MES_Debug('MES_MoveWip_0:外发移库');	
         call MES_MoveWip_0(WorkstationId,CardId,ReqTime,MovedQty,LastBusinessId);
     else  
          -- 工程内
@@ -36,7 +36,7 @@ top:begin
             leave top;
         end if;
 
-        call MES_Debug('MES_MoveWip_0:工程内移库',LogId);	
+        call MES_Debug('MES_MoveWip_0:工程内移库');	
         call MES_MoveWip_0(WorkstationId,CardId,ReqTime,MovedQty,LastBusinessId);        
     end if;
    
