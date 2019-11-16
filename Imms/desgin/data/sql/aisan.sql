@@ -645,3 +645,12 @@ create table global_lock
 (
      lock_name            varchar(50)                    not null
 );
+
+insert into global_lock values('AAAA');
+
+
+create table bom_stock(		
+    production_id     bigint                      not null,
+    qty               int                         not null,
+    lvl               int                         not null
+)engine=memory; 

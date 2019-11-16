@@ -50,7 +50,7 @@ begin
         ReqTime,TimeOfOriginWork,ShiftId,ReportQty,IssueQty
     );
     set LastBusinessId = LAST_INSERT_ID();
-
+ 
     -- 调整完成品库存
     call MES_AssureMaterialStock(ProductionId,ProductionCode,ProductionName,WorkshopId,WorkshopCode,WorkshopName,StockRecordId);
 
@@ -59,8 +59,8 @@ begin
             st.qty_good = st.qty_good + ReportQty
     where st.record_id = StockRecordId;
 
-    call MES_MES_AjustStockByBom(ProductionId,
-                                 CurGID,CurDID,WorkstationId,WorkstationCode,WorkstationName,wocg_code,
+    call MES_AjustStockByBom(ProductionId,
+                                 CurGID,CurDID,WorkstationId,WorkstationCode,WorkstationName,WocgCode,
                                  WorkshopId,WorkshopCode,WorkshopName,
                                  CardId,RfidNo,IssueQty,
                                  ReportQty,TimeOfOriginWork,ShiftId

@@ -34,9 +34,11 @@ top:begin
 			   leave top;
 			end if;
 
-			call MES_Debug('MES_WipCardInput');
+			call MES_Debug(CONCAT('MES_WipCardInput --> Success:',Success));
 			update workstation_session  set current_step = 255 where record_id = SessionId; -- 这些Session只有一步      
 			call MES_WipCardInput(WorkstationId,ReqDataType,ReqData,CardId,ReqTime,Success,RespData);
+			call MES_Debug(CONCAT('MES_WipCardInput --> Success:',Success));
+			
 			set PrevStep = 0;
 			
 			leave top;

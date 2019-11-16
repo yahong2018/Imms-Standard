@@ -124,4 +124,6 @@ top:begin
         call MES_Debug('MES_ReportWip:外发回厂报工');	
         call MES_ReportWip(WorkstationId,WorkshopType,CardId,CardType,CardStatus,ReqTime,Success,RespData); 
     end if;    
+
+    call MES_Debug(CONCAT('MES_WipCardInput Result --> Success:',Success));
 end;

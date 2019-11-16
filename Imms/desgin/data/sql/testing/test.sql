@@ -29,14 +29,18 @@ truncate table bom;
 truncate table rfid_card;
 
 truncate table material_stock;
-truncate table production_order;
 truncate table product_summary;
 truncate table production_order_progress;
 truncate table production_moving;
-truncate table quality_check;
-truncate table workstation_login;
+
 truncate table workstation_session;
 truncate table workstation_session_step;
+
+truncate table production_order;
+
+truncate table quality_check;
+truncate table workstation_login;
+
 truncate table outsource_workstation_bind;
 truncate table outsource_card_bind;
 
@@ -260,68 +264,67 @@ insert into work_organization_unit(org_code,org_name,org_type,workshop_type,
 /****************************************************************************************************
         产品
 *****************************************************************************************************/
-insert into material (material_code,material_name,prev_material_id,prev_material_code,prev_material_name,create_by_id,create_by_code,create_by_name,create_time)
-    values('A01','A_压铸',-1,'','',1,'C00001','刘永红',Now());
+insert into material (material_code,material_name,auto_finished_progress,create_by_id,create_by_code,create_by_name,create_time)
+           select 'A01','A_压铸',0,1,'C00001','刘永红',Now()
+ union all select 'A02','A_粗加工',0,1,'C00001','刘永红',Now()
+ union all select 'A03','A_MC加工',0,1,'C00001','刘永红',Now()
+ union all select 'A04','A_THR组装',0,1,'C00001','刘永红',Now()
+ union all select 'A04_01','A04_01',1,1,'C00001','刘永红',Now()
+ union all select 'A04_0101','A04_0101',1,1,'C00001','刘永红',Now()
+ union all select 'A04_02','A04_02',1,1,'C00001','刘永红',Now()
+ union all select 'A04_0201','A04_0201',1,1,'C00001','刘永红',Now()
 
-set @PreMaterialId = LAST_INSERT_ID();
-insert into material (material_code,material_name,prev_material_id,prev_material_code,prev_material_name,create_by_id,create_by_code,create_by_name,create_time)
-    values('A02','A_粗加工',@PreMaterialId,'A01','A_压铸',1,'C00001','刘永红',Now());
-
-set @PreMaterialId = LAST_INSERT_ID();
-insert into material (material_code,material_name,prev_material_id,prev_material_code,prev_material_name,create_by_id,create_by_code,create_by_name,create_time)
-    values('A03','A_MC加工',@PreMaterialId,'A02','A_粗加工',1,'C00001','刘永红',Now());
-
-set @PreMaterialId = LAST_INSERT_ID();
-insert into material (material_code,material_name,prev_material_id,prev_material_code,prev_material_name,create_by_id,create_by_code,create_by_name,create_time)
-    values('A04','A_THR组装',@PreMaterialId,'A03','A_THR组装',1,'C00001','刘永红',Now());
-
-insert into material (material_code,material_name,prev_material_id,prev_material_code,prev_material_name,create_by_id,create_by_code,create_by_name,create_time)
-    values('B01','B_切断',-1,'','',1,'C00001','刘永红',Now());
-
-set @PreMaterialId = LAST_INSERT_ID();
-insert into material (material_code,material_name,prev_material_id,prev_material_code,prev_material_name,create_by_id,create_by_code,create_by_name,create_time)
-    values('B02','B_锻造',@PreMaterialId,'B01','B_切断',1,'C00001','刘永红',Now());
-
-set @PreMaterialId = LAST_INSERT_ID();
-insert into material (material_code,material_name,prev_material_id,prev_material_code,prev_material_name,create_by_id,create_by_code,create_by_name,create_time)
-    values('B03','B_EV前工程',@PreMaterialId,'B02','B_锻造',1,'C00001','刘永红',Now());    
-
-set @PreMaterialId = LAST_INSERT_ID();
-insert into material (material_code,material_name,prev_material_id,prev_material_code,prev_material_name,create_by_id,create_by_code,create_by_name,create_time)
-    values('B04','B_EV外发',@PreMaterialId,'B03','B_EV前工程',1,'C00001','刘永红',Now());  
-
-set @PreMaterialId = LAST_INSERT_ID();
-insert into material (material_code,material_name,prev_material_id,prev_material_code,prev_material_name,create_by_id,create_by_code,create_by_name,create_time)
-    values('B05','B_EV后工程',@PreMaterialId,'B04','B_EV外发',1,'C00001','刘永红',Now()); 
-
-
-/****************************************************************************************************
-        库存初始化
-*****************************************************************************************************/        
-insert into material_stock(material_id,material_code,material_name,
-                            store_id,store_code,store_name,
-                            qty_stock,qty_move_in,qty_back_in,qty_back_out,qty_consume_good,qty_consume_defect,qty_good,qty_defect,qty_move_out,
-                            create_by_id,create_by_code,create_by_name,create_time)
-select m.record_id as material_id,m.material_code,m.material_name,
-	   w.record_id as store_id,w.org_code,w.org_name,
-	   0,0,0,0,0,0,0,0,0,
-	   1,'C00001','刘永红',Now()
-from material m right outer join work_organization_unit w on 1 = 1
- where w.org_type = 'ORG_WORK_SHOP';
-
-/****************************************************************************************************
-        生产进度初始化
-*****************************************************************************************************/  
-insert into product_summary(product_date,workshop_id,workshop_code,workshop_name,
-                            production_id,production_code,production_name,
-                            qty_good_0,qty_defect_0,qty_good_1,qty_defect_1)
-select  '2019/11/12', w.record_id as store_id,w.org_code,w.org_name,
-        m.record_id as material_id,m.material_code,m.material_name,
-        0,0,0,0
-from material m right outer join work_organization_unit w on 1 = 1
- where w.org_type = 'ORG_WORK_SHOP';
-
-
+ --
+ -- BOM
+ --
+insert bom (bom_no,bom_type,bom_status,
+             material_id,material_code,material_name,
+             component_id,component_code,component_name,
+             material_qty,component_qty,effect_date,
+             create_by_id,create_by_code,create_by_name,create_time,
+             opt_flag)
+         select '',-1,1,
+                7,'A04_02','A04_02',
+                8,'A04_0201','A04_0201',
+                1,1,'2019/11/01',
+                1,'C00001','刘永红',Now(),
+                1
+union all select '',-1,1,
+                5,'A04_01','A04_01',
+                6,'A04_0101','A04_0101',
+                1,1,'2019/11/01',
+                1,'C00001','刘永红',Now(),
+                1        
+union all select '',-1,1,
+                4,'A04','A_THR组装',
+                5,'A04_01','A04_01',
+                1,1,'2019/11/01',
+                1,'C00001','刘永红',Now(),
+                1        
+union all select '',-1,1,
+                4,'A04','A_THR组装',
+                7,'A04_02','A04_02',
+                1,1,'2019/11/01',
+                1,'C00001','刘永红',Now(),
+                1        
+ union all select '',-1,1,
+                6,'A04_01','A04_01',
+                3,'A03','A_MC加工',
+                1,1,'2019/11/01',
+                1,'C00001','刘永红',Now(),
+                1        
+ union all select '',-1,1,
+                3,'A03','A_MC加工',
+                2,'A02','A_粗加工',
+                1,1,'2019/11/01',
+                1,'C00001','刘永红',Now(),
+                1        
+union all select '',-1,1,
+                2,'A02','A_粗加工',
+                1,'A01','A_压铸',
+                1,1,'2019/11/01',
+                1,'C00001','刘永红',Now(),
+                1    
 
 /****************************************************************************************************
         工程内看板 &  外发看板
@@ -380,92 +383,6 @@ insert into rfid_card(
     'THR01','THR01',2,1,
     4,'A04','A_THR加工',
     4,'THR','THR加工',
-    100,0,-1,
-    1,'C00001','刘永红',Now()
-);
-
-
-
-insert into rfid_card(
-    kanban_no,rfid_no,card_type,card_status,
-    production_id,production_code,production_name,
-    workshop_id,workshop_code,workshop_name,
-    issue_qty,stock_qty,last_business_id,
-    create_by_id,create_by_code,create_by_name,create_time
-)values(
-    'QD001','QD001',2,1,
-    3,'B01','B_切断',
-    5,'QD','切断',
-    100,0,-1,
-    1,'C00001','刘永红',Now()
-);
-
-insert into rfid_card(
-    kanban_no,rfid_no,card_type,card_status,
-    production_id,production_code,production_name,
-    workshop_id,workshop_code,workshop_name,
-    issue_qty,stock_qty,last_business_id,
-    create_by_id,create_by_code,create_by_name,create_time
-)values(
-    'DZ001','DZ001',2,1,
-    4,'B02','B_锻造',
-    7,'DZ','锻造',
-    100,0,-1,
-    1,'C00001','刘永红',Now()
-);
-
-insert into rfid_card(
-    kanban_no,rfid_no,card_type,card_status,
-    production_id,production_code,production_name,
-    workshop_id,workshop_code,workshop_name,
-    issue_qty,stock_qty,last_business_id,
-    create_by_id,create_by_code,create_by_name,create_time
-)values(
-    'EV001','EV001',2,1,
-    5,'B03','B_EV前工程',
-    9,'EV0','EV前工程',
-    100,0,-1,
-    1,'C00001','刘永红',Now()
-);
-
-insert into rfid_card(
-    kanban_no,rfid_no,card_type,card_status,
-    production_id,production_code,production_name,
-    workshop_id,workshop_code,workshop_name,
-    issue_qty,stock_qty,last_business_id,
-    create_by_id,create_by_code,create_by_name,create_time
-)values(
-    'EV002','EV002',2,1,
-    5,'B03','B_EV前工程',
-    9,'EV0','EV前工程',
-    100,0,-1,
-    1,'C00001','刘永红',Now()
-);
-
-insert into rfid_card(
-    kanban_no,rfid_no,card_type,card_status,
-    production_id,production_code,production_name,
-    workshop_id,workshop_code,workshop_name,
-    issue_qty,stock_qty,last_business_id,
-    create_by_id,create_by_code,create_by_name,create_time
-)values(
-    'EV101','EV101',3,1,    -- 外发看板
-    6,'B04','B_EV外发',
-    11,'EV1','EV渗氮',
-    200,0,-1,
-    1,'C00001','刘永红',Now()
-);
-
-insert into rfid_card(
-    kanban_no,rfid_no,card_type,card_status,
-    production_id,production_code,production_name,
-    workshop_id,workshop_code,workshop_name,
-    issue_qty,stock_qty,last_business_id,
-    create_by_id,create_by_code,create_by_name,create_time
-)values(
-    'EV201','EV201',2,1,
-    7,'B05','B_EV后工程',
-    12,'EV2','EV后工程',
     100,0,-1,
     1,'C00001','刘永红',Now()
 );

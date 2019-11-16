@@ -20,6 +20,7 @@ namespace Imms.Mes.Data
 
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.MaterialTypeConfigure());
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.MaterialConfigure());
+            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.BomConfigure());
 
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.RfidControllerConfigure());
 

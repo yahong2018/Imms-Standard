@@ -7,7 +7,7 @@ create procedure MES_MoveWip_0(
   out   MovedQty             int,          -- 返回结果：移库数量
   inout LastBusinessId       bigint        -- 报工记录: -1 表示是外发，其他表示工程内移库
 )
-begin    
+begin
     declare CurGID,CurDID int;
 	declare WorkstationCode,WorkshopCode,WorkshopCodeFrom,RfidNo,ProductionCode varchar(20);
 	declare WorkstationName,WorkshopName,WorkshopNameFrom,ProductionName varchar(50);
@@ -44,7 +44,7 @@ begin
 		where w.record_id = WorkstationId;	    
 	end if;
 
-    call MES_Debug('MES_MoveWip_0: MES_MoveWip_1',LogId);	
+    call MES_Debug('MES_MoveWip_0: MES_MoveWip_1');	
 	call MES_MoveWip_1(CardId,RfidNo,CurDID,CurGID,MovedQty,
 	                     ProductionId,ProductionCode,ProductionName,
 						 WorkstationId,WorkstationCode,WorkstationName,

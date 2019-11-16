@@ -73,16 +73,16 @@ namespace Imms.Mes.Data
 
             GlobalConstants.ModifyEntityStatus(stock, dbContext);
 
-            Material material = dbContext.Set<Material>().Where(x => x.RecordId == item.ProductionId).First();
-            MaterialStock prevStock = dbContext.Set<MaterialStock>()
-                .Where(x => x.MaterialId == material.PrevMaterialId && x.StoreId == item.WorkshopId
-               ).FirstOrDefault();
-            if (prevStock != null)
-            {
-                prevStock.QtyStock = prevStock.QtyStock - item.Qty;
-                prevStock.QtyConsumeDefect = prevStock.QtyConsumeDefect + item.Qty;
-                GlobalConstants.ModifyEntityStatus(prevStock, dbContext);
-            }
+            // Material material = dbContext.Set<Material>().Where(x => x.RecordId == item.ProductionId).First();
+            // MaterialStock prevStock = dbContext.Set<MaterialStock>()
+            //     .Where(x => x.MaterialId == material.PrevMaterialId && x.StoreId == item.WorkshopId
+            //    ).FirstOrDefault();
+            // if (prevStock != null)
+            // {
+            //     prevStock.QtyStock = prevStock.QtyStock - item.Qty;
+            //     prevStock.QtyConsumeDefect = prevStock.QtyConsumeDefect + item.Qty;
+            //     GlobalConstants.ModifyEntityStatus(prevStock, dbContext);
+            // }
         }
     }
 }

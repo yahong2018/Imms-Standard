@@ -7,7 +7,7 @@ create procedure MES_ReportWip(
   in    CardType             int,
   in    CardStatus           int,
   in    ReqTime              datetime,            -- 报工时间  
-  in    Success              int,
+  out   Success              int,
   out   RespData             varchar(200)  
 )
 top:begin
@@ -71,4 +71,6 @@ top:begin
     set RespData = CONCAT(RespData,'|3|',ifnull(ReportQty,0),'个|0');
 
     set Success = 0;
+
+    call MES_Debug(CONCAT('MES_ReportWip Result --> Success:',Success));
 end;
