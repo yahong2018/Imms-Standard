@@ -23,18 +23,11 @@ create procedure MES_AjustStockByBom(
 )
 begin
     declare CurLevel int;  
-
-    declare exit handler for sqlexception
-    begin
-         rollback;
-    end;    
+       
+    delete from bom_stock where workstation_id = WorkStationId;
     
-    start transaction;
-    select * from global_lock for update;    
-    truncate bom_stock;
-    
-    insert into bom_stock(production_id,qty,lvl)
-       select b.component_id,b.component_qty * Qty,1 
+    insert into bom_stock(workstation_id,production_id,qty,lvl)
+       select WorkStationId,b.component_id,b.component_qty * Qty,1 
         from bom b 
       where b.material_id = ProductionId
         and b.bom_status = 1;
@@ -44,13 +37,14 @@ begin
     set CurLevel = 1;
     BreakWhile:while (true) do       
         set CurLevel = CurLevel + 1;
-        insert into bom_stock(production_id,qty,lvl)
-            select b.component_id,b.component_qty * bs.qty,CurLevel
+        insert into bom_stock(workstation_id,production_id,qty,lvl)
+            select WorkstationId, b.component_id,b.component_qty * bs.qty,CurLevel
                from bom b join bom_stock bs on bs.production_id = b.material_id
                where b.bom_status = 1
+                 and bs.workstation_id = WorkStationId
                  and bs.lvl = CurLevel-1;
       
-        if not exists(select * from bom_stock where lvl = CurLevel ) then
+        if not exists(select * from bom_stock where lvl = CurLevel and workstation_id = WorkstationId ) then
             leave BreakWhile;
         end if; 
 
@@ -63,7 +57,8 @@ begin
     call MES_Debug('MES_AjustStockByBom   99');
     
     delete bs from bom_stock bs
-      where not exists(
+      where bs.workstation_id = WorkstationId
+        and not exists(
              select * from material m 
                 where m.auto_finished_progress = 1
                  and m.record_id = bs.production_id
@@ -90,7 +85,8 @@ begin
          1,'SYS','数据采集平台',Now(),
          -1,'','',null,0,
          Now(),TimeOfOriginWork,ShiftId,bs.qty,CardQty
-     from bom_stock bs join material m on bs.production_id = m.record_Id;
+     from bom_stock bs join material m on bs.production_id = m.record_Id
+     where bs.workstation_id = WorkstationId;
 
     call MES_Debug('MES_AjustStockByBom   100');
 
@@ -99,7 +95,8 @@ begin
     select TimeOfOriginWork,WorkshopId,WorkshopCode,WorkshopName,
            bs.production_id,m.material_code,m.material_name,0,0,0,0
     from  bom_stock bs join material m on bs.production_id = m.record_id
-    where not exists(
+    where bs.workstation_id = WorkstationId
+      and not exists(
         select * from product_summary ps
           where ps.production_id = bs.production_Id
             and ps.workshop_id = WorkshopId
@@ -111,13 +108,15 @@ begin
           set ps.qty_good_0 = ps.qty_good_0 + bs.qty
         where ps.production_id = bs.production_id
           and ps.product_date = TimeOfOriginWork
-          and ps.workshop_id = WorkshopId;
+          and ps.workshop_id = WorkshopId
+          and bs.workstation_id = WorkstationId;
     else 
         update product_summary ps,bom_stock bs 
           set ps.qty_good_1 = ps.qty_good_1 + bs.qty
         where ps.production_id = bs.production_id
           and ps.product_date = TimeOfOriginWork
-          and ps.workshop_id = WorkshopId;
+          and ps.workshop_id = WorkshopId
+          and bs.workstation_id = WorkstationId;
     end if;    
 
     -- 调整库存
@@ -128,7 +127,8 @@ begin
                   0,0,0,0,0,0,0,0,0,
                   1,'SYS','数据采集平台',Now(),0
      from  bom_stock bs join material m on bs.production_id = m.record_id
-    where not exists(
+    where bs.workstation_id = WorkstationId
+     and not exists(
         select * from material_stock ms 
           where ms.material_id = bs.production_Id
             and ms.store_id = WorkshopId
@@ -138,7 +138,6 @@ begin
     update material_stock ms join bom_stock bs on ms.material_id = bs.production_id
        set ms.qty_good = ms.qty_good + bs.qty,
            ms.qty_consume_good = ms.qty_consume_good + bs.qty
-    where ms.store_id = WorkshopId;
-
-    commit;
+    where ms.store_id = WorkshopId
+      and bs.workstation_id = WorkstationId;    
 end;

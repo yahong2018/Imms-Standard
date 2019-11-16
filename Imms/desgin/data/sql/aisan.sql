@@ -650,6 +650,7 @@ insert into global_lock values('AAAA');
 
 
 create table bom_stock(		
+    workstation_id    bigint                      not null,
     production_id     bigint                      not null,
     qty               int                         not null,
     lvl               int                         not null
