@@ -9,19 +9,20 @@ create procedure MES_IssueCard(
     in CardId        bigint,
     in ReqTime       datetime,
     out Success      int,
+    out RespHint     varchar(200),
     out RespData     varchar(200)
 )
 top:begin    
     declare LogId bigint;
 
-    select -1,'' into Success,RespData;		
+    select -1,'','' into Success,RespData,RespHint;		
 
     call MES_Debug(CONCAT('MES_IssueCard--> CurrentStep:',CurrentStep,',ReqDataType:',ReqDataType,'ReqData:',ReqData),LogId);		
 		
     if (CurrentStep = 0) and (ReqDataType = 4) then  -- 菜单选择
-        call MES_IssueCard_0(Success,RespData);		
+        call MES_IssueCard_0(Success,RespHint,RespData);		
 	elseif (CurrentStep = 1) and (ReqDataType = 2) then --  刷看板
-		call MES_IssueCard_1(ReqDataType,CardId,Success,RespData);		
+		call MES_IssueCard_1(ReqDataType,CardId,Success,RespHint,RespData);		
     elseif (CurrentStep = 2) and (ReqDataType = 4) then -- 输入数量
         call MES_IssueCard_2(SessionId,CurrentStep,ReqDataType,ReqData,Success,RespData);		
     end if;
