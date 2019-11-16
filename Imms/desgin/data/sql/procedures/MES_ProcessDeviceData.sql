@@ -11,7 +11,7 @@ create procedure MES_ProcessDeviceData(
 )
 top:begin    
     declare WorkstationId,CardId,LogId bigint default -1;
-    declare CardType,ReqDataType,TemplateIndex int default -1;
+    declare TemplateIndex int default -1;
     declare ErroCode varchar(5) default '00000';
     declare ErrorMsg text;	
 
@@ -19,35 +19,22 @@ top:begin
     begin
         get diagnostics condition 1 ErroCode = returned_sqlstate, ErrorMsg = message_text;	
         set RespData = '';
+
         call MES_SqlExceptionHandler(StrPara1,DataType,GID,DID,DataGatherTime,ErroCode,ErrorMsg,RespData);
-    end;  
+        call MES_BuildRespData(TemplateIndex,RespData); 
+    end;
 
     select '' into RespData;
-
-    call MES_Debug('MES_VerifyWorkstation',LogId);	
-
     call MES_VerifyWorkstation(GID,DID,WorkstationId,TemplateIndex,RespData);	
-    if WorkstationId = -1 then     
+    call MES_Debug(CONCAT('MES_VerifyWorkstation  GID:',GID,',DID:',DID,',WorkstationId:',WorkstationId,',TemplateIndex:',TemplateIndex),LogId);
+
+    if WorkstationId = -1 then  
+        call MES_Error(RespData);
         call MES_BuildRespData(TemplateIndex,RespData); 
         
         leave top;
     end if;
-
-    call MES_Debug('MES_VerifyCard',LogId);
-    if(DataType = 1) then  -- 刷卡输入    
-        call MES_VerifyCard(StrPara1,CardType,CardId,RespData);		
-        if not (CardType in(0,1,2,3)) then		
-            call MES_BuildRespData(TemplateIndex,RespData); 
-
-            leave top;
-        end if;         
-        set ReqDataType = CardType;
-    elseif(DataType in(2,3)) then
-        set ReqDataType = 4;   -- 键盘输入
-    end if;
-
-    call MES_Debug('MES_ProcessSession',LogId);
-    call MES_ProcessSession(WorkstationId,ReqDataType,StrPara1,CardId,DataGatherTime,RespData);
-
+    
+    call MES_ProcessSession(WorkstationId,DataType,StrPara1,DataGatherTime,RespData); 
     call MES_BuildRespData(TemplateIndex,RespData); 
 end;

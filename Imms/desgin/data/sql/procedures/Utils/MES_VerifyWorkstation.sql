@@ -15,12 +15,11 @@ top:begin
       and w.rfid_controller_id = GID
       and w.rfid_terminator_id = DID )>1 then
 		
-		set RespData = '4';    		
+		set RespData = '3'; 
 		set RespData = CONCAT(RespData,'|1|组号:',GID,',机号:',DID,'|0');
 		set RespData = CONCAT(RespData,'|2|工位重复注册|0');			
 		set RespData = CONCAT(RespData,'|3|请联系管理员|0');
-        call MES_Error(RespData);
-
+        
 		leave top;
 	end if;	  
 
@@ -31,9 +30,8 @@ top:begin
       and w.rfid_terminator_id = DID;
 
     if (WorkstationId = -1) then		
-		set RespData = '3';		
+		set RespData = '2';		
 		set RespData = CONCAT(RespData,'|1|组号:',GID,',机号:',DID,'|0');
-		set RespData = CONCAT(RespData,'|2|请联系管理员注册|0');			
-        call MES_OK(RespData);
+		set RespData = CONCAT(RespData,'|2|请联系管理员注册|0');
 	end if;	   
 end;

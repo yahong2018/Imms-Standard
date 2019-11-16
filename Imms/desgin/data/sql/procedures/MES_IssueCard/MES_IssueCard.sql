@@ -8,10 +8,10 @@ create procedure MES_IssueCard(
     in ReqData       varchar(20),
     in CardId        bigint,
     in ReqTime       datetime,
+    out Success      int,
     out RespData     varchar(200)
 )
-top:begin
-    declare Success int;
+top:begin    
     declare LogId bigint;
 
     select -1,'' into Success,RespData;		

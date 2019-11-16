@@ -7,12 +7,16 @@ create procedure MES_MoveWip
   in    CardId               bigint,              -- RFID  
   in    CardType             int,
   in    CardStatus           int,
-  in    ReqTime              datetime,            -- 移库时间
+  in    ReqTime              datetime,            -- 移库时间  
+  out   Success              int,
   out   RespData             varchar(200)  
 )
 top:begin
     declare MovedQty int;
     declare BindRecordId,LastBusinessId,LogId bigint;
+    declare ProductionName varchar(50);
+
+    select '',-1 into RespData,Success;
    
     select c.last_business_id into LastBusinessId
       from rfid_card c
@@ -25,11 +29,10 @@ top:begin
     else  
          -- 工程内
         if(ifnull(LastBusinessId,-1) = -1) then
-            set RespData= '3';            
+            set RespData= '2';            
             set RespData = CONCAT(RespData,'|1|看板移库异常：|0');            
             set RespData = CONCAT(RespData,'|2|不存在报工记录！|0');               
-            call MES_Error(RespData);
-
+            
             leave top;
         end if;
 
@@ -37,7 +40,7 @@ top:begin
         call MES_MoveWip_0(WorkstationId,CardId,ReqTime,MovedQty,LastBusinessId);        
     end if;
    
-    if (CardType = 3) then    
+    if (CardType = 3) then
         -- 要将所有绑定的工程内看板也一并进行移库            
         select record_id into BindRecordId
         from outsource_workstation_bind
@@ -59,7 +62,14 @@ top:begin
           and bind_status = 10;          
     end if;
 
-    set RespData=	'2';    
-    set RespData = CONCAT(RespData,'|1|已经移库',ifnull(MovedQty,0),'个|0');                
-    call MES_OK(RespData);    
+    select production_name into ProductionName
+      from rfid_card
+    where record_id = CardId;
+
+    set RespData=	'3';            
+    set RespData = CONCAT(RespData,'|1|已移库|0');
+    set RespData = CONCAT(RespData,'|2|',ProductionName,'|0');
+    set RespData = CONCAT(RespData,'|3|',ifnull(MovedQty,0),'个|0'); 
+
+    set Success = 0;              
 end;

@@ -18,8 +18,9 @@ begin
     set LogMessage = CONCAT('StrPara1:',StrPara1,',DataType:',DataType,',GID:',GID,',DID:',DID,',GatherTime:',GatherTime,',ErrorCode:',ErrorCode,',ErrorMsg:',ErrorMsg);
     call MES_Debug(LogMessage,LogId);
 
-    set RespData = '3';    
+    set RespData = '2';
     set RespData = CONCAT(RespData,'|1|系统异常:',LogId,'|0');
-    set RespData = CONCAT(RespData,'|2|请联系管理员|0');	   
-    call MES_Error(RespData);
+    set RespData = CONCAT(RespData,'|2|请联系管理员|0');
+
+    call MES_Error(RespData);   
 end;

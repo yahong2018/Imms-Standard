@@ -4,11 +4,13 @@ create procedure MES_BindOutsourceCard
 (
   in      WorkstationId        bigint,  
   in      CardId               bigint,
-  in      CardNo               varchar(20),
+  in      CardNo               varchar(20),  
+  in      Success              int,
   out     RespData             varchar(200)
 )
 begin
     declare BindRecordId bigint;
+    set Success = -1;
 
     select record_id into BindRecordId from outsource_workstation_bind where workstation_id = WorkstationId and bind_status  = 1;
        
@@ -29,8 +31,8 @@ begin
         where record_id = CardId;
     end if;
     
-    set RespData='2';    
+    set RespData='1';
     set RespData = CONCAT(RespData,'|1|已绑定外发看板|0');  
 
-    call MES_OK(RespData);
+    set Success = 0;
 end;

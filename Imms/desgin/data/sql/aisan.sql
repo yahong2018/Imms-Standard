@@ -599,8 +599,9 @@ create table workstation_session_step
   
   req_time                     datetime                        not null, -- 请求时间
   req_data_type                int                             not null, -- 1. 工卡    2.数量卡   3.委外加工卡    4.键盘输入   
-  req_data                     varchar(20)                     not null, -- 请求的数据
-    
+  req_data                     varchar(20)                     not null, -- 请求的数据  
+
+  resp_hint                    varchar(200)                    not null, -- 操作提示
   resp_data                    varchar(200)                    not null, -- 从服务器返回的结果
   resp_time                    datetime                        not null, -- 返回时间
 

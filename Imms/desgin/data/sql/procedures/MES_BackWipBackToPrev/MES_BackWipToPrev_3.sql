@@ -25,11 +25,7 @@ top:begin
 
 	select -1,'',ReqData into Success,RespData,ReceiveCardNo;
 	
-	if ReqDataType <> 1 then
-        set RespData=	'2|1|2';
-        set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
-        set RespData = CONCAT(RespData,'|1|接收人刷工卡确认|0');				    
-        
+	if ReqDataType <> 1 then	
         leave top;
 	end if;
 					
@@ -42,8 +38,7 @@ top:begin
      where record_id = SessionId;
 			
 	if(CreatorOperatorId = ReceiveOperatorId) then
-		set RespData=	'2|1|3';
-		set RespData = CONCAT(RespData, '|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|150');
+		set RespData='2';		
 		set RespData = CONCAT(RespData,'|1|接收人和退还人|0');				    
 		set RespData = CONCAT(RespData,'|2|不能是同一个人|0');				    
 			
@@ -91,9 +86,10 @@ top:begin
 							LastBusinessId
 	);				
 	
-	set RespData='2';	
-	set RespData = CONCAT(RespData,'|1|已退还',BackQty,'个工件|0');				
-	call MES_OK(RespData);
-
+	set RespData='3';	
+	set RespData = CONCAT(RespData,'|1|已退还:|0');				
+	set RespData = CONCAT(RespData,'|2|',ProductionName,'|0');
+	set RespData = CONCAT(RespData,'|3|',BackQty,'个|0');
+	
 	set Success = 0;
 end

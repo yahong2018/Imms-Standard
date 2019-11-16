@@ -12,10 +12,12 @@ begin
   declare OperatorId bigint default -1;
   declare EmployeeId,EmployeeCardNo varchar(20) default '';
   declare EmployeeName varchar(50) default '';
-  declare CreateTime,LastProcessTime,ExpireTime datetime default Now();
+  declare CreateTime,LastProcessTime,ExpireTime datetime;
   declare SessionType,CurrentStep,CurGID,CurDID int default -1; -- -1表示未知
 
-  set ExpireTime = DATE_ADD(CreateTime,interval 1 minute);
+  set CreateTime = Now();
+  set LastProcessTime = Now();
+  set ExpireTime = DATE_ADD(Now(),interval 1 minute);
 
   if (ReqDataType = 1) then
     select o.record_id,o.employee_id,o.employee_name,ReqData into OperatorId,EmployeeId,EmployeeName,EmployeeCardNo

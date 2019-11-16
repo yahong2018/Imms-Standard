@@ -13,6 +13,6 @@ begin
      from workstation_session s
      where s.workstation_id = WorkstationId
        and s.current_step <= 250
-	   and s.expire_time >= Now()
+	   and s.expire_time >= Now()       
 	;      
 end;
