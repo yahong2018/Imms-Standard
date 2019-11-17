@@ -187,7 +187,7 @@ namespace Imms.WebManager.Controllers
         [Route("reportInstroeByErp"), HttpPost]
         public int ReportInstoreByERP([FromBody] InstoreItem instoreItem)
         {
-            SimpleCRUDLogic<ProductionMoving> movingLogic = new SimpleCRUDLogic<ProductionMoving>();
+            SimpleCRUDLogic<ProductionMoving> movingLogic = new ProductMovingLogic();
             SimpleCRUDLogic<RfidCard> cardLogic = new SimpleCRUDLogic<RfidCard>();
             FilterExpression[] filterExpressions = new FilterExpression[]{
                     new FilterExpression(){L="kanbanNo",O="=",R=instoreItem.KanbanNo}

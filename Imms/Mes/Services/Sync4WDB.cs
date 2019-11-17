@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using Imms.Data.Domain;
 using Imms.Mes.Data.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -84,10 +85,10 @@ namespace Imms.Mes.Services
 
                     this.Initarameters(); //获取参数
                     this.LoginToWDB();    //登录
-                    this.PushInstoreData(); //入库报工
-                    this.PushInstoreWWData(); //委外入库
-                    this.PushMovingData();   //移库
-                    this.PushQualityCheckdata();  //品质
+                    // this.PushInstoreData(); //入库报工
+                    // this.PushInstoreWWData(); //委外入库
+                    // this.PushMovingData();   //移库
+                    // this.PushQualityCheckdata();  //品质
 
                     this.GetBom(); //同步BOM的数据
                 }
@@ -127,7 +128,7 @@ namespace Imms.Mes.Services
             this.InstoreSyncUrl = this.ParameterList.Single(x => x.ParameterCode == "progress_report_url").ParameterValue;
             this.MoveSyncUrl = this.ParameterList.Single(x => x.ParameterCode == "moving_report_url").ParameterValue;
             this.QualityCheckSyncUrl = this.ParameterList.Single(x => x.ParameterCode == "qualitycheck_report_url").ParameterValue;
-            this.BomSyncUrl = this.ParameterList.Single(x => x.ParameterClassCode == "bom_get_url").ParameterValue;
+            this.BomSyncUrl = this.ParameterList.Single(x => x.ParameterCode == "bom_get_url").ParameterValue;
             string strAccountId = this.ParameterList.Single(x => x.ParameterCode == "account_id").ParameterValue;
             int tempAccountid = 0;
             if (int.TryParse(strAccountId, out tempAccountid))
@@ -173,10 +174,83 @@ namespace Imms.Mes.Services
             {
                 return;
             }
+            var materialList = this.dbContext.Set<Material>().Where(x =>
+                !this.dbContext.Set<Bom>().Select(b => b.MaterialId == x.RecordId).Any()
+            ).Select(x => x.MaterialCode)
+            .ToArray();
+
+            materialList = new string[] { "5502-04060" };
+            
+            string getBaseUrl = this.ServerHost + "/" + this.BomSyncUrl;
+            using (HttpClient client = this._factory.CreateClient())
+            {
+                this.FillAuthorizationHeader(client);
+                int i = 0;
+                foreach (string materialCode in materialList)
+                {
+                    string getUrl = getBaseUrl + "/" + materialCode;
+                    HttpResponseMessage result = client.GetAsync(getUrl).GetAwaiter().GetResult();
+                    try
+                    {
+                        result.EnsureSuccessStatusCode();
+
+                        string respContent = result.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                        if (!string.IsNullOrEmpty(respContent))
+                        {
+                            BomSyncData bomSyncData = respContent.ToObject<BomSyncData>();
+
+                            foreach (BomSyncItem bomItem in bomSyncData.Values)
+                            {
+                                Material material = dbContext.Set<Material>().Where(x => x.MaterialCode == bomItem.ProCode).FirstOrDefault();
+                                if (material == null)
+                                {
+                                    GlobalConstants.DefaultLogger.Error("导入物料" + materialCode + "的BOM数据错误,ERP的BOM数据错误，物料" + bomItem.ProCode + "不存在!");
+                                    continue;
+                                }
+
+                                Material component = dbContext.Set<Material>().Where(x => x.MaterialCode == bomItem.MatCode).FirstOrDefault();
+                                if (material == null)
+                                {
+                                    GlobalConstants.DefaultLogger.Error("导入物料" + materialCode + "的BOM数据错误,ERP的BOM数据错误，组件" + bomItem.MatCode + "不存在!");
+                                    continue;
+                                }
+
+                                Bom bom = new Bom();
+                                bom.BomNo = bomItem.BomCode;
+                                bom.BomStatus = 1;
+                                bom.BomType = 1;
+                                bom.EffectDate = bomItem.TDate;
+
+                                bom.MaterialId = material.RecordId;
+                                bom.MaterialCode = bomItem.ProCode;
+                                bom.MaterialName = bomItem.ProDesc;
+
+                                bom.ComponentId = component.RecordId;
+                                bom.ComponentCode = bomItem.MatCode;
+                                bom.ComponentName = bomItem.MatDesc;
+
+                                bom.MaterialQty = 1;
+                                bom.ComponentQty = (int)bomItem.AQty;
+
+                                dbContext.Set<Bom>().Add(bom);
+                            }
+                        }
+                        i = i + 1;
+                        Thread.Sleep(100);
+                    }
+                    catch (Exception ex)
+                    {
+                        GlobalConstants.DefaultLogger.Error("跟ERP同步BOM错误:" + ex.Message);
+                        GlobalConstants.DefaultLogger.Error(ex.StackTrace);
+                    }
+                }
+                GlobalConstants.DefaultLogger.Info("已导入 " + i.ToString() + "个物料的BOM");
+                dbContext.SaveChanges();
+            }
+
             //
             //TODO:在这里进行BOM同步的开发
             //
-
             // this.dbContext.Set<Material>().Where(x=>x)            
         }
 
@@ -411,6 +485,34 @@ namespace Imms.Mes.Services
             client.DefaultRequestHeaders.Add("cache-control", "no-cache");
         }
     }
+
+    public class BomSyncData
+    {
+        public int Size { get; set; }
+        public string name { get; set; }
+        public BomSyncItem[] Values { get; set; }
+        public BomSyncField[] Fields { get; set; }
+    }
+
+    public class BomSyncItem
+    {
+        public string BomCode { get; set; }
+        public string ProCode { get; set; }
+        public string ProDesc { get; set; }
+        public string MatCode { get; set; }
+        public string MatDesc { get; set; }
+        public float AQty { get; set; }
+        public DateTime TDate { get; set; }
+    }
+
+    public class BomSyncField
+    {
+        public string Name { get; set; }
+        public int ClassType { get; set; }
+        public string FieldClassName { get; set; }
+        public string FieldClass { get; set; }
+    }
+
 
     public class JsonContent : StringContent
     {

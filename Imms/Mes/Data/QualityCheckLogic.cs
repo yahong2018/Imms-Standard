@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Imms.Data;
 using Imms.Mes.Data.Domain;
@@ -5,11 +6,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Imms.Mes.Data
 {
-
     public class QualityCheckLogic : SimpleCRUDLogic<QualityCheck>
     {
         public QualityCheckLogic()
         {
+        }
+
+        private class BomStock
+        {
+            public long MaterialId { get; set; }
+            public string MaterialCode { get; set; }
+            public string MaterialName { get; set; }
+            public int Qty { get; set; }
+            public int Level { get; set; }
         }
 
         protected override void AfterInsert(QualityCheck item, DbContext dbContext)
@@ -19,7 +28,6 @@ namespace Imms.Mes.Data
                 AjustStock(item, dbContext);
                 AjustProductSummary(item, dbContext);
             }
-
             dbContext.SaveChanges();
         }
 
@@ -33,6 +41,7 @@ namespace Imms.Mes.Data
                 productSummary.ProductionId = item.ProductionId;
                 productSummary.ProductionCode = item.ProductionCode;
                 productSummary.ProductionName = item.ProductionName;
+
                 productSummary.WorkshopId = item.WorkshopId;
                 productSummary.WorkshopCode = item.WorkshopCode;
                 productSummary.WorkshopName = item.WorkshopName;
@@ -50,7 +59,23 @@ namespace Imms.Mes.Data
             }
         }
 
-        private static void AjustStock(QualityCheck item, DbContext dbContext)
+        private static void UpdateItemStock(QualityCheck item, DbContext dbContext)
+        {
+            MaterialStock stock = AssureStock(item, dbContext);
+            stock.QtyStock = stock.QtyStock + item.Qty;
+            stock.QtyDefect = stock.QtyDefect + item.Qty;
+            GlobalConstants.ModifyEntityStatus(stock, dbContext);
+        }
+
+        private static void AjustStock(QualityCheck parentItem, DbContext dbContext)
+        {
+            UpdateItemStock(parentItem, dbContext);
+
+            // List<BomStock> SubBomStockList = GetBomStockItems(parentItem, dbContext);
+            // AddSubQualityCheckItems(parentItem, dbContext, SubBomStockList);
+        }
+
+        private static MaterialStock AssureStock(QualityCheck item, DbContext dbContext)
         {
             MaterialStock stock = dbContext.Set<MaterialStock>().Where(x => x.StoreId == item.WorkshopId && x.MaterialId == item.ProductionId).FirstOrDefault();
             if (stock == null)
@@ -67,22 +92,70 @@ namespace Imms.Mes.Data
                 dbContext.Set<MaterialStock>().Add(stock);
                 dbContext.SaveChanges();
             }
-
-            stock.QtyStock = stock.QtyStock + item.Qty;
-            stock.QtyDefect = stock.QtyDefect + item.Qty;
-
-            GlobalConstants.ModifyEntityStatus(stock, dbContext);
-
-            // Material material = dbContext.Set<Material>().Where(x => x.RecordId == item.ProductionId).First();
-            // MaterialStock prevStock = dbContext.Set<MaterialStock>()
-            //     .Where(x => x.MaterialId == material.PrevMaterialId && x.StoreId == item.WorkshopId
-            //    ).FirstOrDefault();
-            // if (prevStock != null)
-            // {
-            //     prevStock.QtyStock = prevStock.QtyStock - item.Qty;
-            //     prevStock.QtyConsumeDefect = prevStock.QtyConsumeDefect + item.Qty;
-            //     GlobalConstants.ModifyEntityStatus(prevStock, dbContext);
-            // }
+            return stock;
         }
+
+        // private static void AddSubQualityCheckItems(QualityCheck parentItem, DbContext dbContext, List<BomStock> SubBomStockList)
+        // {
+        //     foreach (var stockItem in SubBomStockList)
+        //     {
+        //         QualityCheck subQualityItem = new QualityCheck();
+        //         subQualityItem.Clone(parentItem);
+        //         subQualityItem.ProductionId = stockItem.MaterialId;
+        //         subQualityItem.ProductionCode = stockItem.MaterialCode;
+        //         subQualityItem.ProductionName = stockItem.MaterialName;
+        //         subQualityItem.Qty = stockItem.Qty;
+
+        //         dbContext.Set<QualityCheck>().Add(subQualityItem);
+
+        //         UpdateItemStock(subQualityItem, dbContext);
+        //     }
+        //     dbContext.SaveChanges();
+        // }
+
+        // private static System.Collections.Generic.List<BomStock> GetBomStockItems(QualityCheck item, DbContext dbContext)
+        // {
+        //     int level = 1;
+        //     var bom_stock = (from b in dbContext.Set<Bom>()
+        //                      where b.MaterialId == item.ProductionId
+        //                         && b.BomStatus == 1
+        //                        && (from b1 in dbContext.Set<Bom>() where b1.MaterialId == b.ComponentId select b1).Any()
+        //                      select new BomStock()
+        //                      {
+        //                          MaterialId = b.ComponentId,
+        //                          MaterialCode = b.ComponentCode,
+        //                          MaterialName = b.ComponentName,
+        //                          Qty = b.ComponentQty * item.Qty,
+        //                          Level = level
+        //                      }).ToList();
+
+        //     while (true)
+        //     {
+        //         level = level + 1;
+        //         var tmp = (from b in dbContext.Set<Bom>()
+        //                    join bs in bom_stock on b.MaterialId equals bs.MaterialId
+        //                    join m in dbContext.Set<Material>() on b.MaterialId equals m.RecordId
+        //                    where bs.Level == level - 1
+        //                       && b.BomStatus == 1
+        //                       && m.AutoFinishedProgress == 1
+        //                       && (from b1 in dbContext.Set<Bom>() where b1.MaterialId == b.ComponentId select b1).Any()
+        //                    select new BomStock()
+        //                    {
+        //                        MaterialId = b.ComponentId,
+        //                        MaterialCode = b.ComponentCode,
+        //                        MaterialName = b.ComponentName,
+        //                        Qty = b.ComponentQty * bs.Qty,
+        //                        Level = level
+        //                    }).ToList();
+        //         bom_stock.AddRange(tmp);
+
+        //         if (tmp.Count == 0 || level > 99)
+        //         {
+        //             break;
+        //         }
+        //     }
+
+        //     return bom_stock;
+        // }
     }
 }
