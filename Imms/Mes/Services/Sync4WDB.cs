@@ -29,10 +29,23 @@ namespace Imms.Mes.Services
             {
                 return;
             }
-            this.NextRunTime = currentTime.AddMinutes(120);  //暂定120分钟(2个小时)同步一次
 
             try
             {
+                DbContext dbContext = GlobalConstants.DbContextFactory.GetContext();
+                string strCycle = dbContext.Set<SystemParameter>()
+                .Where(x => x.ParameterClassCode == "B003" && x.ParameterCode == "sync_cycle_minutes")
+                .Select(x => x.ParameterValue)
+                .FirstOrDefault();
+                int cylce = 120;
+                int.TryParse(strCycle, out cylce);
+                if (cylce <= 0)
+                {
+                    this.NextRunTime = currentTime.AddMinutes(5);
+                    return;
+                }
+                this.NextRunTime = currentTime.AddMinutes(cylce);
+
                 this.SyncData();
             }
             catch (Exception ex)
@@ -85,10 +98,10 @@ namespace Imms.Mes.Services
 
                     this.Initarameters(); //获取参数
                     this.LoginToWDB();    //登录
-                    // this.PushInstoreData(); //入库报工
-                    // this.PushInstoreWWData(); //委外入库
-                    // this.PushMovingData();   //移库
-                    // this.PushQualityCheckdata();  //品质
+                    this.PushInstoreData(); //入库报工
+                    this.PushInstoreWWData(); //委外入库
+                    this.PushMovingData();   //移库
+                    this.PushQualityCheckData();  //品质
 
                     this.GetBom(); //同步BOM的数据
                 }
@@ -176,17 +189,22 @@ namespace Imms.Mes.Services
             }
             var materialList = this.dbContext.Set<Material>().Where(x =>
                 !this.dbContext.Set<Bom>().Select(b => b.MaterialId == x.RecordId).Any()
-            ).Select(x => x.MaterialCode)
-            .ToArray();
+            ).ToList();
+            if (materialList.Count == 0)
+            {
+                return;
+            }
 
-            materialList = new string[] { "5502-04060" };
-            
+            var materialCodeList = materialList.Select(x => x.MaterialCode).ToArray();
+
+            //  materialList = new string[] { "5502-04060" };
+
             string getBaseUrl = this.ServerHost + "/" + this.BomSyncUrl;
             using (HttpClient client = this._factory.CreateClient())
             {
                 this.FillAuthorizationHeader(client);
                 int i = 0;
-                foreach (string materialCode in materialList)
+                foreach (string materialCode in materialCodeList)
                 {
                     string getUrl = getBaseUrl + "/" + materialCode;
                     HttpResponseMessage result = client.GetAsync(getUrl).GetAwaiter().GetResult();
@@ -201,14 +219,14 @@ namespace Imms.Mes.Services
 
                             foreach (BomSyncItem bomItem in bomSyncData.Values)
                             {
-                                Material material = dbContext.Set<Material>().Where(x => x.MaterialCode == bomItem.ProCode).FirstOrDefault();
+                                Material material = materialList.Where(x => x.MaterialCode == bomItem.ProCode).FirstOrDefault();
                                 if (material == null)
                                 {
                                     GlobalConstants.DefaultLogger.Error("导入物料" + materialCode + "的BOM数据错误,ERP的BOM数据错误，物料" + bomItem.ProCode + "不存在!");
                                     continue;
                                 }
 
-                                Material component = dbContext.Set<Material>().Where(x => x.MaterialCode == bomItem.MatCode).FirstOrDefault();
+                                Material component = materialList.Where(x => x.MaterialCode == bomItem.MatCode).FirstOrDefault();
                                 if (material == null)
                                 {
                                     GlobalConstants.DefaultLogger.Error("导入物料" + materialCode + "的BOM数据错误,ERP的BOM数据错误，组件" + bomItem.MatCode + "不存在!");
@@ -247,14 +265,9 @@ namespace Imms.Mes.Services
                 GlobalConstants.DefaultLogger.Info("已导入 " + i.ToString() + "个物料的BOM");
                 dbContext.SaveChanges();
             }
-
-            //
-            //TODO:在这里进行BOM同步的开发
-            //
-            // this.dbContext.Set<Material>().Where(x=>x)            
         }
 
-        private void PushQualityCheckdata()
+        private void PushQualityCheckData()
         {
             if (string.IsNullOrEmpty(this.QualityCheckSyncUrl))
             {
@@ -291,9 +304,9 @@ namespace Imms.Mes.Services
                 loccode = x.WorkshopCode,
             }).ToList();
 
-            itemList = new QualitySyncItem[]{
-                new QualitySyncItem(){procode="5010-08120",unitcode="pcs",qty=23,loccode="THR",udfbldm="01",udfblbm="THR_BAD",wcgcode="THR01"}
-            }.ToList();
+            // itemList = new QualitySyncItem[]{
+            //     new QualitySyncItem(){procode="5010-08120",unitcode="pcs",qty=23,loccode="THR",udfbldm="01",udfblbm="THR_BAD",wcgcode="THR01"}
+            // }.ToList();
 
             if (dataList.Count > 0)
             {
@@ -316,9 +329,9 @@ namespace Imms.Mes.Services
                 unitcode = "pcs"
             }).ToList();
 
-            itemList = new MoveSyncItem[]{
-                new MoveSyncItem(){procode="1411-06880",unitcode="pcs",qty=23,loccode="B02",aloccode="THR"}
-            }.ToList();
+            // itemList = new MoveSyncItem[]{
+            //     new MoveSyncItem(){procode="1411-06880",unitcode="pcs",qty=23,loccode="B02",aloccode="THR"}
+            // }.ToList();
 
             if (dataList.Count > 0)
             {
@@ -363,9 +376,9 @@ namespace Imms.Mes.Services
                 unitcode = "pcs"
             }).ToList();
 
-            itemList = new InstoreSyncItem[]{
-                 new InstoreSyncItem(){procode="5010-08120",unitcode="pcs",qty=23,loccode="THR",wcgcode="THR01"}
-            }.ToList();
+            // itemList = new InstoreSyncItem[]{
+            //      new InstoreSyncItem(){procode="5010-08120",unitcode="pcs",qty=23,loccode="THR",wcgcode="THR01"}
+            // }.ToList();
 
             if (dataList.Count > 0)
             {
@@ -408,9 +421,9 @@ namespace Imms.Mes.Services
                 unitcode = "pcs"
             }).ToList();
 
-            itemList = new InstoreSyncItemWW[]{
-                new InstoreSyncItemWW(){procode="5010-08120",unitcode="pcs",qty=23,loccode="HJG"}
-            }.ToList();
+            // itemList = new InstoreSyncItemWW[]{
+            //     new InstoreSyncItemWW(){procode="5010-08120",unitcode="pcs",qty=23,loccode="HJG"}
+            // }.ToList();
 
             if (dataList.Count > 0)
             {

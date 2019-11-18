@@ -22,7 +22,7 @@ namespace Imms.WebManager.Controllers
         public RfidCardController(IHostingEnvironment host)
         {
             this.host = host;
-            this.Logic = new Data.SimpleCRUDLogic<RfidCard>();
+            this.Logic = new RfidCardLogic();
         }
 
         protected override void Verify(RfidCard item, int operation)
@@ -182,17 +182,15 @@ namespace Imms.WebManager.Controllers
     [Route("api/imms/mfc/productionOrderProgress")]
     public class ProductionOrderProgressController : SimpleCRUDController<ProductionOrderProgress>
     {
-        public ProductionOrderProgressController() => this.Logic = new SimpleCRUDLogic<ProductionOrderProgress>();
+        public ProductionOrderProgressController() => this.Logic = new ProductOrderProgressLogic();
 
         [Route("reportInstroeByErp"), HttpPost]
         public int ReportInstoreByERP([FromBody] InstoreItem instoreItem)
         {
-            SimpleCRUDLogic<ProductionMoving> movingLogic = new ProductMovingLogic();
-            SimpleCRUDLogic<RfidCard> cardLogic = new SimpleCRUDLogic<RfidCard>();
-            FilterExpression[] filterExpressions = new FilterExpression[]{
-                    new FilterExpression(){L="kanbanNo",O="=",R=instoreItem.KanbanNo}
-                };
-            RfidCard card = cardLogic.GetByOne(filterExpressions);
+            ProductMovingLogic movingLogic = new ProductMovingLogic();
+            RfidCardLogic cardLogic = new RfidCardLogic();    
+                   
+            RfidCard card = cardLogic.GetByKanbanAndMaterialCode(instoreItem.KanbanNo,instoreItem.ProductionCode);
             if (card == null)
             {
                 throw new BusinessException(GlobalConstants.EXCEPTION_CODE_DATA_NOT_FOUND, $"看板编号(KanbanNo)='{instoreItem.KanbanNo}'的看板还没有发卡！");
@@ -226,7 +224,9 @@ namespace Imms.WebManager.Controllers
             {
                 movingItem.TimeOfOriginWork = movingItem.TimeOfOriginWork.AddDays(-1);
             }
-            if ((movingItem.TimeOfOrigin.Hour <= 8 && movingItem.TimeOfOrigin.Minute < 30) || (movingItem.TimeOfOriginWork.Hour >= 20))
+            if ((movingItem.TimeOfOrigin.Hour < 8) 
+                || (movingItem.TimeOfOriginWork.Hour >= 20)  
+                || (movingItem.TimeOfOriginWork.Hour == 8 && movingItem.TimeOfOrigin.Minute < 30))
             {
                 movingItem.ShiftId = 1;
             }
@@ -257,8 +257,8 @@ namespace Imms.WebManager.Controllers
 
             movingLogic.Create(movingItem);
 
-            //card.CardStatus = 0;
-            //cardLogic.Update(card);
+            card.CardStatus = 1; // 已经移库并自动派发
+            cardLogic.Update(card);
 
             return GlobalConstants.EXCEPTION_CODE_NO_ERROR;
         }
@@ -400,7 +400,7 @@ namespace Imms.WebManager.Controllers
     [Route("api/imms/mfc/productionOrderMoving")]
     public class ProductionMovingController : SimpleCRUDController<ProductionMoving>
     {
-        public ProductionMovingController() => this.Logic = new SimpleCRUDLogic<ProductionMoving>();
+        public ProductionMovingController() => this.Logic = new ProductMovingLogic();
 
 
     }

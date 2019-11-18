@@ -32,13 +32,12 @@ truncate table material_stock;
 truncate table product_summary;
 truncate table production_order_progress;
 truncate table production_moving;
-
 truncate table workstation_session;
 truncate table workstation_session_step;
-
+truncate table quality_check;
+truncate table defect;
 truncate table production_order;
 
-truncate table quality_check;
 truncate table workstation_login;
 
 truncate table outsource_workstation_bind;

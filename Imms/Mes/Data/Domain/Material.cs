@@ -53,10 +53,7 @@ namespace Imms.Mes.Data.Domain
         public string ComponentName { get; set; }
 
         public int MaterialQty { get; set; }
-        public int ComponentQty { get; set; }
-
-        public string ParentBomNo { get; set; }
-        public long ParentBomId { get; set; }
+        public int ComponentQty { get; set; }       
 
         public DateTime EffectDate{get;set;}
     }
@@ -130,9 +127,6 @@ namespace Imms.Mes.Data.Domain
 
             builder.Property(e => e.MaterialQty).HasColumnName("material_qty");
             builder.Property(e => e.ComponentQty).HasColumnName("component_qty");
-
-            builder.Property(e => e.ParentBomNo).HasColumnName("parent_bom_no");
-            builder.Property(e => e.ParentBomId).HasColumnName("parent_bom_id");
 
             builder.Property(e=>e.EffectDate).HasColumnName("effect_date");
         }

@@ -101,7 +101,7 @@ namespace Imms
 
         public virtual bool Config()
         {
-            this.ThreadIntervals = 30;
+            this.ThreadIntervals = 100;
             return true;
         }
     }

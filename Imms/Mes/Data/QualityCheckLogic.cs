@@ -51,11 +51,11 @@ namespace Imms.Mes.Data
             }
             if (item.ShiftId == 0)
             {
-                productSummary.QtyDefect_0 = item.Qty;
+                productSummary.QtyDefect_0 = productSummary.QtyDefect_0 + item.Qty;
             }
             else
             {
-                productSummary.QtyDefect_1 = item.Qty;
+                productSummary.QtyDefect_1 = productSummary.QtyDefect_1 + item.Qty;
             }
         }
 

@@ -181,6 +181,10 @@ namespace Imms.WebManager
 
             // RealtimeDataPushTask task = app.ApplicationServices.GetService<RealtimeDataPushTask>();
             //  task.Start();
+
+            Sync4WDBService syncService = app.ApplicationServices.GetService<Sync4WDBService>();
+         //   syncService.Config();
+         //   syncService.Startup();
         }
     }
 

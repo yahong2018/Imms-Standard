@@ -23,7 +23,7 @@ top:begin
 		leave top;
 	end if;	  
 
-    select record_id,did_template_index into WorkstationId,TemplateIndex
+    select record_id,rfid_template_index into WorkstationId,TemplateIndex
     from work_organization_unit w
     where w.org_type = 'ORG_WORK_STATION'
       and w.rfid_controller_id = GID

@@ -4,12 +4,23 @@ drop view v_rfid_controller;
 drop table work_organization_unit;
 drop table operator;
 drop table material;
+drop table bom;
+drop table material_stock;
+drop table product_summary;
 drop table rfid_card;
 drop table production_order;
 drop table production_order_progress;
 drop table production_moving;
+drop table defect;
 drop table quality_check;
 drop table workstation_login;
+drop table workstation_session;
+drop table workstation_session_step;
+drop table outsource_workstation_bind;
+drop table outsource_card_bind;
+drop table global_lock;
+drop table bom_stock;
+
 
 --
 -- 系统参数，包括与ERP的接口
@@ -17,8 +28,8 @@ drop table workstation_login;
 create table system_parameter
 (
     record_id          bigint  auto_increment   not null,
-    parameter_class_id bigint                   not null, -- 参数分类
-    parameter_class_name varchar(50)            not null,
+    parameter_class_code varchar(20)            not null,
+	  parameter_class_name varchar(50)            not null,
     parameter_code     varchar(50)              not null,
     parameter_name     varchar(120)             not null,
     parameter_value    varchar(255)             not null,
@@ -108,7 +119,7 @@ create table work_organization_unit
     
     rfid_controller_id     int                         not null default 0,
     rfid_terminator_id     int                         not null default 0,
-    did_template_index     int                         not null default 8,  --  工位机的缺省显示模板，默认为8，如果是手持机，则要设为4
+    rfid_template_index     int                         not null default 8,  --  工位机的缺省显示模板，默认为8，如果是手持机，则要设为4
     
     wocg_code              varchar(20)                 null,
 
