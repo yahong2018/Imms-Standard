@@ -28,7 +28,21 @@ namespace Imms
                 lock (this)
                 {
                     Console.WriteLine();
-                    Console.ForegroundColor = ConsoleColor.Green;
+                    if (level == LogLevel.Critical || level == LogLevel.Error)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                    }
+                    else if (level == LogLevel.Warning)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                    }
+                    else if (level == LogLevel.Information)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                    }else{
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+
                     Console.Write(string.Format("[Imms.Core.Logger--{0:yyyy/MM/dd HH:mm:ss}-{1}]:", DateTime.Now, level));
                     Console.WriteLine(message);
                     Console.ResetColor();

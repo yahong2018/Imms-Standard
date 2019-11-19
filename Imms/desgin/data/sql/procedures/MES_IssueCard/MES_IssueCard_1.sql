@@ -25,6 +25,9 @@ top:begin
     select prev_operation_index into WorkshopPrevIndex
        from work_organization_unit w
     where w.record_id = WorkstationId;    
+
+    select card_status,issue_qty into CardStatus,DefaultIssueQty 
+	  from rfid_card where record_id = CardId;    
    
     if (not(CardStatus in(0,20))) then
         set RespData='3';        

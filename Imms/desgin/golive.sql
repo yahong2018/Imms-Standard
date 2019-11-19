@@ -61,6 +61,29 @@ A      0005252159   0010995284
 -- select * from operator where employee_card_no='0010995284';
 
 
+-- update excel_import_rfid_card c,material m
+--    set c.production_id = m.record_id
+-- where c.production_code = m.material_code;
+
+-- 
+-- update excel_import_rfid_card c,work_organization_unit w
+--    set c.workshop_id = w.record_id
+-- where c.workshop_code = w.org_code;
+-- 
+-- 
+-- insert into rfid_card(kanban_no,rfid_no,card_type,card_status,
+-- 		production_Id,production_code,production_name,
+-- 		workshop_id,workshop_code,workshop_name,
+-- 		issue_qty,stock_qty,last_business_id,
+-- 		create_by_id,create_by_code,create_by_name,
+-- 		opt_flag)
+-- select e.kanban_no,e.rfid_no,2,1,
+--        e.production_id,e.production_code,e.production_name,
+-- 	   e.workshop_id,e.workshop_code,e.workshop_name,
+-- 	   e.issue_qty,0,-1,
+-- 	   1,'C00001','刘永红',
+-- 	   0	   
+--    from excel_import_rfid_card e
 
 
 /Users/yahong/Desktop/pub_20191118

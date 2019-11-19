@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,7 +64,7 @@ namespace Imms.Mes.Services
         private IHttpClientFactory _factory;
         private WDBLoginParameter _loginParameter = new WDBLoginParameter();
         private WDBLoginResult _loginResult = new WDBLoginResult();
-        private DbContext dbContext;
+        private DbContext dbContext{get;set;}
         private List<SystemParameter> ParameterList;
 
         public string ServerHost { get; set; }
@@ -85,7 +83,7 @@ namespace Imms.Mes.Services
         public WDBSynchronizer(IHttpClientFactory factory)
         {
             this._factory = factory;
-        }
+        }        
 
         public BusinessException SyncData()
         {
@@ -106,7 +104,7 @@ namespace Imms.Mes.Services
                     this.GetBom(); //同步BOM的数据
                 }
 
-                result = new BusinessException(GlobalConstants.EXCEPTION_CODE_NO_ERROR, "成功同步");
+                result = new BusinessException(GlobalConstants.EXCEPTION_CODE_NO_ERROR, "同步完成");
             }
             catch (Exception ex)
             {
@@ -121,7 +119,7 @@ namespace Imms.Mes.Services
             }
             finally
             {
-                this.dbContext.Dispose();
+                // this.dbContext.Dispose();
             }
             return result;
         }
@@ -281,12 +279,14 @@ namespace Imms.Mes.Services
                 return;
             }
 
-            this.ReportToErp(this.last_sync_qualitycheck_param, this.QualityCheckSyncUrl, new QualitySyncData()
+            QualitySyncData data = new QualitySyncData()
             {
                 beId = this.AccountId,
                 doctypeId = 4,
                 prodpwt = itemList.ToArray()
-            }, lastRecordId);
+            };
+            GlobalConstants.DefaultLogger.Debug("开始不良报工数据:\n" + data.ToJson());
+            this.ReportToErp(this.last_sync_qualitycheck_param, this.QualityCheckSyncUrl, data, lastRecordId);
         }
 
         private long GetQualitySyncData(out List<QualitySyncItem> itemList)
@@ -353,12 +353,14 @@ namespace Imms.Mes.Services
             {
                 return;
             }
-
-            this.ReportToErp(this.last_sync_move_param, this.MoveSyncUrl, new MoveSyncData()
+            MoveSyncData data = new MoveSyncData()
             {
                 beId = this.AccountId,
                 movet = itemList.ToArray(),
-            }, lastRecordId);
+            };
+
+            GlobalConstants.DefaultLogger.Debug("开始内部转移数据:\n" + data.ToJson());
+            this.ReportToErp(this.last_sync_move_param, this.MoveSyncUrl, data, lastRecordId);
         }
 
 
@@ -400,11 +402,13 @@ namespace Imms.Mes.Services
                 return;
             }
 
-            this.ReportToErp(this.last_sync_progress_param, this.InstoreSyncUrl, new InstoreSyncData()
+            InstoreSyncData data = new InstoreSyncData()
             {
                 beId = this.AccountId,
                 prodpwt = itemList.ToArray()
-            }, lastRecordId);
+            };
+            GlobalConstants.DefaultLogger.Info("开始同步内部报工数据：\n" + data.ToString());
+            this.ReportToErp(this.last_sync_progress_param, this.InstoreSyncUrl, data, lastRecordId);
         }
 
 
@@ -445,11 +449,14 @@ namespace Imms.Mes.Services
                 return;
             }
 
-            this.ReportToErp(this.last_sync_progress_ww_param, this.InstoreSyncUrl, new InstoreSyncDataWW()
+            InstoreSyncDataWW data = new InstoreSyncDataWW()
             {
                 beId = this.AccountId,
                 pdcorespwt = itemList.ToArray()
-            }, lastRecordId);
+            };
+
+            GlobalConstants.DefaultLogger.Debug("开始同步委外加工数据:\n" + data.ToJson());
+            this.ReportToErp(this.last_sync_progress_ww_param, this.InstoreSyncUrl, data, lastRecordId);
         }
 
         private void ReportToErp(SystemParameter syncParameter, string url, object data, long lastRecord)
@@ -458,23 +465,34 @@ namespace Imms.Mes.Services
             {
                 return;
             }
+
             try
             {
                 string reportUrl = this.ServerHost + "/" + url;
                 using (HttpClient client = this._factory.CreateClient())
                 {
-                    GlobalConstants.DefaultLogger.Info("开始同步数据：\n" + data.ToString());
                     FillAuthorizationHeader(client);
                     string respContent = this.SendData(client, reportUrl, data);
                     GlobalConstants.DefaultLogger.Info("收到同步的结果：\n" + respContent);
-                }
 
-                string strLastRecordId = lastRecord.ToString();
-                if (strLastRecordId != syncParameter.ParameterValue)
-                {
-                    syncParameter.ParameterValue = strLastRecordId;
-                    GlobalConstants.ModifyEntityStatus(syncParameter, this.dbContext);
-                    this.dbContext.SaveChanges();
+                    WDBSyncResponse syncResponese = respContent.ToObject<WDBSyncResponse>();
+                    if (syncResponese.Status)
+                    {
+                        GlobalConstants.DefaultLogger.Info("同步成功");
+                    }
+                    else
+                    {
+                        GlobalConstants.DefaultLogger.Error("同步失败!");
+                        return;
+                    }
+
+                    string strLastRecordId = lastRecord.ToString();
+                    if (strLastRecordId != syncParameter.ParameterValue)
+                    {
+                        syncParameter.ParameterValue = strLastRecordId;
+                        GlobalConstants.ModifyEntityStatus(syncParameter, this.dbContext);
+                        this.dbContext.SaveChanges();
+                    }
                 }
             }
             catch (Exception ex)
@@ -497,6 +515,18 @@ namespace Imms.Mes.Services
             client.DefaultRequestHeaders.Add("client_id", this._loginParameter.client_id);
             client.DefaultRequestHeaders.Add("cache-control", "no-cache");
         }
+
+        // string testSucessString = "{\"tranId\":266,\"tranCode\":\"PW19110277\",\"message\":\"\",\"status\":true}";
+        // string testFaillString = "{\"tranId\":0,\"tranCode\":\"\",\"message\":\"[{\\\"exception\\\":\\\"\\\",\\\"htmlMessage\\\":false,\\\"id\\\":10300,\\\"info\\\":\\\"table is empty(prodpwt)\\\",\\\"info_desc\\\":\\\"\\\\\\\"生产入库单 (生产详细)\\\\\\\"表格的数据为空，不能保存。\\\",\\\"jsonStr\\\":\\\"\\\",\\\"key\\\":\\\"ce01_core_10300\\\",\\\"locators\\\":[{\\\"colMess\\\":\\\"\\\",\\\"colName\\\":\\\"\\\",\\\"id\\\":0,\\\"locatorKey\\\":\\\"prodpwt\\\",\\\"row\\\":0,\\\"tableMess\\\":\\\"\\\",\\\"tableName\\\":\\\"prodpwt\\\",\\\"type\\\":\\\"Table\\\"}],\\\"pass\\\":false,\\\"trace\\\":\\\"[MacCheckerUtil.checkEmptyTable_197]-[TradeModuleChecker.checkTradingEmptyTable_1060]-[CheckerLib.runChecker_224]-[CawEntityCurdAction.updateEntity_107]-[CawEntityInterceptor.logCall_44]\\\",\\\"type\\\":\\\"Error\\\"}]\",\"status\":false}";
+    }
+
+    public class WDBSyncResponse
+    {
+        public long TranId { get; set; }
+        public string TranCode { get; set; }
+        public bool Status { get; set; }
+        public string Message { get; set; }
+
     }
 
     public class BomSyncData
