@@ -191,7 +191,6 @@ namespace Imms.WebManager.Controllers
             string strInData = instoreItem.ToJson();
             GlobalConstants.DefaultLogger.Debug("收到ERP工务移库数据-->");
             GlobalConstants.DefaultLogger.Debug(strInData);
-
             GlobalConstants.DefaultLogger.Debug("开始工务移库...");
             try
             {
@@ -267,6 +266,8 @@ namespace Imms.WebManager.Controllers
 
                 card.CardStatus = 1; // 已经移库并自动派发
                 cardLogic.Update(card);
+
+                GlobalConstants.DefaultLogger.Info("工务移库报工处理完成");
 
                 return GlobalConstants.EXCEPTION_CODE_NO_ERROR;
             }
