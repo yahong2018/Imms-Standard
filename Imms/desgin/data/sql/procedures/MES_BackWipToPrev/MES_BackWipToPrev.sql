@@ -14,8 +14,17 @@ create procedure MES_BackWipToPrev
 	out RespData     varchar(200)
 )
 top:begin
-    declare GID,DID int;
-    select -1,'','' into Success,RespData,RespHint;		
+    declare GID,DID,CardStatus int;
+	
+    select -1,'','' into Success,RespData,RespHint;	
+
+    if ReqDataType = 2 then
+	    select card_status into rfid_card where record_id = CardId;
+	end if;
+	call MES_HandleBackWipToPreError(CurrentStep,ReqDataType,CardStatus,RespData);
+	if RespData = '' then
+	   leave top;
+	end if;
 		
     if (CurrentStep = 0) and (ReqDataType = 4) then  
         call MES_BackWipToPrev_0(Success,RespHint,RespData);		
@@ -27,8 +36,8 @@ top:begin
 		call MES_BackWipToPrev_3(SessionId,CurrentStep,ReqDataType,ReqData,CardId,WorkstationId,ReqTime,Success,RespData);
 	end if;
 		
-	if( Success <> 0 ) then
-	   leave top;
+	if( Success <> 0 ) then	           
+	    leave top;
 	end if;
 
 	if CurrentStep = 3 then

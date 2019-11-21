@@ -29,6 +29,7 @@ namespace Imms.Mes.Data
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.WorkstationConfigure());
 
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.RfidCardConfigure());
+            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.CardIssueConfigure());
 
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.ProductionOrderConfigure());
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.ProductionOrderProgressConfigure());

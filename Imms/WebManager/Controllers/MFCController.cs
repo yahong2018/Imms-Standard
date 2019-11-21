@@ -173,9 +173,10 @@ namespace Imms.WebManager.Controllers
             this.DataSourceFilterHandler = this.ProductSummaryQueryFilterHandler;
         }
 
-        private IQueryable<ProductSummary> ProductSummaryQueryFilterHandler(IQueryable<ProductSummary> query, FilterExpression[] expressions){
-            IQueryable<ProductSummary> result = this.Logic.DefaultDataSourceFilter(query,expressions);
-            return result.OrderByDescending(x=>x.ProductDate);            
+        private IQueryable<ProductSummary> ProductSummaryQueryFilterHandler(IQueryable<ProductSummary> query, FilterExpression[] expressions)
+        {
+            IQueryable<ProductSummary> result = this.Logic.DefaultDataSourceFilter(query, expressions);
+            return result.OrderByDescending(x => x.ProductDate);
         }
     }
 
@@ -187,80 +188,95 @@ namespace Imms.WebManager.Controllers
         [Route("reportInstroeByErp"), HttpPost]
         public int ReportInstoreByERP([FromBody] InstoreItem instoreItem)
         {
-            ProductMovingLogic movingLogic = new ProductMovingLogic();
-            RfidCardLogic cardLogic = new RfidCardLogic();    
-                   
-            RfidCard card = cardLogic.GetByKanbanAndMaterialCode(instoreItem.KanbanNo,instoreItem.ProductionCode);
-            if (card == null)
+            string strInData = instoreItem.ToJson();
+            GlobalConstants.DefaultLogger.Debug("收到ERP工务移库数据-->");
+            GlobalConstants.DefaultLogger.Debug(strInData);
+
+            GlobalConstants.DefaultLogger.Debug("开始工务移库...");
+            try
             {
-                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_DATA_NOT_FOUND, $"看板编号(KanbanNo)='{instoreItem.KanbanNo}'的看板还没有发卡！");
+                ProductMovingLogic movingLogic = new ProductMovingLogic();
+                RfidCardLogic cardLogic = new RfidCardLogic();
+
+                RfidCard card = cardLogic.GetByKanbanAndMaterialCode(instoreItem.KanbanNo, instoreItem.ProductionCode);
+                if (card == null)
+                {
+                    throw new BusinessException(GlobalConstants.EXCEPTION_CODE_DATA_NOT_FOUND, $"看板编号(KanbanNo)='{instoreItem.KanbanNo}'的看板还没有发卡！");
+                }
+                if (card.CardStatus != 10)
+                {
+                    throw new BusinessException(GlobalConstants.EXCEPTION_CODE_PARAMETER_INVALID, $"看板编号(KanbanNo)='{instoreItem.KanbanNo}'的看板还没有报工，不可以执行移库动作！");
+                }
+                ProductionMoving movingItem = new ProductionMoving();
+                movingItem.RfidCardId = card.RecordId;
+                movingItem.RfidNo = card.RfidNo;
+                movingItem.WorkshopIdFrom = card.WorkshopId;
+                movingItem.WorkshopCodeFrom = card.WorkshopCode;
+                movingItem.WorkshopNameFrom = card.WorkshopName;
+                movingItem.Qty = instoreItem.Qty;
+                movingItem.ProductionId = card.ProductionId;
+                movingItem.ProductionCode = card.ProductionCode;
+                movingItem.ProductionName = card.ProductionName;
+                DateTime movingTime = DateTime.Now;
+                if (DateTime.TryParse(instoreItem.MovingTime, out movingTime))
+                {
+                    movingItem.TimeOfOrigin = movingTime;
+                }
+                else
+                {
+                    movingItem.TimeOfOrigin = DateTime.Now;
+                }
+
+                movingItem.TimeOfOriginWork = new DateTime(movingItem.TimeOfOrigin.Year, movingItem.TimeOfOrigin.Month, movingItem.TimeOfOrigin.Day);
+                if (movingItem.TimeOfOrigin.Hour <= 8 && movingItem.TimeOfOrigin.Minute < 30)
+                {
+                    movingItem.TimeOfOriginWork = movingItem.TimeOfOriginWork.AddDays(-1);
+                }
+                if ((movingItem.TimeOfOrigin.Hour < 8)
+                    || (movingItem.TimeOfOriginWork.Hour >= 20)
+                    || (movingItem.TimeOfOriginWork.Hour == 8 && movingItem.TimeOfOrigin.Minute < 30))
+                {
+                    movingItem.ShiftId = 1;
+                }
+                else
+                {
+                    movingItem.ShiftId = 0;
+                }
+
+                movingItem.ProductionOrderId = -1;
+                movingItem.ProductionOrderNo = "";
+                movingItem.PrevProgressRecordId = -1;
+
+                movingItem.WorkstationId = -1;
+                movingItem.WorkstationCode = "";
+                movingItem.WorkstationName = "";
+
+                movingItem.WorkshopId = -1;
+                movingItem.WorkshopCode = instoreItem.StoreNo;
+                movingItem.WorkshopName = instoreItem.StoreName;
+
+                movingItem.OperatorId = -1;
+                movingItem.EmployeeId = instoreItem.operatorCode;
+                movingItem.EmployeeName = instoreItem.operatorName;
+
+                movingItem.OperatorIdFrom = -1;
+                movingItem.EmployeeIdFrom = "";
+                movingItem.EmployeeNameFrom = "";
+
+                movingLogic.Create(movingItem);
+
+                card.CardStatus = 1; // 已经移库并自动派发
+                cardLogic.Update(card);
+
+                return GlobalConstants.EXCEPTION_CODE_NO_ERROR;
             }
-            if (card.CardStatus != 10)
+            catch (Exception ex)
             {
-                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_PARAMETER_INVALID, $"看板编号(KanbanNo)='{instoreItem.KanbanNo}'的看板还没有报工，不可以执行移库动作！");
+                GlobalConstants.DefaultLogger.Error("处理ERP工务报工数据失败:" + ex.Message);
+                GlobalConstants.DefaultLogger.Debug(ex.StackTrace);
+
+                throw;
             }
-            ProductionMoving movingItem = new ProductionMoving();
-            movingItem.RfidCardId = card.RecordId;
-            movingItem.RfidNo = card.RfidNo;
-            movingItem.WorkshopIdFrom = card.WorkshopId;
-            movingItem.WorkshopCodeFrom = card.WorkshopCode;
-            movingItem.WorkshopNameFrom = card.WorkshopName;
-            movingItem.Qty = instoreItem.Qty;
-            movingItem.ProductionId = card.ProductionId;
-            movingItem.ProductionCode = card.ProductionCode;
-            movingItem.ProductionName = card.ProductionName;
-            DateTime movingTime = DateTime.Now;
-            if (DateTime.TryParse(instoreItem.MovingTime, out movingTime))
-            {
-                movingItem.TimeOfOrigin = movingTime;
-            }
-            else
-            {
-                movingItem.TimeOfOrigin = DateTime.Now;
-            }
-
-            movingItem.TimeOfOriginWork = new DateTime(movingItem.TimeOfOrigin.Year, movingItem.TimeOfOrigin.Month, movingItem.TimeOfOrigin.Day);
-            if (movingItem.TimeOfOrigin.Hour <= 8 && movingItem.TimeOfOrigin.Minute < 30)
-            {
-                movingItem.TimeOfOriginWork = movingItem.TimeOfOriginWork.AddDays(-1);
-            }
-            if ((movingItem.TimeOfOrigin.Hour < 8) 
-                || (movingItem.TimeOfOriginWork.Hour >= 20)  
-                || (movingItem.TimeOfOriginWork.Hour == 8 && movingItem.TimeOfOrigin.Minute < 30))
-            {
-                movingItem.ShiftId = 1;
-            }
-            else
-            {
-                movingItem.ShiftId = 0;
-            }
-
-            movingItem.ProductionOrderId = -1;
-            movingItem.ProductionOrderNo = "";
-            movingItem.PrevProgressRecordId = -1;
-
-            movingItem.WorkstationId = -1;
-            movingItem.WorkstationCode = "";
-            movingItem.WorkstationName = "";
-
-            movingItem.WorkshopId = -1;
-            movingItem.WorkshopCode = instoreItem.StoreNo;
-            movingItem.WorkshopName = instoreItem.StoreName;
-
-            movingItem.OperatorId = -1;
-            movingItem.EmployeeId = instoreItem.operatorCode;
-            movingItem.EmployeeName = instoreItem.operatorName;
-
-            movingItem.OperatorIdFrom = -1;
-            movingItem.EmployeeIdFrom = "";
-            movingItem.EmployeeNameFrom = "";
-
-            movingLogic.Create(movingItem);
-
-            card.CardStatus = 1; // 已经移库并自动派发
-            cardLogic.Update(card);
-
-            return GlobalConstants.EXCEPTION_CODE_NO_ERROR;
         }
 
         [Route("reportProgress")]

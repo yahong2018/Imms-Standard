@@ -11,8 +11,7 @@ create procedure MES_BackWipToPrev_2
     out RespData     varchar(200)
 )
 top:begin
-    --  校验数量，退还的数量不能大于移库的数量	 
-	declare RfidNo varchar(20);
+    --  校验数量，退还的数量不能大于移库的数量	 	
 	declare IssueQty,StockQty,BackQty int;	 
 	 
 	select -1,'' into Success,RespData;
@@ -23,7 +22,7 @@ top:begin
 	 
 	set BackQty = cast(ReqData as UNSIGNED);	
 	
-    select s.req_data,c.issue_qty,c.stock_qty into RfidNo,IssueQty,StockQty
+    select s.req_data,c.issue_qty,c.stock_qty into IssueQty,StockQty
 	  from workstation_session_step s join rfid_card c on s.req_data = c.rfid_no
     where s.workstation_session_id = SessionId
 	  and s.step = 1
@@ -32,10 +31,9 @@ top:begin
 		
 	if (BackQty > StockQty) then
         set RespData='2';        
-        set RespData = CONCAT(RespData,'|1|退还数量必须|0');				    
-        set RespData = CONCAT(RespData,'|2|小于等于移库数量|0');				    
-               
-        leave top;	 
+        set RespData = CONCAT(RespData,'|1|数量错误|0');				    
+        set RespData = CONCAT(RespData,'|2|退还数必须≤移库数|0');		
+        leave top;
     end if;
 	 	 
     set RespData='1';	

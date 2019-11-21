@@ -12,7 +12,7 @@ top:begin
     declare SessionType,Success int default -1;
     declare SessionId,CardId  bigint;
     declare RespHint varchar(200);
-    declare CardType,ReqDataType int;
+    declare CardType,ReqDataType,CardStatus int;
 
     select -1,-1,'','' into SessionId,Step,RespData,RespHint;	
     
@@ -20,7 +20,7 @@ top:begin
     call MES_Debug(CONCAT('MES_GetWorkstationSession  WorkstationId:',WorkstationId,',SessionId:',SessionId,',PrevStep:',PrevStep,',SessionType:',SessionType));	
 
     if(DataType = 1) then  -- 刷卡输入    
-        call MES_VerifyCard(ReqData,CardType,CardId,RespData);		
+        call MES_VerifyCard(ReqData,CardType,CardStatus,CardId,RespData);		
         call MES_Debug(CONCAT('MES_VerifyCard  ReqData:',ReqData,',CardType:',CardType,',CardId:',CardId));
         if not (CardType in(0,1,2,3)) then		            
             if SessionId <> -1 then
@@ -81,7 +81,7 @@ top:begin
         end if;
 
         if (ifnull(RespData,'') = '') then
-            call MES_HandleErrorReq(ReqData,RespData);        
+            call MES_HandleErrorReq(ReqData,CardStatus,RespData);        
         end if;
     end if;
 

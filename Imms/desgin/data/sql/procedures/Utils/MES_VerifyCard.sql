@@ -4,12 +4,13 @@ create procedure MES_VerifyCard
 (
     in  RfidNo      varchar(20),
     out CardType    int,
+    out CardStatus  int,
     out CardId      bigint,
-    out RespData varchar(200)
+    out RespData    varchar(200)
 )
 begin    
-    select -1,-1,'' into CardType,CardId,RespData;	    
-    call MES_GetCardType(RfidNo,CardType,CardId);
+    select -1,-1,-1,'' into CardType,CardStatus,CardId,RespData;	    
+    call MES_GetCardType(RfidNo,CardType,CardStatus,CardId);
 		   
     if not CardType in(1,2,3) then
 	    set RespData = '2';                         

@@ -50,29 +50,38 @@ top:begin
                    2. 移库
     */
 
-    if ((CardType = 2) and (CardStatus in (1,2)) and (CardOpIndex = WorkshopOpIndex)) then  -- 工程内报工       
-        -- if(CardWorkshopId <> WorkshopId) then
-        --     set RespData='2';            
-        --     set RespData = CONCAT(RespData,'|1|看板可以报工的车间:|0');            
-        --     set RespData = CONCAT(RespData,'|2|',CardWorkshopName,':|0');            
+    if (CardStatus = 0) then
+        set RespData= '2';            
+        set RespData = CONCAT(RespData,'|1|本看板还没有派发,|0');            
+        set RespData = CONCAT(RespData,'|2|请后工程先派发.|0');            
             
-        --     leave top;           
-        -- end if;
+        leave top;                  
+    end if;
+
+    if( CardType = 2)   then
+       if (CardOpIndex = WorkshopOpIndex) and not(CardStatus in (1,2))then
+            set RespData= '2';            
+            set RespData = CONCAT(RespData,'|1|本看板后工程还没有派发,|0');            
+            set RespData = CONCAT(RespData,'|2|请后工程先派发.|0');            
+            
+            leave top;              
+       end if;
+
+       if (CardOpIndex <> WorkshopOpIndex) and not (CardStatus in (2,10)) then
+            set RespData= '2';
+            set RespData = CONCAT(RespData,'|1|本看板前工程还没有报工,|0');
+            set RespData = CONCAT(RespData,'|2|请前工程先报工.|0');
+            
+            leave top;
+       end if;
+    end if;
+
+    if ((CardType = 2) and (CardStatus in (1,2)) and (CardOpIndex = WorkshopOpIndex)) then  -- 工程内报工       
         call MES_Debug('MES_ReportWip:工程内报工');	
         call MES_ReportWip(WorkstationId,WorkshopType,CardId,CardType,CardStatus,ReqTime,Success,RespData); 
-    elseif(CardType = 2) and (CardStatus in (2,10)) and (CardOpIndex = WorkshopPreIndex) then  -- 工程内移库
-        -- if WorkshopPreIndex <> CardOpIndex then
-        --     set RespData='3';            
-        --     set RespData = CONCAT(RespData,'|1|只有上下工序之间|0');            
-        --     set RespData = CONCAT(RespData,'|2|才可以进行移库|0');            
-            
-
-        --     leave top;                              
-        -- end if;
+    elseif(CardType = 2) and (CardStatus in (2,10)) and (CardOpIndex <> WorkshopOpIndex) then  -- 工程内移库
         call MES_Debug('MES_MoveWip:工程内移库');	
         call MES_MoveWip(WorkstationId,WorkshopType,CardId,CardType,CardStatus,ReqTime,Success,RespData);
-   -- elseif(CardType = 2) and (CardStatus = 20) then   退后: 本存储过程不处理后工序退回
-   --     call return_back
     elseif(CardType = 3) and (CardStatus = 1) then  -- 外发绑卡
         if(WorkshopType <> 3) then
             set RespData= '2';            
@@ -123,6 +132,16 @@ top:begin
 
         call MES_Debug('MES_ReportWip:外发回厂报工');	
         call MES_ReportWip(WorkstationId,WorkshopType,CardId,CardType,CardStatus,ReqTime,Success,RespData); 
+    elseif(CardType = 3) and (CardStatus = 30) then  -- 外发回厂以后移库投入
+        if WorkshopType <> 5 then 
+            set RespData='1';            
+            set RespData = CONCAT(RespData,'|1|非后工程车间|0');            
+                        
+            leave top;        
+        end if;
+
+        call MES_Debug('MES_MovetWip:外发回厂报投入');	
+        call MES_MoveWip(WorkstationId,WorkshopType,CardId,CardType,CardStatus,ReqTime,Success,RespData);
     end if;    
 
     call MES_Debug(CONCAT('MES_WipCardInput Result --> Success:',Success));

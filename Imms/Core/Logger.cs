@@ -46,7 +46,7 @@ namespace Imms
                     Console.Write(string.Format("[Imms.Core.Logger--{0:yyyy/MM/dd HH:mm:ss}-{1}]:", DateTime.Now, level));
                     Console.WriteLine(message);
                     Console.ResetColor();
-                    //  File.AppendAllText(this.LoggerFileName, msg);
+                    File.AppendAllText(this.LoggerFileName, message);
                 }
             }
         }

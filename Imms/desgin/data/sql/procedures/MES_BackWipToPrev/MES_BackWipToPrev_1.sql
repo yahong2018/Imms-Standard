@@ -24,7 +24,7 @@ top:begin
     end if;
     
     select c.card_status,c.workshop_id,c.workshop_name into CardStatus,CardWorkshopId,CardWorkshopName
-     from  rfid_card c
+      from  rfid_card c
     where c.record_id = CardId;
 
     select parent_id into WorkshopId  from work_organization_unit where record_id = WorkstationId;
@@ -35,19 +35,10 @@ top:begin
         set RespData = CONCAT(RespData,'|2|才可以退本卡.|0');					   
                
         leave top;       
-    end if;
-    
-    if(CardStatus<>20) then
-        set RespData='2';        
-        set RespData = CONCAT(RespData,'|1|只有移库了的卡|0');					   
-        set RespData = CONCAT(RespData,'|2|才可以退数.|0');					   
-               
-        leave top;
-    end if;	
+    end if;   
     
     set RespData='1';    
-    set RespData = CONCAT(RespData,'|1|请输入退还数量|0');			    
-
+    set RespData = CONCAT(RespData,'|1|请输入退还数量|0');
     set RespHint = '请输入退还数量';
     
     set Success = 0;
