@@ -367,7 +367,11 @@ namespace Imms.Mes.Services
         private long GetInstoreData(out List<InstoreSyncItem> itemList)
         {
             long last_sync_id = long.Parse(this.last_sync_progress_param.ParameterValue);
-            List<ProductionOrderProgress> dataList = this.dbContext.Set<ProductionOrderProgress>().Where(x => x.RecordId > last_sync_id && x.WorkshopCode != "EV_2").ToList();
+            List<ProductionOrderProgress> dataList = this.dbContext.Set<ProductionOrderProgress>()                  
+                   .Where(x => x.RecordId > last_sync_id && x.WorkshopCode != "EV_2")
+                   .OrderBy(x=>x.CreateTime)
+                   // .Take(10)
+                   .ToList();
             itemList = dataList.GroupBy(x => new { x.WorkshopCode, x.ProductionCode, x.WocgCode })
             .Select(group => new InstoreSyncItem
             {
@@ -407,7 +411,7 @@ namespace Imms.Mes.Services
                 beId = this.AccountId,
                 prodpwt = itemList.ToArray()
             };
-            GlobalConstants.DefaultLogger.Info("开始同步内部报工数据：\n" + data.ToString());
+            GlobalConstants.DefaultLogger.Info("开始同步内部报工数据：\n" + data.ToJson());
             this.ReportToErp(this.last_sync_progress_param, this.InstoreSyncUrl, data, lastRecordId);
         }
 

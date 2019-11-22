@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using Imms.Security.Data;
 using Microsoft.AspNetCore.Authorization;
 using Imms.Mes.Data.Domain;
+using Microsoft.AspNetCore.Http;
 
 namespace Imms.WebManager.Controllers
 {
@@ -31,6 +32,13 @@ namespace Imms.WebManager.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+
+        [Route("keepAlive")]
+        public string KeepAlive(){
+            GlobalConstants.DefaultLogger.Info("客户端心跳:"+GlobalConstants.GetCurrentUser().UserCode);
+
+            return "{}";
         }
 
         [Route("userMenu"), HttpGet]
@@ -100,6 +108,6 @@ namespace Imms.WebManager.Controllers
             return loginText;
         }
 
-       
+
     }
 }

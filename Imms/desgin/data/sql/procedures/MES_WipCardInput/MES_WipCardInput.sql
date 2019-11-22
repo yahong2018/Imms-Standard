@@ -13,6 +13,7 @@ top:begin
     declare CardStatus,WorkshopType,WorkshopOpIndex,WorkshopPreIndex,CardOpIndex,CardPreOpIndex int;
     declare CardWorkshopId,WorkshopId bigint;
     declare CardWorkshopName varchar(50);
+    declare CardStatusName varchar(20);
 
     select '',-1 into RespData,Success;
 
@@ -49,33 +50,44 @@ top:begin
                 => 1. 报工  card_status = 30
                    2. 移库  card_status = 40
     */
-
+   
+    call MES_ParseCardStatus(CardStatus,CardStatusName);
     if (CardStatus = 0) then
-        set RespData= '2';
-        set RespData = CONCAT(RespData,'|1|本看板还没有派发,|0');
-        set RespData = CONCAT(RespData,'|2|请后工程先派发.|0');
+        set RespData= '3';
+        set RespData = CONCAT(RespData,'|1|看板的状态为:',CardStatusName,'|0');
+        set RespData = CONCAT(RespData,'|2|后工程派发以后|0');
+        set RespData = CONCAT(RespData,'|3|才可以报工和报工.|0');
 
         leave top;
     end if;
-
+    
     if( CardType = 2) then
        if (CardOpIndex = WorkshopOpIndex) and not(CardStatus in (1,2))then
-            set RespData= '2';
-            set RespData = CONCAT(RespData,'|1|本看板后工程还没有派发,|0');
-            set RespData = CONCAT(RespData,'|2|请后工程先派发.|0');
+            set RespData= '3';            
+            set RespData = CONCAT(RespData,'|1|看板的状态为:',CardStatusName,'|0');
+            set RespData = CONCAT(RespData,'|2|后工程移库派发|0');
+            set RespData = CONCAT(RespData,'|3|以后才可以报工.|0');
 
             leave top;
        end if;
-
-       if (CardOpIndex <> WorkshopOpIndex) and not (CardStatus in (2,10)) then
-            set RespData= '2';
-            set RespData = CONCAT(RespData,'|1|本看板前工程还没有报工,|0');
-            set RespData = CONCAT(RespData,'|2|请前工程先报工.|0');
+        
+       if (CardOpIndex < WorkshopOpIndex) and not (CardStatus in (2,10)) then
+            set RespData= '3';
+            set RespData = CONCAT(RespData,'|1|看板的状态为:',CardStatusName,'|0');
+            set RespData = CONCAT(RespData,'|2|前工程报工以后,|0');
+            set RespData = CONCAT(RespData,'|3|才可以移库.|0');
 
             leave top;
+        elseif(CardOpIndex > WorkshopOpIndex) then
+            set RespData= '2';
+            set RespData = CONCAT(RespData,'|1|本看板可以报工的车间:|0');
+            set RespData = CONCAT(RespData,'|2|',CardWorkshopName,'|0');
+
+            leave top;        
        end if;
     end if;
 
+    
     if ((CardType = 2) and (CardStatus in (1,2)) and (CardOpIndex = WorkshopOpIndex)) then  -- 工程内报工
         call MES_Debug('MES_ReportWip:工程内报工');
         call MES_ReportWip(WorkstationId,WorkshopType,CardId,CardType,CardStatus,ReqTime,Success,RespData);

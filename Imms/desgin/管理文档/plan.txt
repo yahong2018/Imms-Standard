@@ -169,6 +169,7 @@ WK43_RK_ZZ    组装入库
 ---------------------------------------------------------------------------  
 2019/11/06
 http:192.168.121.11/jsf/rfws/erp/aisa/save/prodPw
+委外 http:192.168.121.11/jsf/rfws/erp/aisa/save/pdcoreSpw
 
 内部转移 /jsf/rfws/erp/aisa/savemove 
 入库 /jsf/rfws/erp/aisa/savepc

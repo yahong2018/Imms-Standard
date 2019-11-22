@@ -39,18 +39,28 @@ Ext.define('app.view.main.Main', {
 		});
 
 		var runner = mainView.getViewModel().get('system.taskRunner');
-		var interval = mainView.getViewModel().get('system.autoRefreshInterval') * 1000 * 60;
+		var interval = mainView.getViewModel().get('system.autoRefreshInterval') * 1000 * 60 * 1;
 		var task = runner.newTask({
 			interval: interval,
 			run: function () {
-				console.log('start refresh:' + Ext.util.Format.date(new Date(), "Y-m-d H:i:s"));
+				console.log('start keep alive:' + Ext.util.Format.date(new Date(), "Y-m-d H:i:s"));
+
+				app.ux.Utils.ajaxRequest({
+					url:"home/keepAlive",
+					method:"GET",
+					successCallback:function(){
+						console.log('sucess keep alive:' + Ext.util.Format.date(new Date(), "Y-m-d H:i:s"));
+					},
+					failCallback: function (response, opts){
+						console.log('failed keep alive:' + Ext.util.Format.date(new Date(), "Y-m-d H:i:s"));
+						console.log(response.responseText);
+					}
+				})
 			}
 		});
 		mainView.getViewModel().set('system.autoRefreshTask', task);
 		task.start();
 	},
-
-
 
 	listeners: {
 		resize: function (container) {

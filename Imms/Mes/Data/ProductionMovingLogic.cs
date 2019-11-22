@@ -13,26 +13,34 @@ namespace Imms.Mes.Data
             //移库以后，要调整库存：移入部门库存增加，移出部门库存减少
             lock (typeof(ProductMovingLogic))
             {
-                MaterialStock stockIn = AssureInStock(item, dbContext);
-                MaterialStock stockOut = AssureOutStock(item, dbContext);
+                WorkshopLogic WorkshopLogic  = new WorkshopLogic(dbContext);
+                Workshop fromWorkshop = dbContext.Set<Workshop>().Where(x=>x.RecordId == item.WorkshopIdFrom).First();
+                bool isFinishedProductionWorkshop = WorkshopLogic.IsFinishedProductionWorkshop(fromWorkshop);
+                MaterialStock stockIn = AssureInStock(item, isFinishedProductionWorkshop,dbContext);
+                MaterialStock stockOut = AssureOutStock(item, isFinishedProductionWorkshop,dbContext);
 
-                stockIn.QtyMoveIn =  stockIn.QtyMoveIn + item.Qty;  // 移入
-                stockIn.QtyStock = stockIn.QtyStock + item.Qty;     // 库存增加
+                if (stockIn != null)
+                {
+                    stockIn.QtyMoveIn = stockIn.QtyMoveIn + item.Qty;  // 移入
+                    stockIn.QtyStock = stockIn.QtyStock + item.Qty;     // 库存增加
+                    GlobalConstants.ModifyEntityStatus(stockIn, dbContext);
+                }
 
-                stockOut.QtyMoveOut = stockOut.QtyMoveOut + item.Qty;  // 移出
-                stockOut.QtyStock = stockOut.QtyStock - item.Qty;      // 库存减少
+                if (stockOut != null)
+                {
+                    stockOut.QtyMoveOut = stockOut.QtyMoveOut + item.Qty;  // 移出
+                    stockOut.QtyStock = stockOut.QtyStock - item.Qty;      // 库存减少
+                    GlobalConstants.ModifyEntityStatus(stockOut, dbContext);
+                }
 
-                GlobalConstants.ModifyEntityStatus(stockIn,dbContext);
-                GlobalConstants.ModifyEntityStatus(stockOut,dbContext);
-
-                dbContext.SaveChanges();                
+                dbContext.SaveChanges();
             }
         }
 
-        private MaterialStock AssureInStock(ProductionMoving item, DbContext dbContext)
+        private MaterialStock AssureInStock(ProductionMoving item, bool isFinishedProductionWorkshop,DbContext dbContext)
         {
             MaterialStock stock = dbContext.Set<MaterialStock>().Where(x => x.StoreId == item.WorkshopId && x.MaterialId == item.ProductionId).FirstOrDefault();
-            if (stock == null)
+            if (stock == null && !isFinishedProductionWorkshop)
             {
                 stock = new MaterialStock();
                 stock.MaterialId = item.ProductionId;
@@ -49,10 +57,10 @@ namespace Imms.Mes.Data
             return stock;
         }
 
-        private MaterialStock AssureOutStock(ProductionMoving item, DbContext dbContext)
+        private MaterialStock AssureOutStock(ProductionMoving item, bool isFinishedProductionWorkshop, DbContext dbContext)
         {
             MaterialStock stock = dbContext.Set<MaterialStock>().Where(x => x.StoreId == item.WorkshopIdFrom && x.MaterialId == item.ProductionId).FirstOrDefault();
-            if (stock == null)
+            if (stock == null && !isFinishedProductionWorkshop)
             {
                 stock = new MaterialStock();
                 stock.MaterialId = item.ProductionId;

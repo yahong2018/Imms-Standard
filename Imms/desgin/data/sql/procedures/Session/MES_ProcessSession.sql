@@ -46,7 +46,7 @@ top:begin
             set PrevStep = -1;    
         else
             set RespData = '3';
-            set RespData = CONCAT(RespData,'|1|前次功能已过1分钟有效期|0');
+            set RespData = CONCAT(RespData,'|1|前次功能已过30秒有效期|0');
             set RespData = CONCAT(RespData,'|2|刷工卡确定系统功能之后，|0');
             set RespData = CONCAT(RespData,'|3|才可按键输入。|0');
             
@@ -81,7 +81,7 @@ top:begin
         end if;
 
         if (ifnull(RespData,'') = '') then
-            call MES_HandleErrorReq(ReqData,CardStatus,RespData);        
+            call MES_HandleErrorReq(CardStatus,RespData);        
         end if;
     end if;
 

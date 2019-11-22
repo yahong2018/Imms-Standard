@@ -19,10 +19,10 @@ top:begin
     select -1,'','' into Success,RespData,RespHint;	
 
     if ReqDataType = 2 then
-	    select card_status into rfid_card where record_id = CardId;
+	    select card_status into CardStatus from rfid_card where record_id = CardId;
 	end if;
 	call MES_HandleBackWipToPreError(CurrentStep,ReqDataType,CardStatus,RespData);
-	if RespData = '' then
+	if RespData <> '' then
 	   leave top;
 	end if;
 		

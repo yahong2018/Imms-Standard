@@ -19,7 +19,7 @@ Ext.define('app.view.main.MainModel', {
 			currentTime:'',
 			taskRunner: new Ext.util.TaskRunner(),
 			autoRefreshTask:{},	
-			autoRefreshInterval:2,			 
+			autoRefreshInterval:1,			 
 		},
 
 		// 用户单位信息和用户信息

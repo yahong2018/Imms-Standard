@@ -21,13 +21,14 @@
 --
 -- 清空原有数据
 --
-truncate table system_logs;
+
 truncate table work_organization_unit;
 truncate table operator;
 truncate table material;
 truncate table bom;
 truncate table rfid_card;
 
+truncate table system_logs;
 truncate table material_stock;
 truncate table product_summary;
 truncate table production_order_progress;
@@ -35,13 +36,15 @@ truncate table production_moving;
 truncate table workstation_session;
 truncate table workstation_session_step;
 truncate table quality_check;
+truncate table outsource_workstation_bind;
+truncate table outsource_card_bind;
+
 truncate table defect;
 truncate table production_order;
 
 truncate table workstation_login;
 
-truncate table outsource_workstation_bind;
-truncate table outsource_card_bind;
+
 
 /****************************************************************************************************
         操作员与工卡

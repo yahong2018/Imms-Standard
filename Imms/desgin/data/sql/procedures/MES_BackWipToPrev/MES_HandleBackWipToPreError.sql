@@ -1,3 +1,4 @@
+drop procedure MES_HandleBackWipToPreError;
 create procedure MES_HandleBackWipToPreError(
     in        CurrentStep     int,
     in        ReqDataType     int,    
@@ -21,7 +22,7 @@ begin
         if CardStatus <> 20 then
             set RespData='2';    
             call MES_ParseCardStatus(CardStatus,StatusName);
-            set RespData = CONCAT(RespData,'|1|当前看板状态为:,',StatusName,'|0');
+            set RespData = CONCAT(RespData,'|1|当前看板状态为:',StatusName,'|0');
             set RespData = CONCAT(RespData,'|2|不可以退回.|0');        
         end if;
     elseif(CurrentStep = 2) then

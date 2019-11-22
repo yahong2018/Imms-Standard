@@ -12,11 +12,11 @@ namespace Imms
 
         protected internal Logger()
         {
-#if DEBUG
-            this.LogLevel = LogLevel.Information;
-#else
-            this.LoggerLevel= LoggerLevel.INFO;
-#endif
+// #if DEBUG
+//             this.LogLevel = LogLevel.Debug;
+// #else
+//             this.LoggerLevel= LoggerLevel.INFO;
+// #endif
 
         }
 
@@ -42,11 +42,10 @@ namespace Imms
                     }else{
                         Console.ForegroundColor = ConsoleColor.White;
                     }
-
-                    Console.Write(string.Format("[Imms.Core.Logger--{0:yyyy/MM/dd HH:mm:ss}-{1}]:", DateTime.Now, level));
-                    Console.WriteLine(message);
+                    string msg =  string.Format("[Imms.Core.Logger--{0:yyyy/MM/dd HH:mm:ss}-{1}]:{2}\r\n", DateTime.Now, level, message);                
+                    Console.WriteLine(msg);
                     Console.ResetColor();
-                    File.AppendAllText(this.LoggerFileName, message);
+                    File.AppendAllText(this.LoggerFileName, msg);
                 }
             }
         }

@@ -114,11 +114,11 @@ create table work_organization_unit
 
     operation_index        int                         not null default 0,   -- 对于车间来说，工序编号必须唯一
     prev_operation_index   int                         not null default 0,    
-    workshop_type          int                         not null default 0,   -- 车间类型: 1. 内部车间   3.外发前工程车间   4.外发车间   5.外发后工程车间
-
+    workshop_type          int                         not null default 0,   -- 车间类型: 1. 内部车间   3.外发前工程车间   4.外发车间   5.外发后工程车间 
+    
     rfid_controller_id     int                         not null default 0,
     rfid_terminator_id     int                         not null default 0,
-    rfid_template_index     int                         not null default 8,  --  工位机的缺省显示模板，默认为8，如果是手持机，则要设为4
+    rfid_template_index     int                        not null default 8,  --  工位机的缺省显示模板，默认为8，如果是手持机，则要设为4
 
     wocg_code              varchar(20)                 null,
 
@@ -321,13 +321,24 @@ create table card_issue
     
     card_id                bigint                      not null,
     card_no                varchar(20)                 not null,
+    card_type              int                         not null,
+    old_card_status        int                         not null,
     
     issue_user_id          bigint                      not null,
     issue_user_code        varchar(20)                 not null,
     issue_user_name        varchar(50)                 not null,
+    
+    issue_workstation_id   bigint                      not null,
+    issue_workstation_code varchar(20)                 not null,
+    issue_workstation_name varchar(50)                 not null,
 
-    GID                    int                         not null,
-    DID                    int                         not null,
+    production_id          bigint                      not null,
+    production_code        varchar(20)                 not null,
+    production_name        varchar(50)                 not null,
+
+    workshop_id            bigint                      not null,
+    workshop_code          varchar(20)                 not null,
+    workshop_name          varchar(50)                 not null,
     
     issue_qty              int                         not null,
 

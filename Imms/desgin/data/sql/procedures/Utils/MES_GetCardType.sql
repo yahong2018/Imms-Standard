@@ -14,7 +14,7 @@ begin
       where rfid_no = CardNo;
 
    if(CardId = -1) then   -- 员工卡
-        select record_id,1,-1 into CardId,CardType,-1
+        select record_id,1,-1 into CardId,CardType,CardStatus
           from  operator
         where employee_card_no = CardNo;
    end if;           

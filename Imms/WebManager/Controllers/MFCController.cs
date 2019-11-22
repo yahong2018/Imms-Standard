@@ -191,7 +191,7 @@ namespace Imms.WebManager.Controllers
             string strInData = instoreItem.ToJson();
             GlobalConstants.DefaultLogger.Debug("收到ERP工务移库数据-->");
             GlobalConstants.DefaultLogger.Debug(strInData);
-            GlobalConstants.DefaultLogger.Debug("开始工务移库...");
+            GlobalConstants.DefaultLogger.Info("开始工务移库...");
             try
             {
                 ProductMovingLogic movingLogic = new ProductMovingLogic();
@@ -251,8 +251,8 @@ namespace Imms.WebManager.Controllers
                 movingItem.WorkstationName = "";
 
                 movingItem.WorkshopId = -1;
-                movingItem.WorkshopCode = instoreItem.StoreNo;
-                movingItem.WorkshopName = instoreItem.StoreName;
+                movingItem.WorkshopCode = ""; //instoreItem.StoreNo;
+                movingItem.WorkshopName = ""; //instoreItem.StoreName;
 
                 movingItem.OperatorId = -1;
                 movingItem.EmployeeId = instoreItem.operatorCode;

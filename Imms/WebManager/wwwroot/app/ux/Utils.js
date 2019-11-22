@@ -33,10 +33,18 @@ Ext.define('app.ux.Utils', {
                         me.successCallback(result, response, opts);
                     }
                 } catch (e) {
-                    handleFailure(response, opts);
+                    if(me.failCallback){
+                        me.failCallback(response,opts);
+                    }else{
+                        handleFailure(response, opts);
+                    }                    
                 }
             }, failure: function (response, opts) {
-                handleFailure(response, opts);
+                if (me.failCallback) {
+                    me.failCallback(response, opts);
+                } else {
+                    handleFailure(response, opts);
+                }
             }
         }
 

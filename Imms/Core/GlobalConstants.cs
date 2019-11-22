@@ -66,7 +66,6 @@ namespace Imms
         public const string JWT_ISSURER_URL="http://localhost:5200";
         public const string AUTHROIZATION_SESSION_KEY = "Authorization";
 
-
         //其他
         public static Imms.Data.IDbContextFactory DbContextFactory = null;
         public static Logger DefaultLogger = new Logger();

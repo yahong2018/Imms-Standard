@@ -24,7 +24,8 @@ top:begin
         where record_id = CardId;           
     end if;
     call MES_HandleIssueCardError(CurrentStep,ReqDataType,ReqData,CardStatus,RespData);
-    if RespData = '' then
+    
+    if RespData <> '' then
         leave top;
     end if;    
 		

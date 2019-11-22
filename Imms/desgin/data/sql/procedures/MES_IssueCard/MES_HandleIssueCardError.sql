@@ -1,3 +1,4 @@
+drop procedure MES_HandleIssueCardError;
 create procedure MES_HandleIssueCardError(
     in      CurrentStep     int,
     in      ReqDataType     int,
@@ -7,6 +8,8 @@ create procedure MES_HandleIssueCardError(
 )
 begin
     declare CardStatusName varchar(20);
+
+    call MES_Debug('MES_HandleIssueCardError');
 
     if (CurrentStep = 0)  and  (ReqDataType <> 4) then
         set RespData='2';    
@@ -20,9 +23,9 @@ begin
         elseif( not CardStatus in (0,20,40)) then   -- 40为外发回厂投入
             call MES_ParseCardStatus(CardStatus,CardStatusName);
           
-            set RespData='2';    
-            set RespData = CONCAT(RespData,'|1|只能派已移库或未使用的卡|0');		       
-            set RespData = CONCAT(RespData,'|2|当前卡的状态为:',CardStatusName,'|0');
+            set RespData='2';  
+            set RespData = CONCAT(RespData,'|1|当前卡的状态为:',CardStatusName,'|0');  
+            set RespData = CONCAT(RespData,'|2|只能派已移库或未使用的卡|0');		 
         end if;    
     elseif(CurrentStep = 2) and (ReqDataType <> 4)then        
         set RespData='2';    

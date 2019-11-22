@@ -22,7 +22,7 @@ top:begin
 	 
 	set BackQty = cast(ReqData as UNSIGNED);	
 	
-    select s.req_data,c.issue_qty,c.stock_qty into IssueQty,StockQty
+    select c.issue_qty,c.stock_qty into IssueQty,StockQty
 	  from workstation_session_step s join rfid_card c on s.req_data = c.rfid_no
     where s.workstation_session_id = SessionId
 	  and s.step = 1
