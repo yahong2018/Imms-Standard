@@ -339,6 +339,26 @@ http:192.168.121.11/jsf/rfws/erp/aisa/save/prodPw
    1. E/V后工程回厂跟投入是两件事情
    2. E/V整直报工（移库可以不需要上下工序，只要是不同的工序就可以移库）
 
+--------------------------------------------------------------------------  
+外发看板增加塔号
+    修改表
+         rfid_card
+ 
+按照生产线自动报工
+    修改存储过程
+        MES_ReportWip_0
+        MES_ReportWip
+        
+    增加存储过程
+        MES_AjustStockByOp
+
+    增加表
+        automation_workstation
+
+
+
+
+
 
         
     

@@ -13,6 +13,7 @@ Ext.define("app.view.imms.org.workstation.Workstation", {
         { dataIndex: "wocgCode", text: "工作中心组", width: 200 },
         { dataIndex: "rfidControllerId", text: "Rfid控制器编号", width: 150 },
         { dataIndex: "rfidTerminatorId", text: "Rfid工位机编号", width: 150 },
+        { dataIndex: "rfidTemplateIndex", text: "显示模板编号", width: 150 },
         { dataIndex: "description", text: "备注", flex: 1 }
     ],
     constructor: function (config) {       

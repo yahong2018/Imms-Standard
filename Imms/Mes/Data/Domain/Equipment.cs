@@ -47,6 +47,8 @@ namespace Imms.Mes.Data.Domain
         public int IssueQty { get; set; }
         public int StockQty { get; set; }
 
+        public string TowerNo { get; set; }
+
         public virtual Material Production { get; set; }
         public virtual Workshop Workshop { get; set; }
     }
@@ -67,7 +69,8 @@ namespace Imms.Mes.Data.Domain
         public string IssueQty { get; set; }
     }
 
-    public class CardIssueConfigure:TrackableEntityConfigure<CardIssue>{
+    public class CardIssueConfigure : TrackableEntityConfigure<CardIssue>
+    {
         protected override void InternalConfigure(EntityTypeBuilder<CardIssue> builder)
         {
             base.InternalConfigure(builder);
@@ -112,6 +115,7 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.IssueQty).HasColumnName("issue_qty");
             builder.Property(e => e.StockQty).HasColumnName("stock_qty");
             builder.Property(e => e.KanbanNo).HasColumnName("kanban_no");
+            builder.Property(e=>e.TowerNo).HasColumnName("tower_no");
 
             builder.HasOne(e => e.Production).WithMany().HasForeignKey(e => e.ProductionId).HasConstraintName("production_id");
             builder.HasOne(e => e.Workshop).WithMany().HasForeignKey(e => e.WorkshopId).HasConstraintName("workshop_id");

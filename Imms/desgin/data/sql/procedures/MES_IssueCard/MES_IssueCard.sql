@@ -29,11 +29,11 @@ top:begin
         leave top;
     end if;    
 		
-    if (CurrentStep = 0) and (ReqDataType = 4) then  -- 菜单选择
+    if (CurrentStep = 0) and (ReqDataType = 4) then         -- 菜单选择
         call MES_IssueCard_0(Success,RespHint,RespData);		
-	elseif (CurrentStep = 1) and (ReqDataType = 2) then --  刷看板
+	elseif (CurrentStep = 1) and (ReqDataType in(2,3)) then --  刷看板
         call MES_IssueCard_1(ReqDataType,CardId,DefaultIssueQty,Success,RespHint,RespData);	
-    elseif (CurrentStep = 2) and (ReqDataType = 4) then -- 输入数量
+    elseif (CurrentStep = 2) and (ReqDataType = 4) then     -- 输入数量
         call MES_IssueCard_2(SessionId,CurrentStep,ReqDataType,ReqData,Success,RespData);		
     end if;
 

@@ -27,15 +27,26 @@ top:begin
                 call MES_Debug('MES_ReportWip:工程内车间、外发后工程车间 ');  
                 call MES_ReportWip_0(WorkstationId,CardId,ReqTime,ReportQty,LastBusinessId);
         elseif(WorkshopType = 3) then   -- 外发前工程车间的工程内看板报工
-                -- 外发前工程，必须先有相应的绑定记录     
+                --
+                -- 外发前工程，必须先有相应的绑定记录
+                --   注意可以多答来回切换
+                --  
                 select b.record_id, c.production_id into BindId, OutSourceCardProductionId
                   from outsource_workstation_bind b join rfid_card  c on b.outsource_card_id = c.record_id                                            
-                 where b.workstation_id = WorkstationId and b.bind_status < 20;        
+                 where b.workstation_id = WorkstationId 
+                   and b.bind_status < 20
+                   and exists (
+                       select * from bom bm
+                        where bm.material_id = b.production_id
+                          and bm.component_id = QtyCardProductionId
+                   );
+                         
                 set OutSourceCardProductionId = ifnull(OutSourceCardProductionId,-1);
 
-                if (OutSourceCardProductionId = -1) or (not exists( select * from material m
-                     where m.record_id = OutSourceCardProductionId
-                       and m.prev_material_id = QtyCardProductionId)) then
+                if (OutSourceCardProductionId = -1) or (not exists( select * from bom b
+                     where b.material_id = OutSourceCardProductionId
+                       and b.component_id = QtyCardProductionId)
+                ) then
                         set RespData = '3';            
                         set RespData = CONCAT(RespData,'|1|工位没有绑定对应|0');     
                         set RespData = CONCAT(RespData,'|2|产品',QtyCardProductionCode,'|0');     

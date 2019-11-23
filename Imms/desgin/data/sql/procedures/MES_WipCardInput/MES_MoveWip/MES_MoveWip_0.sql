@@ -11,7 +11,7 @@ begin
     declare CurGID,CurDID int;
 	declare WorkstationCode,WorkshopCode,WorkshopCodeFrom,RfidNo,ProductionCode varchar(20);
 	declare WorkstationName,WorkshopName,WorkshopNameFrom,ProductionName varchar(50);
-	declare WorkshopId,ProductionId,WorkshopIdFrom,OutProductionId bigint;	
+	declare WorkshopId,ProductionId,WorkshopIdFrom,OutProductionId,BindId bigint;	
     
     if LastBusinessId = -1 then   -- 如果是外发移库
 	    call MES_Debug('MES_MoveWip_0: LastBusinessId is -1');	
@@ -20,10 +20,22 @@ begin
 		        into RfidNo,MovedQty,OutProductionId,WorkshopId,WorkshopCode,WorkshopName
 		from rfid_card c where c.record_id = CardId;				
 		-- 移入的产品为外发产品的上个工序的产品
-		select m.prev_material_id,m.prev_material_code,m.prev_material_name
+		select record_id into BindId from outsource_workstation_bind
+		   where outsource_card_id = CardId
+		     and workstation_id = WorkstationId
+			 and bind_status = 10
+			order by attach_time desc
+			limit 1;
+		
+		select c.production_id,c.production_code,c.production_name
 		    into ProductionId,ProductionCode,ProductionName
-		  from material m
-		where m.record_id = OutProductionId;
+		  from rfid_card c
+		where c.card_status = 10		  
+		  and c.record_id in 
+		  (
+		  	 select b.qty_card_id from outsource_card_bind b where b.workstation_bind_id = BindId
+		  )
+		  limit 1;			
 
 		-- 移出车间
 		select w.org_code,w.org_name,w.rfid_controller_id,w.rfid_terminator_id,w.parent_id,w.parent_code,w.parent_name 

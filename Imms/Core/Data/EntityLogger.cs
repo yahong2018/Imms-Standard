@@ -17,7 +17,7 @@ namespace Imms.Data
         public EFLogger(string categoryName) => this.categoryName = categoryName;
 
         public bool IsEnabled(LogLevel logLevel){
-            return logLevel >= GlobalConstants.DefaultLogger.LogLevel;
+            return logLevel >= ConfigurationManager.LogLevel;
         }
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)

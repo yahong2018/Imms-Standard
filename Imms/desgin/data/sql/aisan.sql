@@ -138,6 +138,18 @@ create table work_organization_unit
 );
 
 --
+-- 自动报工的生产线
+--
+create table automation_workstation
+(
+    record_id             bigint     auto_increment    not null,
+    workstation_id        bigint                       not null,
+    workshop_id           bigint                       not null,
+
+    primary key(record_id)
+);
+
+--
 -- 员工：就是操作员 operator
 --
 create table operator
@@ -295,6 +307,8 @@ create table rfid_card
     stock_qty              int                         not null,       -- 库存数量
 
     last_business_id       bigint                      not null,       -- 最后一笔绑定的业务单据
+
+    tower_no               varchar(20)                 not null default '',           -- 塔的号码
 
     create_by_id           bigint                      not null,
     create_by_code         varchar(20)                 not null,

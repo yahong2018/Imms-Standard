@@ -59,7 +59,15 @@ Ext.define("app.view.imms.org.workstation.WorkstationDetailForm", {
             maxLength: 3,
             enforceMaxLength: true,
             width: 180
-        },
+        }, {
+             name: "rfidTemplateIndex",
+            xtype: "textfield",
+            fieldLabel: "显示模板编号",
+            allowBlank: false,
+            maxLength: 3,
+            enforceMaxLength: true,
+            width: 180
+        },        
         {
             name: "description",
             xtype: "textarea",

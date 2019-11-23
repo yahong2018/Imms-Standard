@@ -9,5 +9,18 @@ namespace Imms.Mes.Data
         {
             return CommonRepository.GetOneByFilter<RfidCard>(x => x.KanbanNo == kanbanNo && x.ProductionCode == materialCode);
         }
+
+        protected override void BeforeInsert(RfidCard item, Microsoft.EntityFrameworkCore.DbContext dbContext){
+            if(string.IsNullOrEmpty(item.TowerNo)){
+                item.TowerNo = "";
+            }
+        }
+
+        protected override void BeforeUpdate(RfidCard item, Microsoft.EntityFrameworkCore.DbContext dbContext){
+            if (string.IsNullOrEmpty(item.TowerNo))
+            {
+                item.TowerNo = "";
+            }
+        }
     }
 }

@@ -15,7 +15,7 @@ Ext.define("app.ux.data.SaveOperation", {
                 theUrl = store.getInsertUrl();
             }
             if (formCmp.beforePost) {
-                if (formCmp.beforePost({ dataMode: me.dataMode, seq: app.ux.data.DataOperationSeq.BEFORE, record: form.getRecord() }) === false) {
+                if (formCmp.beforePost({ dataMode: me.dataMode, seq: app.ux.data.DataOperationSeq.BEFORE, record: form.getFieldValues() }) === false) {
                     return;
                 }
             }

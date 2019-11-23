@@ -1,5 +1,4 @@
-drop procedure MES_AjustStockByBom;
-create procedure MES_AjustStockByBom(
+create procedure MES_AjustStockByOp(
         in       ProductionId      bigint,
 
         in       GID               int,
@@ -19,11 +18,12 @@ create procedure MES_AjustStockByBom(
 
         in       Qty               int,
         in       TimeOfOriginWork  datetime,
-        in       ShiftId           int
+        in       ShiftId           int,
+        in       LevelCount        int
 )
 begin
         declare CurLevel int;  
-             
+       
         delete from bom_stock where workstation_id = WorkStationId;
         
         -- 第1层的部品(非原材料)
@@ -36,36 +36,26 @@ begin
                 select * from bom b1 where b1.material_id = b.component_id
         );
 
-        call MES_Debug('MES_AjustStockByBom   1');
-
         set CurLevel = 1;
-        BreakWhile:while (true) do       
-                set CurLevel = CurLevel + 1;
+        BreakWhile:while (CurLevel <= LevelCount) do       
+            set CurLevel = CurLevel + 1;
 
-                insert into bom_stock(workstation_id,production_id,qty,lvl)
-                select WorkstationId, b.component_id,b.component_qty * bs.qty,CurLevel
-                from bom b,bom_stock bs,material m
-                where  bs.workstation_id = WorkStationId
-                        and b.material_id     = bs.production_id                  
-                    and b.material_id     = m.record_id
-                    and bs.lvl            = CurLevel - 1
-                    and b.bom_status      = 1
-                    and m.auto_finished_progress  = 1
-                    and exists(
-                        select * from bom b1 where b1.material_id = b.component_id
-                    );
-            
-                if not exists(select * from bom_stock where lvl = CurLevel and workstation_id = WorkstationId ) then
-                    leave BreakWhile;
-                end if; 
-
-                if CurLevel > 99 then
-                    call MES_Debug('Max Level Reached');
-                    leave BreakWhile;
-                end if;       
-        end while;
-
-        call MES_Debug('MES_AjustStockByBom   99');               
+            insert into bom_stock(workstation_id,production_id,qty,lvl)
+            select WorkstationId, b.component_id,b.component_qty * bs.qty,CurLevel
+            from bom b,bom_stock bs,material m
+            where  bs.workstation_id  = WorkStationId
+                and b.material_id     = bs.production_id                  
+                and b.material_id     = m.record_id
+                and bs.lvl            = CurLevel - 1
+                and b.bom_status      = 1                    
+                and exists(
+                    select * from bom b1 where b1.material_id = b.component_id
+                );
+        
+            if not exists(select * from bom_stock where lvl = CurLevel and workstation_id = WorkstationId ) then
+                leave BreakWhile;
+            end if; 
+        end while;                 
         
         -- 1. 自动报工记录    
         insert into production_order_progress(
@@ -89,8 +79,7 @@ begin
                  -1,'','',null,0,
                  Now(),TimeOfOriginWork,ShiftId,bs.qty,CardQty
          from bom_stock bs join material m on bs.production_id = m.record_Id
-         where bs.workstation_id = WorkstationId
-             and m.auto_finished_progress = 1;
+         where bs.workstation_id = WorkstationId;
 
         -- 2. 生产进度
         insert into product_summary (product_date,workshop_id,workshop_code,workshop_name,production_id,production_code,production_name,qty_good_0,qty_defect_0,qty_good_1,qty_defect_1)
@@ -98,7 +87,6 @@ begin
                 bs.production_id,m.material_code,m.material_name,0,0,0,0
         from  bom_stock bs join material m on bs.production_id = m.record_id
         where bs.workstation_id = WorkstationId
-            and m.auto_finished_progress = 1
             and not exists(
                 select * from product_summary ps
                     where ps.production_id = bs.production_Id

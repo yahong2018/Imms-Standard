@@ -45,6 +45,12 @@ Ext.define("app.view.imms.mfc.rfidCard.RfidCardDetailForm", {
             ]
         },
         {
+            name: "towerNo",
+            xtype: "textfield",
+            fieldLabel: "塔编号",
+            allowBlank: true,
+        },
+        {
             xtype: "container",
             layout: "hbox",
             margin: '0 0 3 ',
@@ -57,7 +63,7 @@ Ext.define("app.view.imms.mfc.rfidCard.RfidCardDetailForm", {
                 },
                 {
                     xtype: "label",
-                    text: "0.未使用 1.已派发 2.已退回 3.已绑定 20.已移库(外发) 30.已回厂 255.已作废",
+                    text: "0.未使用 1.已派发 2.已退回 3.已绑定 20.已移库(外发) 30.已回厂 40.已回厂投入 255.已作废",
                     flex: 0.8,
                     margin: '0 0 0 5', 
                 }
@@ -122,5 +128,12 @@ Ext.define("app.view.imms.mfc.rfidCard.RfidCardDetailForm", {
                 }
             ]
         }
-    ]
+    ],
+    beforePost :function(config){         
+        if (config.record.towerNo == "" && config.record.cardType == "3") {
+            Ext.Msg.alert("系统提示","外发看板的【塔编号】必须输入!");
+            return false;
+        }
+        return true;
+    }
 });

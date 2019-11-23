@@ -81,7 +81,7 @@ top:begin
         end if;
 
         if (ifnull(RespData,'') = '') then
-            call MES_HandleErrorReq(CardStatus,RespData);        
+            call MES_HandleErrorReq(ReqData,RespData);        
         end if;
     end if;
 

@@ -19,6 +19,8 @@ begin
        set StatusName = '已移库';
     elseif(StatusCode = 30) then
        set StatusName = '已回厂';
+    elseif(StatusCode = 40) then
+       set StatusName = '已回厂后投入';       
     elseif(StatusCode = 255) then
        set StatusName = '已作废';
     else

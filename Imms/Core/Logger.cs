@@ -6,10 +6,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Imms
 {
-    public class Logger : TextWriter
+    public class Logger : TextWriter,ILogger
     {
-        public LogLevel LogLevel { get; set; }
-
         protected internal Logger()
         {
 // #if DEBUG
@@ -22,7 +20,7 @@ namespace Imms
 
         public virtual void WriteMessage(string message, LogLevel level)
         {
-            if (level >= this.LogLevel)
+            if (level >= ConfigurationManager.LogLevel)
             {
                 //string msg = string.Format(string.Format("[Imms.Core.Logger--{0:yyyy/MM/dd HH:mm:ss}-{1}]:{2}{3}", DateTime.Now, level, message.Trim(), Environment.NewLine), parameterValues);
                 lock (this)
@@ -102,6 +100,22 @@ namespace Imms
             //}
 
             this.WriteMessage(message, LogLevel.Error);
+        }
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+        {
+            var logContent = formatter(state, exception);
+            this.WriteMessage(logContent, logLevel);
+        }
+
+        public bool IsEnabled(LogLevel logLevel)
+        {
+            return logLevel >= ConfigurationManager.LogLevel; 
+        }
+
+        public IDisposable BeginScope<TState>(TState state)
+        {
+            return null;            
         }
     }
 

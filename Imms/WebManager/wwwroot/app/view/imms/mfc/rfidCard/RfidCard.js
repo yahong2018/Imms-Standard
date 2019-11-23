@@ -16,11 +16,14 @@ Ext.define("app.view.imms.mfc.rfidCard.RfidCard", {
                 return labels[v];
             }
         },
+        { dataIndex: "towerNo", text: "外发塔编号", width: 100 },
         {
-            dataIndex: "cardStatus", text: '看板状态', width: 100, renderer: function (v) {
+            dataIndex: "cardStatus", text: '看板状态', width: 120, renderer: function (v) {
                 var lables = ["0.未使用", "1.已派发", "2.已退回", "3.已绑定", "4", "5", "6", "7", "8", "9", "10.已报工",
                     "11", "12", "13", "14", "15", "16", "17", "18", "19", "20.已移库(外发)",
-                    "21", "22", "23", "24", "25", "26", "27", "28", "29", "30.已回厂"];
+                    "21", "22", "23", "24", "25", "26", "27", "28", "29", "30.已回厂",
+                    "31", "32", "33", "34", "35", "36", "37", "38", "39", "40.已回厂投入"
+                ];
                 if (v == 255) {
                     return "255.已作废";
                 }

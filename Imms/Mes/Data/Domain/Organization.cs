@@ -14,8 +14,8 @@ namespace Imms.Mes.Data.Domain
         public string WorkshopName { get { return base.OrgName; } set { base.OrgName = value; } }
 
         public int OperationIndex { get; set; }
-        public int PrevOperationIndex { get; set; }        
-        public int WorkshopType { get; set; }        
+        public int PrevOperationIndex { get; set; }
+        public int WorkshopType { get; set; }
     }
 
     public class Workstation : WorkOrganizationUnit
@@ -25,6 +25,7 @@ namespace Imms.Mes.Data.Domain
 
         public int RfidControllerId { get; set; }
         public int RfidTerminatorId { get; set; }
+        public int RfidTemplateIndex { get; set; }
         public string WocgCode { get; set; }
 
         public virtual RfidController RfidController { get; set; }
@@ -112,8 +113,8 @@ namespace Imms.Mes.Data.Domain
             builder.Ignore(e => e.WorkshopName);
 
             builder.Property(e => e.OperationIndex).HasColumnName("operation_index");
-            builder.Property(e => e.PrevOperationIndex).HasColumnName("prev_operation_index");            
-            builder.Property(e=>e.WorkshopType).HasColumnName("workshop_type");
+            builder.Property(e => e.PrevOperationIndex).HasColumnName("prev_operation_index");
+            builder.Property(e => e.WorkshopType).HasColumnName("workshop_type");
         }
     }
 
@@ -130,6 +131,7 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.RfidTerminatorId).HasColumnName("Rfid_terminator_id");
             builder.Property(e => e.WocgCode).HasColumnName("wocg_code");
 
+            builder.Property(e=>e.RfidTemplateIndex).HasColumnName("rfid_template_index");
             builder.HasOne(e => e.RfidController).WithMany().HasForeignKey(e => e.RfidControllerId).HasConstraintName("rfid_controller_id");
         }
     }

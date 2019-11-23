@@ -16,14 +16,14 @@ begin
         set RespData = CONCAT(RespData,'|1|发卡第1步:|0');		       
         set RespData = CONCAT(RespData,'|2|请输入1或者2.|0');
     elseif(CurrentStep = 1) then
-        if (ReqDataType <> 2) then
+        if (ReqDataType in(1,4)) then
             set RespData='2';    
             set RespData = CONCAT(RespData,'|1|发卡第2步:|0');		       
             set RespData = CONCAT(RespData,'|2|请刷看板。|0');
         elseif( not CardStatus in (0,20,40)) then   -- 40为外发回厂投入
             call MES_ParseCardStatus(CardStatus,CardStatusName);
           
-            set RespData='2';  
+            set RespData='2';
             set RespData = CONCAT(RespData,'|1|当前卡的状态为:',CardStatusName,'|0');  
             set RespData = CONCAT(RespData,'|2|只能派已移库或未使用的卡|0');		 
         end if;    
