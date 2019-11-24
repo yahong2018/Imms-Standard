@@ -48,6 +48,8 @@ top:begin
 					set SessionType = 0;
 				elseif ReqData = '2' then
 					set SessionType = 1;
+				elseif ReqData = '3' then
+				    set SessionType = 2;
 				end if;
 				
 				update workstation_session  
@@ -66,6 +68,9 @@ top:begin
     elseif SessionType = 1 then -- 如果是"给前工程发卡"
 	    call MES_Debug('MES_IssueCard');		
         call MES_IssueCard(SessionId,PrevStep + 1,WorkstationId,ReqDataType,ReqData,CardId,ReqTime,Success,RespHint,RespData);
+	elseif SessionType = 2 then  -- 尾数报工
+	    call MES_Debug('MES_PartialReport');		
+        call MES_PartialReport(SessionId,PrevStep + 1,WorkstationId,ReqDataType,ReqData,CardId,ReqTime,Success,RespHint,RespData);	
     end if;  
 
 	if Success = 0 then

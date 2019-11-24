@@ -87,3 +87,67 @@ A      0005252159   0010995284
 
 
 /Users/yahong/Desktop/pub_20191118
+
+
+
+-- truncate excel_import_rfid_card;
+
+-- update excel_import_rfid_card c,material m,work_organization_unit w
+--    set c.production_id = m.record_id,
+--        c.workshop_id = w.record_id,
+--        c.workshop_name = w.org_name
+--   where c.production_code = m.material_code
+--      and c.workshop_code = w.org_code
+-- 	 ;
+--   
+       
+	   
+-- select * from 	 excel_import_rfid_card
+--   where production_id is null
+--     or workshop_id is null
+-- 
+
+-- insert into rfid_card(
+--      kanban_no,rfid_no,card_type,card_status,
+-- 	 production_id,production_code,production_name,
+-- 	 workshop_id,workshop_code,workshop_name,
+-- 	 issue_qty,stock_qty,last_business_id,
+-- 	 create_by_id,create_by_code,create_by_name,create_time,opt_flag)
+-- select 	kanban_no,rfid_no,2,1,
+-- 	    production_id,production_code,production_name,
+-- 	    workshop_id,workshop_code,workshop_name,
+-- 		issue_qty,0,-1,
+-- 		1,'C00001','刘永红',Now(),0
+-- from excel_import_rfid_card
+-- ;
+-- 
+-- 					 
+
+select * from rfid_card c0
+   where c0.record_id in(
+	select min(c1.record_id) as record_id  from rfid_card c1
+ 	 where c1.rfid_no in(
+	select c2.rfid_no from rfid_card c2
+	   group by c2.rfid_no
+	   having count(c2.rfid_no) > 1
+	) group by c1.rfid_no
+)
+
+
+
+insert into material(material_code,material_name,auto_finished_progress,create_by_id,create_by_code,create_by_name,create_time,opt_flag)
+select distinct production_code,production_name,0,1,'C00001','刘永红','2019/11/24',0
+from excel_import_rfid_card c
+where not exists (
+   select * from material m where m.material_code = c.production_code
+);  
+
+update rfid_card c,material m,work_organization_unit w
+   set c.production_id = m.record_id,
+       c.workshop_id = w.record_id,
+       c.workshop_name = w.org_name
+  where c.production_code = m.material_code
+     and c.workshop_code = w.org_code
+	 and c.workshop_id =0;  
+
+	 

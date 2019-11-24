@@ -10,7 +10,7 @@ create procedure MES_ReportWip_1
     in    CardId               int,              
     in    RfidNo               varchar(20),      
     in    ReqTime              datetime,         -- 报工时间
-    out   ReportQty            int,               -- 结果：报工数量
+    inout ReportQty            int,               -- 结果：报工数量
     out   LastBusinessId       bigint
 )
 begin
@@ -27,11 +27,20 @@ begin
 
     update outsource_workstation_bind b
        set b.bind_status = 10
-    where b.record_id = BindId;
+     where b.record_id = BindId;
 
     -- 工程内看板与外发看板的绑定对应关系
-    insert into outsource_card_bind(outsource_card_id,outsource_card_no,qty_report_id,qty_card_id,qty_card_no,attach_time,workstation_bind_id)
-       values(OutSourceCardId,OutSourceCardNo,LastBusinessId,CardId,RfidNo,Now(),BindId);
+    if not exists(
+        select * from outsource_card_bind where workstation_bind_id = BindId and qty_card_id = CardId
+    ) then
+        insert into outsource_card_bind(outsource_card_id,outsource_card_no,qty_report_id,qty_card_id,qty_card_no,attach_time,workstation_bind_id)
+             values(OutSourceCardId,OutSourceCardNo,LastBusinessId,CardId,RfidNo,Now(),BindId);
+    else
+        update outsource_card_bind
+           set qty_report_id = LastBusinessId
+        where workstation_bind_id = BindId 
+          and qty_card_id = CardId;
+    end if;
     
     -- 更新外发看板的完工数量
     update rfid_card c

@@ -11,7 +11,7 @@ begin
     if (CurrentStep = 0) and (ReqDataType <> 4) then  
        set RespData='2';    
        set RespData = CONCAT(RespData,'|1|工件退回第1步:|0');		       
-       set RespData = CONCAT(RespData,'|2|请输入1或者2.|0');
+       set RespData = CONCAT(RespData,'|2|请输入1.|0');
     elseif(CurrentStep = 1)  then    
         if ReqDataType <> 2 then
             set RespData='2';    

@@ -31,9 +31,9 @@ begin
             select WorkStationId,b.component_id,b.component_qty * Qty,1 
             from bom b 
         where b.material_id = ProductionId
-            and b.bom_status = 1
-            and exists(
-                select * from bom b1 where b1.material_id = b.component_id
+         and b.bom_status = 1
+         and exists(
+            select * from bom b1 where b1.material_id = b.component_id
         );
 
         set CurLevel = 1;

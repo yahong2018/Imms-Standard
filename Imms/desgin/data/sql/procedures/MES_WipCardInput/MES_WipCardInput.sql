@@ -10,8 +10,8 @@ create procedure MES_WipCardInput(
     out    RespData            varchar(200)
 )
 top:begin
-    declare CardStatus,WorkshopType,WorkshopOpIndex,WorkshopPreIndex,CardOpIndex,CardPreOpIndex int;
-    declare CardWorkshopId,WorkshopId bigint;
+    declare CardStatus,WorkshopType,WorkshopOpIndex,WorkshopPreIndex,CardOpIndex,CardPreOpIndex,ReportQty int;
+    declare CardWorkshopId,WorkshopId,LastBusinessId bigint;
     declare CardWorkshopName varchar(50);
     declare CardStatusName varchar(20);
 
@@ -135,9 +135,10 @@ top:begin
     end if;
 
     
+    set ReportQty = -1;
     if ((CardType = 2) and (CardStatus in (1,2)) and (CardOpIndex = WorkshopOpIndex)) then  -- 工程内报工
         call MES_Debug('MES_ReportWip:工程内报工');
-        call MES_ReportWip(WorkstationId,WorkshopType,CardId,CardType,CardStatus,ReqTime,Success,RespData);
+        call MES_ReportWip(WorkstationId,WorkshopType,CardId,CardType,CardStatus,ReqTime,ReportQty,LastBusinessId,Success,RespData);
     elseif(CardType = 2) and (CardStatus in (2,10)) and (CardOpIndex <> WorkshopOpIndex) then  -- 工程内移库
         call MES_Debug('MES_MoveWip:工程内移库');
         call MES_MoveWip(WorkstationId,WorkshopType,CardId,CardType,CardStatus,ReqTime,Success,RespData);
@@ -149,7 +150,7 @@ top:begin
         call MES_MoveWip(WorkstationId,WorkshopType,CardId,CardType,CardStatus,ReqTime,Success,RespData);
     elseif(CardType = 3) and (CardStatus = 20) then  -- 外发回厂报工
         call MES_Debug('MES_ReportWip:外发回厂报工');
-        call MES_ReportWip(WorkstationId,WorkshopType,CardId,CardType,CardStatus,ReqTime,Success,RespData);
+        call MES_ReportWip(WorkstationId,WorkshopType,CardId,CardType,CardStatus,ReqTime,ReportQty,LastBusinessId,Success,RespData);
     elseif(CardType = 3) and (CardStatus = 30) then  -- 外发回厂以后移库投入
         if WorkshopType <> 5 then
             set RespData='1';

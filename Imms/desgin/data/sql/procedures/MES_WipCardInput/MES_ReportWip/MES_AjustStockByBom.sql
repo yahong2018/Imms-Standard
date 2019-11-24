@@ -40,29 +40,29 @@ begin
 
         set CurLevel = 1;
         BreakWhile:while (true) do       
-                set CurLevel = CurLevel + 1;
+            set CurLevel = CurLevel + 1;
 
-                insert into bom_stock(workstation_id,production_id,qty,lvl)
-                select WorkstationId, b.component_id,b.component_qty * bs.qty,CurLevel
-                from bom b,bom_stock bs,material m
-                where  bs.workstation_id = WorkStationId
-                        and b.material_id     = bs.production_id                  
-                    and b.material_id     = m.record_id
-                    and bs.lvl            = CurLevel - 1
-                    and b.bom_status      = 1
-                    and m.auto_finished_progress  = 1
-                    and exists(
-                        select * from bom b1 where b1.material_id = b.component_id
-                    );
-            
-                if not exists(select * from bom_stock where lvl = CurLevel and workstation_id = WorkstationId ) then
-                    leave BreakWhile;
-                end if; 
+            insert into bom_stock(workstation_id,production_id,qty,lvl)
+            select WorkstationId, b.component_id,b.component_qty * bs.qty,CurLevel
+            from bom b,bom_stock bs,material m
+             where  bs.workstation_id = WorkStationId
+                and b.material_id     = bs.production_id                  
+                and b.material_id     = m.record_id
+                and bs.lvl            = CurLevel - 1
+                and b.bom_status      = 1
+                and m.auto_finished_progress  = 1
+                and exists(
+                    select * from bom b1 where b1.material_id = b.component_id
+                );
+        
+            if not exists(select * from bom_stock where lvl = CurLevel and workstation_id = WorkstationId ) then
+                leave BreakWhile;
+            end if; 
 
-                if CurLevel > 99 then
-                    call MES_Debug('Max Level Reached');
-                    leave BreakWhile;
-                end if;       
+            if CurLevel > 99 then
+                call MES_Debug('Max Level Reached');
+                leave BreakWhile;
+            end if;       
         end while;
 
         call MES_Debug('MES_AjustStockByBom   99');               

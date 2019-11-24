@@ -4,7 +4,7 @@ create procedure MES_ReportWip_0(
 	in    WorkstationId        int,              -- 报工工位
 	in    CardId               int,              -- RFID
 	in    ReqTime              datetime,         -- 报工时间
-	out   ReportQty            int,              -- 结果：报工数量
+	inout ReportQty            int,              -- 结果：报工数量
 	out   LastBusinessId       bigint
 )
 begin  
@@ -16,12 +16,14 @@ begin
 				
 		call MES_GetWorkDayAndShiftId(ReqTime,TimeOfOriginWork,ShiftId);
 
-		select c.production_id,c.production_code,c.production_name,c.rfid_no,c.issue_qty,
-		        if(c.card_type = 3 and c.card_status = 20, c.stock_qty, c.issue_qty - c.stock_qty), -- 外发回厂的报工数量，取完工数
+		select c.production_id,c.production_code,c.production_name,c.rfid_no,
+		        c.issue_qty, 
+				if(ReportQty <> -1,ReportQty,if(c.card_type = 3 and c.card_status = 20, c.stock_qty, c.issue_qty - c.stock_qty)), -- 外发回厂的报工数量，取完工数
 				c.card_type,c.card_status				
 		   into ProductionId,ProductionCode,ProductionName,RfidNo,
-		        IssueQty,ReportQty,
-				CardType,CardStatus				 
+		        IssueQty,
+				ReportQty,
+				CardType,CardStatus
 		  from rfid_card c
 	   	 where c.record_id = CardId;
  

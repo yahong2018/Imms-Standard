@@ -9,9 +9,9 @@ create procedure MES_IssueCard_2(
         out RespData     varchar(200)
 )
 begin
-    declare RfidNo varchar(20);
-    declare IssueQty int;
-    declare CardId,TheNewSessionId bigint;	 
+    declare RfidNo,EmpCardNo varchar(20);
+    declare IssueQty,kanbanCount,totalQty int;
+    declare CardId,TheNewSessionId,ProductionId bigint;	 
     declare CreateTime,LastProcessTime,ExpireTime datetime;
     declare ProductionName varchar(50);
      
@@ -24,7 +24,7 @@ begin
         order by s.record_id desc
         limit 1;
 
-    select c.record_id,c.issue_qty,c.production_name into CardId,IssueQty,ProductionName
+    select c.record_id,c.issue_qty,c.production_id,c.production_name into CardId,IssueQty,ProductionId,ProductionName
         from rfid_card c
     where c.rfid_no = RfidNo
       and c.card_status <> 255;
@@ -33,7 +33,7 @@ begin
         set IssueQty = cast(ReqData as UNSIGNED);	
     end if; 
      
-    select employee_card_no into RfidNo from workstation_session where record_id = SessionId;
+    select employee_card_no into EmpCardNo from workstation_session where record_id = SessionId;
         
     update rfid_card
        set issue_qty = IssueQty,
@@ -57,13 +57,18 @@ begin
     set TheNewSessionId = LAST_INSERT_ID();
     
     insert into workstation_session_step(workstation_session_id,step,req_time,req_data_type,req_data,resp_hint,resp_data,resp_time)
-        values (TheNewSessionId,0,CreateTime,1,RfidNo,'请刷看板',RespData,Now());   
+        values (TheNewSessionId,0,CreateTime,1,EmpCardNo,'请刷看板',RespData,Now());   
+
+    select count(*),sum(issue_qty)  into kanbanCount,totalQty
+     from rfid_card c
+     where c.produciton_id = ProductionId
+       and c.card_status = 1; -- 累计已经发放的总数
     
-    set RespData= '4';  	
-    set RespData = CONCAT(RespData,'|1|已给看板',RfidNo,'|0');				    	 
-    set RespData = CONCAT(RespData,'|2|派发',ProductionName,'|0');				    	 
-    set RespData = CONCAT(RespData,'|3|',IssueQty,'个.|0');
-    set RespData = CONCAT(RespData,'|4|继续请刷其他看板.|0');    
+    set RespData= '4';
+    set RespData = CONCAT(RespData,'|1|已给看板',RfidNo,'派发|0');
+    set RespData = CONCAT(RespData,'|2|',ProductionName,'|0');
+    set RespData = CONCAT(RespData,'|3|',IssueQty,'个,共计',kanbanCount,'张,',totalQty,'个.|0');
+    set RespData = CONCAT(RespData,'|4|请刷看板继续.|0');
 
     set Success = 0;
 end;
