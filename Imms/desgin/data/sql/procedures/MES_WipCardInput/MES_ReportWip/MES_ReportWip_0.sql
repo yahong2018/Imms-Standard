@@ -55,7 +55,7 @@ begin
 				-1,'',ProductionId,ProductionCode,ProductionName,
 				WorkshopId,WorkshopCode,WorkshopName,			
 				WorkstationId,WorkstationCode,WorkstationName,WocgCode,
-				CurGID,CurDID,			
+				CurDID,CurGID,			
 				CardId,RfidNo,0,
 				-1,'','',			
 				1,'SYS','数据采集平台',Now(),			

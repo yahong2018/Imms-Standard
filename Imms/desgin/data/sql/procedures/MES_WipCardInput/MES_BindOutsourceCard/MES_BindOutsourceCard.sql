@@ -5,7 +5,7 @@ create procedure MES_BindOutsourceCard
   in      WorkstationId        bigint,  
   in      CardId               bigint,
   in      CardNo               varchar(20),  
-  in      Success              int,
+  out     Success              int,
   out     RespData             varchar(200)
 )
 begin

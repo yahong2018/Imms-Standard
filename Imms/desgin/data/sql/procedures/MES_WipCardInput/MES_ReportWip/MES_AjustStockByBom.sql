@@ -133,7 +133,7 @@ begin
         
         -- 产出与消耗
         update material_stock ms , bom_stock bs, material m
-             set ms.qty_stock = if(m.auto_finished_progress = 0, (ms.qty_stock - bs.qty), 0),
+             set ms.qty_stock = if(m.auto_finished_progress = 0, (ms.qty_stock - bs.qty), ms.qty_stock),
                  ms.qty_good =  if(m.auto_finished_progress = 1, (ms.qty_good + bs.qty), ms.qty_good),
                  ms.qty_consume_good = ms.qty_consume_good + bs.qty
         where ms.material_id = bs.production_id

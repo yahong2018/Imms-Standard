@@ -61,7 +61,7 @@ begin
 
     select count(*),sum(issue_qty)  into kanbanCount,totalQty
      from rfid_card c
-     where c.produciton_id = ProductionId
+     where c.production_id = ProductionId
        and c.card_status = 1; -- 累计已经发放的总数
     
     set RespData= '4';

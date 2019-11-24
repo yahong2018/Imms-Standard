@@ -21,7 +21,8 @@ top:begin
     
     select '',-1 into RespData,Success;   
 
-    select c.rfid_no,c.production_id,c.production_code,c.production_name,if(ReportQty <>-1,ReportQty,c.issue_qty - c.stock_qty)
+    select c.rfid_no,c.production_id,c.production_code,c.production_name,
+                if(ReportQty <> -1,ReportQty,if(c.card_type = 3 and c.card_status = 20, c.stock_qty, c.issue_qty - c.stock_qty))
             into RfidNo,QtyCardProductionId,QtyCardProductionCode,ProductionName,ReportQty
         from rfid_card c
     where c.record_id = CardId; 
@@ -34,15 +35,16 @@ top:begin
         -- 外发前工程，必须先有相应的绑定记录
         --   注意可以不同机种的多塔来回切换
         --  
-        select b.record_id, c.production_id,c.stock_qty,c.issue_qty 
+       
+        select b.record_id, c.production_id,c.issue_qty,c.stock_qty
           into BindId, OutSourceCardProductionId,BindCardIssueQty,BindCardStockQty
           from outsource_workstation_bind b join rfid_card  c on b.outsource_card_id = c.record_id                                            
          where b.workstation_id = WorkstationId            
            and b.bind_status < 20
            and exists (
                 select * from bom bm
-                where bm.material_id = b.production_id
-                    and bm.component_id = QtyCardProductionId
+                where bm.material_id = c.production_id
+                  and bm.component_id = QtyCardProductionId
            )
            order by attach_time desc  -- 只匹配最后刷卡的对应记录
            limit 1;
@@ -88,14 +90,13 @@ top:begin
 
     -- 返回结果    
     call MES_GetWorkDayAndShiftId(ReqTime,TimeOfOriginWork,ShiftId);
-    select count(c.recorid_id) as total_count,sum(c.stock_qty) as total_qty into totalCount,totalQty
-      from production_order_progress p,rfid_card c
+    select count(DISTINCT p.rfid_card_id) as total_count,sum(p.qty) as total_qty into totalCount,totalQty
+      from production_order_progress p
        where p.workstation_id = WorkstationId
          and p.shift_id = ShiftId
          and p.time_of_origin_work = TimeOfOriginWork
-         and c.production_id = QtyCardProductionId
-         and p.rfid_id = c.record_id;
-    
+         and p.production_id = QtyCardProductionId;
+        
     set RespData=	'3';    
     set RespData = CONCAT(RespData,'|1|已报工|0');
     set RespData = CONCAT(RespData,'|2|',ProductionName,'|0');
