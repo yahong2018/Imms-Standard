@@ -1,3 +1,4 @@
+drop procedure if exists MES_PartialReport;
 create procedure MES_PartialReport
 (
     in SessionId     bigint,
@@ -18,7 +19,7 @@ top:begin
     call MES_Debug(CONCAT('MES_PartialReport--> CurrentStep:',CurrentStep,',ReqDataType:',ReqDataType,'ReqData:',ReqData));		
 
     if CurrentStep = 1 then
-        select card_status,issue_qty into CardStatus,DefaultIssueQty
+        select card_status,issue_qty - stock_qty into CardStatus,DefaultIssueQty
             from rfid_card
         where record_id = CardId;           
     end if;
@@ -33,7 +34,7 @@ top:begin
 	elseif (CurrentStep = 1) and (ReqDataType = 2) then --  刷看板
         call MES_PartialReport_1(ReqDataType,CardId,DefaultIssueQty,Success,RespHint,RespData);	
     elseif (CurrentStep = 2) and (ReqDataType = 4) then     -- 输入数量
-        call MES_PartialReport_2(SessionId,CurrentStep,ReqDataType,ReqData,Success,RespData);		
+        call MES_PartialReport_2(SessionId,CurrentStep,ReqDataType,ReqData,ReqTime,Success,RespData);		
     end if;
 
     if( Success <> 0 ) then

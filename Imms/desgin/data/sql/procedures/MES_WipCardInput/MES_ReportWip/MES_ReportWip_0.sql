@@ -98,7 +98,7 @@ begin
 
 		update rfid_card c
 		set  c.card_status = TheNewCardStatus  
-			,c.stock_qty = IssueQty  
+			,c.stock_qty = c.stock_qty + ReportQty
 			,c.last_business_id = LastBusinessId
 		where c.record_id = CardId;
 

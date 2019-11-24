@@ -1,3 +1,4 @@
+drop procedure if exists MES_HandlePartialReportError ;
 create procedure MES_HandlePartialReportError(
     in      CurrentStep     int,
     in      ReqDataType     int,
@@ -26,7 +27,7 @@ begin
             set RespData = CONCAT(RespData,'|1|当前卡的状态为:',CardStatusName,'|0');  
             set RespData = CONCAT(RespData,'|2|已派发的卡才可以报工.|0');		 
         end if;    
-    elseif(CurrentStep = 2) and ((ReqDataType <> 4) or ((ReqDataType = 4) and ReqData = ''))then        
+    elseif(CurrentStep = 2) and (ReqDataType <> 4)then        
         set RespData='2';    
         set RespData = CONCAT(RespData,'|1|尾数报工第3步:|0');		       
         set RespData = CONCAT(RespData,'|2|请输入正确的派发数量.|0'); 

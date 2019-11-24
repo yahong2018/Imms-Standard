@@ -43,7 +43,7 @@ top:begin
 			
 			leave top;
 		elseif (ReqDataType = 4) then			    
-			if ReqData in ('1','2') then -- 确定Session类型
+			if ReqData in ('1','2','3') then -- 确定Session类型
 				if ReqData = '1' then
 					set SessionType = 0;
 				elseif ReqData = '2' then
