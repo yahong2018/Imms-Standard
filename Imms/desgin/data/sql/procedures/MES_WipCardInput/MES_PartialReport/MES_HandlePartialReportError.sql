@@ -25,7 +25,7 @@ begin
           
             set RespData='2';
             set RespData = CONCAT(RespData,'|1|当前卡的状态为:',CardStatusName,'|0');  
-            set RespData = CONCAT(RespData,'|2|已派发的卡才可以报工.|0');		 
+            set RespData = CONCAT(RespData,'|2|已派发的卡才可以报工.|0');
         end if;    
     elseif(CurrentStep = 2) and (ReqDataType <> 4)then        
         set RespData='2';    

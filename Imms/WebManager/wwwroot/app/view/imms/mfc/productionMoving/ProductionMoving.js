@@ -15,7 +15,7 @@ Ext.define("app.view.imms.mfc.productionMoving.ProductionMoving", {
         // { dataIndex: "productionOrderNo", text: "计划单号" },
         { dataIndex: "recordId", text: "业务流水" },
         { dataIndex: "productionCode", text: "产品编号" },
-        { dataIndex: "productionName", text: "产品名称" },
+        { dataIndex: "productionName", text: "产品名称",width:150 },
 
         { dataIndex: "workshopCode", text: "接收车间编号" },
         { dataIndex: "workshopName", text: "接收车间名称" },
@@ -26,7 +26,7 @@ Ext.define("app.view.imms.mfc.productionMoving.ProductionMoving", {
         { dataIndex: "qty", text: "接收数量" },
         { dataIndex: "employeeId", text: "接收人工号" },
         { dataIndex: "employeeName", text: "接收人姓名" },
-        { dataIndex: "timeOfOrigin", text: "接收时间" },
+        { dataIndex: "timeOfOrigin", text: "接收时间",width:150 },
 
         { dataIndex: "rfidNo", text: "RFID卡号" },
         { dataIndex: "rfidTerminatorId", text: "工位机号" },

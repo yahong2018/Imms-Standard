@@ -4,25 +4,25 @@ Ext.define("app.view.imms.rpt.rptProductionOrderProgress.RptProductionOrderProgr
     requires: ["app.model.imms.mfc.ProductSummaryModel", "app.store.imms.mfc.ProductSummaryStore"],
     columns: [
         { text: "品号", dataIndex: "productionCode", width: 100, align: "center", menuDisabled: true },
-        // { text: "品名", dataIndex: "productionName", width: 220, align: "center", menuDisabled: true },
-        { text: "车间", dataIndex: "workshopCode", width: 60, align: "center", menuDisabled: true },
+        { text: "品名", dataIndex: "productionName", width: 150, align: "center", menuDisabled: true },
+        { text: "车间", dataIndex: "workshopCode", width: 100, align: "center", menuDisabled: true },
         { text: "日期", dataIndex: "productDate", width: 90, align: "center", menuDisabled: true },
         {
             text: "白班", menuDisabled: true, disableSearch: true,
             columns: [
-                { text: "总数", dataIndex: "qtyTotal_0", width: 50, menuDisabled: true },
-                { text: "良品数", dataIndex: "qtyGood_0", width: 60, menuDisabled: true },
+                { text: "总数", dataIndex: "qtyTotal_0", align: "right",  width: 100, menuDisabled: true },
+                { text: "良品数", dataIndex: "qtyGood_0", align: "right",  width: 100, menuDisabled: true },
                 {
-                    text: "良品率", dataIndex: "rateGood_0", width: 75, menuDisabled: true, renderer: function (v, item) {
+                    text: "良品率", dataIndex: "rateGood_0", align: "right",  width: 100, menuDisabled: true, renderer: function (v, item) {
                         if (v == 0) {
                             return "";
                         }
                         return Ext.util.Format.percent(v, "0.00");
                     }
                 },
-                { text: "不良数", dataIndex: "qtyDefect_0", width: 60, menuDisabled: true },
+                { text: "不良数", dataIndex: "qtyDefect_0", width: 100, align: "right",  menuDisabled: true },
                 {
-                    text: "不良率", dataIndex: "rateDefect_0", width: 60, menuDisabled: true, renderer: function (v) {
+                    text: "不良率", dataIndex: "rateDefect_0", width: 100, align: "right", menuDisabled: true, renderer: function (v) {
                         if (v == 0) {
                             return "";
                         }
@@ -33,19 +33,19 @@ Ext.define("app.view.imms.rpt.rptProductionOrderProgress.RptProductionOrderProgr
         }, {
             text: "晚班", menuDisabled: true, disableSearch: true,
             columns: [
-                { text: "总数", dataIndex: "qtyTotal_1", width: 60, menuDisabled: true },
-                { text: "良品数", dataIndex: "qtyGood_1", width: 60, menuDisabled: true },
+                { text: "总数", dataIndex: "qtyTotal_1", width: 100, align: "right", menuDisabled: true },
+                { text: "良品数", dataIndex: "qtyGood_1", width: 100, align: "right",  menuDisabled: true },
                 {
-                    text: "良品率", dataIndex: "rateGood_1", width: 75, menuDisabled: true, renderer: function (v) {
+                    text: "良品率", dataIndex: "rateGood_1", width: 100, align: "right", menuDisabled: true, renderer: function (v) {
                         if (v == 0) {
                             return "";
                         }
                         return Ext.util.Format.percent(v, "0.00");
                     }
                 },
-                { text: "不良数", dataIndex: "qtyDefect_1", width: 60, menuDisabled: true },
+                { text: "不良数", dataIndex: "qtyDefect_1", width: 100, align: "right", menuDisabled: true },
                 {
-                    text: "不良率", dataIndex: "rateDefect_1", width: 60, menuDisabled: true, renderer: function (v) {
+                    text: "不良率", dataIndex: "rateDefect_1", width: 100, align: "right", menuDisabled: true, renderer: function (v) {
                         if (v == 0) {
                             return "";
                         }
@@ -57,19 +57,19 @@ Ext.define("app.view.imms.rpt.rptProductionOrderProgress.RptProductionOrderProgr
         {
             text: "小计", menuDisabled: true, disableSearch: true,
             columns: [
-                { text: "总数", dataIndex: "qtyTotal", width: 60, menuDisabled: true },
-                { text: "良品数", dataIndex: "qtyGood", width: 60, menuDisabled: true },
+                { text: "总数", dataIndex: "qtyTotal", width: 100, align: "right", menuDisabled: true },
+                { text: "良品数", dataIndex: "qtyGood", width: 100, align: "right", menuDisabled: true },
                 {
-                    text: "良品率", dataIndex: "rateGood", width: 75, menuDisabled: true, renderer: function (v) {
+                    text: "良品率", dataIndex: "rateGood", width: 100, align: "right", menuDisabled: true, renderer: function (v) {
                         if (v == 0) {
                             return "";
                         }
                         return Ext.util.Format.percent(v, "0.00");
                     }
                 },
-                { text: "不良数", dataIndex: "qtyDefect", width: 60, menuDisabled: true },
+                { text: "不良数", dataIndex: "qtyDefect", width: 100, align: "right",  menuDisabled: true },
                 {
-                    text: "不良率", dataIndex: "rateDefect", width: 60, menuDisabled: true, renderer: function (v) {
+                    text: "不良率", dataIndex: "rateDefect", width: 100, align: "right",  menuDisabled: true, renderer: function (v) {
                         if (v == 0) {
                             return "";
                         }
