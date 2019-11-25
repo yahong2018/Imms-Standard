@@ -1,25 +1,22 @@
 Ext.define("app.view.imms.material.material.Material", {
-    extend: "app.ux.dbgrid.DbGrid",
-    xtype: "app_view_imms_material_material_Material",
-
-    requires: ["app.store.imms.material.MaterialStore", "app.model.imms.material.MaterialModel",
-       "app.model.imms.org.WorkshopModel","app.store.imms.org.WorkshopStore"],
-    uses: ["app.view.imms.material.material.MaterialDetailForm"],
-
-    columns: [
-        { dataIndex: "materialCode", text: '产品编码', width: 150 },
-        { dataIndex: "materialName", text: '产品名称', width: 250 },
-        { dataIndex: "description", text: '产品描述', flex: 1 }
-    ],
-
-    constructor: function (config) {
-        var configBase = {
-            store: Ext.create({ xtype: 'app_store_imms_material_MaterialStore' }),
-            detailFormClass: 'app_view_imms_material_material_MaterialDetailForm',
-            detailWindowTitle: '物料',
+    extend: "Ext.panel.Panel",
+    requires: ["app.model.imms.material.BomModel", "app.store.imms.material.BomStore",
+        "app.store.imms.material.MaterialStore", "app.model.imms.material.MaterialModel",
+        "app.view.imms.material.material.MaterialGrid", "app.view.imms.material.material.BomGrid",
+        "app.view.imms.material.material.MaterialController"],
+    layout: "border",
+    controller: {
+        type: "imms_material_material_MaterialController"
+    },
+    items: [
+        {
+            region: "west",
+            width: 750,
+            xtype: "app_view_imms_material_material_MaterialGrid"
+        },
+        {
+            region: "center",            
+            xtype: "app_view_imms_material_material_BomGrid"
         }
-        Ext.applyIf(config, configBase);
-
-        this.callParent(arguments);
-    }
+    ]
 });

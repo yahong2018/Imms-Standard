@@ -1,12 +1,14 @@
 Ext.define("app.view.imms.material.material.MaterialDetailForm", {
     extend: "app.ux.TrackableFormPanel",
     xtype: "app_view_imms_material_material_MaterialDetailForm",
-    padding:10,
-    width:420,
+    padding: 10,
+    width: 420,
+    layout: "anchor",
     defaults: {
-        labelWidth: 100
+        layout: "anchor",
+        anchor: "100%",
     },
-    workshopStore: Ext.create({ xtype: 'imms_org_WorkshopStore', autoLoad: true, pageSize: 0 }),
+
     items: [
         {
             name: "materialCode",
@@ -21,16 +23,19 @@ Ext.define("app.view.imms.material.material.MaterialDetailForm", {
             name: "materialName",
             fieldLabel: "产品名称",
             xtype: "textfield",
-            maxLength: 50,            
+            maxLength: 50,
             allowBlank: false,
             enforceMaxLength: true,
             width: 380,
-        },        
+        },
         {
-            name: "description",
-            xtype: "textarea",            
-            fieldLabel: "产品描述",
-            width: 380,
+            xtype: "container",
+            layout: "hbox",
+            margin: '0 0 3 ',
+            items: [
+                { name: "AutoFinishedProgress", xtype: "textfield", fieldLabel: "是否自动报工", width: 150, },
+                { xtype: "label", margin: '8 20 0 5', flex: 0.8, text: "0.不自动   1.自动" },
+            ]
         }
     ]
 });
