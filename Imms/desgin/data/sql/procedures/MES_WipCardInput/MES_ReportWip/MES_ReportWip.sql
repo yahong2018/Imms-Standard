@@ -22,7 +22,7 @@ top:begin
     select '',-1 into RespData,Success;   
 
     select c.rfid_no,c.production_id,c.production_code,c.production_name,
-                if(ReportQty <> -1,ReportQty,if(c.card_type = 3 and c.card_status = 20, c.stock_qty, c.issue_qty - c.stock_qty))
+                if(c.card_type = 3 and c.card_status = 20, c.stock_qty, if(ReportQty <> -1,ReportQty, c.issue_qty - c.stock_qty))
             into RfidNo,QtyCardProductionId,QtyCardProductionCode,ProductionName,ReportQty
         from rfid_card c
     where c.record_id = CardId; 

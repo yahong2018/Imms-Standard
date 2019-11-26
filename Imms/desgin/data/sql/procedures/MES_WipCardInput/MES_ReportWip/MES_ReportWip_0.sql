@@ -18,7 +18,7 @@ begin
 
 	select c.production_id,c.production_code,c.production_name,c.rfid_no,
 			c.issue_qty, 
-			if(ReportQty <> -1,ReportQty,if(c.card_type = 3 and c.card_status = 20, c.stock_qty, c.issue_qty - c.stock_qty)), -- 外发回厂的报工数量，取完工数
+			if(c.card_type = 3 and c.card_status = 20, c.stock_qty, if(ReportQty <> -1,ReportQty, c.issue_qty - c.stock_qty)), -- 外发回厂的报工数量，取完工数
 			c.card_type,c.card_status				
 		into ProductionId,ProductionCode,ProductionName,RfidNo,
 			IssueQty,
@@ -93,12 +93,12 @@ begin
 	-- 更新状态和卡的库存数量
 	set TheNewCardStatus = 10;
 	if (WorkshopType = 5) and (CardType = 3) then
-			set TheNewCardStatus = 30;  -- 0. 未使用   1. 已派发  2.已退回  3.已绑定    10. 已报工   20. 已移库收货  30.已外发回厂
+			set TheNewCardStatus = 30;  -- 0. 未使用   1. 已派发  2.已退回  3.已绑定    10. 已报工   20. 已移库收货  30.已外发回厂 40.回厂已投入
 	end if;    
 
 	update rfid_card c
 	set  c.card_status = TheNewCardStatus  
-		,c.stock_qty = c.stock_qty + ReportQty
+		,c.stock_qty = if(TheNewCardStatus = 30,c.stock_qty, c.stock_qty + ReportQty)  -- 外发回厂报工的时候，不需要再增加完工数，完工数已经在EV前工程报工的时候就已增加到卡上了
 		,c.last_business_id = LastBusinessId
 	where c.record_id = CardId;
 
