@@ -4,6 +4,7 @@ Ext.define("app.model.imms.org.WorkstationModel", {
         { name: "rfidControllerId", type: "int" },
         { name: "rfidTerminatorId", type: "int" },
         { name: "wocgCode", type: "string" },
-        { name: "rfidTemplateIndex", type: "int" }
+        { name: "rfidTemplateIndex", type: "int" },
+        { name: "autoReportCount", type: "int" },
     ]
 });

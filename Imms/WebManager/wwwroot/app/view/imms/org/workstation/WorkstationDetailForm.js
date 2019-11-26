@@ -67,7 +67,15 @@ Ext.define("app.view.imms.org.workstation.WorkstationDetailForm", {
             maxLength: 3,
             enforceMaxLength: true,
             width: 180
-        },        
+        }, {
+             name: "autoReportCount",
+            xtype: "textfield",
+            fieldLabel: "自动工序数",
+            allowBlank: false,
+            maxLength: 3,
+            enforceMaxLength: true,
+            width: 180
+        },      
         {
             name: "description",
             xtype: "textarea",

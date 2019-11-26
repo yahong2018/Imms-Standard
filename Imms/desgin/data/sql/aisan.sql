@@ -118,9 +118,10 @@ create table work_organization_unit
     
     rfid_controller_id     int                         not null default 0,
     rfid_terminator_id     int                         not null default 0,
-    rfid_template_index     int                        not null default 8,  --  工位机的缺省显示模板，默认为8，如果是手持机，则要设为4
+    rfid_template_index    int                        not null default 8,  --  工位机的缺省显示模板，默认为8，如果是手持机，则要设为4
 
     wocg_code              varchar(20)                 null,
+    auto_report_count      int                         not null default 0,  -- 自动报工的工序个数
 
     create_by_id           bigint                      not null,
     create_by_code         varchar(20)                 not null,
@@ -137,6 +138,7 @@ create table work_organization_unit
     primary key(record_id)
 );
 
+/*
 --
 -- 自动报工的生产线
 --
@@ -148,6 +150,8 @@ create table automation_workstation
 
     primary key(record_id)
 );
+
+*/
 
 --
 -- 员工：就是操作员 operator
