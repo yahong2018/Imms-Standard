@@ -10,7 +10,7 @@ Ext.define("app.view.imms.material.material.MaterialGrid", {
         { dataIndex: "materialCode", text: '产品编码', width: 150 },
         { dataIndex: "materialName", text: '产品名称', flex: 1 },
         {
-            dataIndex: "AutoFinishedProgress", text: '是否自动报工', width: 100, renderer: function (v) {
+            dataIndex: "autoFinishedProgress", text: '是否自动报工', width: 100, renderer: function (v) {
                 if (v == 1) {
                     return "1.是";
                 }

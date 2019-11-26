@@ -33,7 +33,7 @@ Ext.define("app.view.imms.material.material.MaterialDetailForm", {
             layout: "hbox",
             margin: '0 0 3 ',
             items: [
-                { name: "AutoFinishedProgress", xtype: "textfield", fieldLabel: "是否自动报工", width: 150, },
+                { name: "autoFinishedProgress", xtype: "textfield", fieldLabel: "是否自动报工", width: 150, },
                 { xtype: "label", margin: '8 20 0 5', flex: 0.8, text: "0.不自动   1.自动" },
             ]
         }
