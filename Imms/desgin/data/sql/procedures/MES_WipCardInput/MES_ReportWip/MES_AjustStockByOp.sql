@@ -1,4 +1,4 @@
-drop procedure MES_AjustStockByOp;
+drop procedure if exists MES_AjustStockByOp;
 create procedure MES_AjustStockByOp(
     in       ProductionId      bigint,
 

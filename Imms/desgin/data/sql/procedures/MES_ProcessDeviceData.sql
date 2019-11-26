@@ -1,4 +1,4 @@
-drop procedure MES_ProcessDeviceData;
+drop procedure if exists MES_ProcessDeviceData;
 
 create procedure MES_ProcessDeviceData( 
  in	GID            int,

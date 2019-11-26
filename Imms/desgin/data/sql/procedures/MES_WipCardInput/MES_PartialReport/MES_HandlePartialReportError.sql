@@ -1,5 +1,6 @@
 drop procedure if exists MES_HandlePartialReportError ;
-create procedure MES_HandlePartialReportError(
+
+create procedure MES_HandlePartialReportError(  
     in      CurrentStep     int,
     in      ReqDataType     int,
     in      ReqData         varchar(20),

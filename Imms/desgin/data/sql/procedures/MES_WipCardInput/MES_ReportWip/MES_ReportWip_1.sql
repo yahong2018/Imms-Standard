@@ -1,4 +1,4 @@
-drop procedure MES_ReportWip_1;
+drop procedure if exists MES_ReportWip_1;
 
 create procedure MES_ReportWip_1
 (

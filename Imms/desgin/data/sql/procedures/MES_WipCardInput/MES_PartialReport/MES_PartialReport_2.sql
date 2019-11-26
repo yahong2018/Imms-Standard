@@ -1,3 +1,4 @@
+drop procedure if exists MES_PartialReport_2;
 
 create procedure MES_PartialReport_2(        
         in  SessionId     bigint,    

@@ -1,4 +1,4 @@
-drop procedure MES_Light;
+drop procedure if exists MES_Light;
 create procedure MES_Light(
     in   LightIndex  int,
     inout  RespData    varchar(200)
@@ -15,7 +15,7 @@ begin
     call MES_AddRespMessage(LigthMessage,RespData);
 end;
 
-drop procedure MES_AddRespMessage;
+drop procedure  if exists MES_AddRespMessage;
 create procedure MES_AddRespMessage(
     in    TheLine     varchar(200),
     inout RespData    varchar(200)
@@ -26,7 +26,7 @@ begin
     set RespData = CONCAT(LineLength,TheLine,SUBSTRING(RespData,2));
 end;
 
-drop procedure MES_Error;
+drop procedure  if exists MES_Error;
 create procedure MES_Error(
     inout RespData  varchar(200)
 )
@@ -34,7 +34,7 @@ begin
    call MES_Light(3,RespData);   -- 红灯亮
 end;
 
-drop procedure MES_OK;
+drop procedure  if exists MES_OK;
 create procedure MES_OK(
     inout RespData varchar(200)
 )

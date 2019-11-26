@@ -1,4 +1,4 @@
-drop procedure MES_GetWorkDayAndShiftId;
+drop procedure if exists MES_GetWorkDayAndShiftId;
 
 create procedure MES_GetWorkDayAndShiftId(
    in  ReqTime              datetime,

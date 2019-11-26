@@ -1,4 +1,5 @@
-drop procedure MES_HandleIssueCardError;
+drop procedure if exists MES_HandleIssueCardError;
+
 create procedure MES_HandleIssueCardError(
     in      CurrentStep     int,
     in      ReqDataType     int,

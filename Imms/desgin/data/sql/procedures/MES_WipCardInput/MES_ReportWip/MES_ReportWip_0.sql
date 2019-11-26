@@ -1,4 +1,4 @@
-drop procedure MES_ReportWip_0;
+drop procedure if exists MES_ReportWip_0;
 
 create procedure MES_ReportWip_0(  
 	in    WorkstationId        int,              -- 报工工位

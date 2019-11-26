@@ -1,4 +1,4 @@
-drop procedure MES_HandleErrorReq;
+drop procedure if exists MES_HandleErrorReq;
 
 create procedure MES_HandleErrorReq(
   in     ReqData       varchar(20),

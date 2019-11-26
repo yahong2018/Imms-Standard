@@ -1,4 +1,4 @@
-drop procedure MES_VerifyWorkstation;
+drop procedure if exists MES_VerifyWorkstation;
 
 create procedure MES_VerifyWorkstation(
     in GID              int,

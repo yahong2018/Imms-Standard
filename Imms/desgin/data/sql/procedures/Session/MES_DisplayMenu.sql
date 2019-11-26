@@ -1,4 +1,4 @@
-drop procedure MES_DisplayMenu;
+drop procedure if exists MES_DisplayMenu;
 
 create procedure MES_DisplayMenu(  
     out    RespHint              varchar(200),

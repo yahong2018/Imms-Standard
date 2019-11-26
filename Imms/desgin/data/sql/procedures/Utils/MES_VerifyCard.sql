@@ -1,4 +1,4 @@
-drop procedure MES_VerifyCard;
+drop procedure if exists MES_VerifyCard;
 
 create procedure MES_VerifyCard
 (

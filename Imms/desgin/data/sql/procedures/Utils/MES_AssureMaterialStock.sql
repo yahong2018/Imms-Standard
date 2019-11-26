@@ -1,4 +1,4 @@
-drop procedure MES_AssureMaterialStock;
+drop procedure if exists MES_AssureMaterialStock;
 
 create procedure MES_AssureMaterialStock(
     in ProductionId      bigint,

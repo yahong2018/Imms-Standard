@@ -1,4 +1,4 @@
-drop procedure MES_Debug;
+drop procedure if exists MES_Debug;
 
 create procedure MES_Debug(  
     in Content varchar(500)    

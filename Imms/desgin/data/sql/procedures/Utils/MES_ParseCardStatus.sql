@@ -1,4 +1,4 @@
-drop procedure MES_ParseCardStatus;
+drop procedure if exists MES_ParseCardStatus;
 
 create procedure MES_ParseCardStatus(
     in     StatusCode    int,

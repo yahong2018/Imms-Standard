@@ -1,4 +1,4 @@
-drop procedure MES_IssueCard;
+drop procedure if exists MES_IssueCard;
 
 create procedure MES_IssueCard(
     in SessionId     bigint,

@@ -1,4 +1,4 @@
-drop procedure MES_ProcessSessionStep;
+drop procedure if exists MES_ProcessSessionStep;
 
 create procedure MES_ProcessSessionStep(
     in   SessionId            bigint,       -- Session的Id

@@ -1,4 +1,4 @@
-drop procedure MES_MoveWip;
+drop procedure if exists MES_MoveWip;
 
 create procedure MES_MoveWip
 (

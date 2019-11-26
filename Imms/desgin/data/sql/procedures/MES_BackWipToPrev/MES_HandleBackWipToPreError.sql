@@ -1,4 +1,5 @@
-drop procedure MES_HandleBackWipToPreError;
+drop procedure if exists MES_HandleBackWipToPreError;
+
 create procedure MES_HandleBackWipToPreError(
     in        CurrentStep     int,
     in        ReqDataType     int,    

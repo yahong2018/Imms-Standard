@@ -1,4 +1,4 @@
-drop procedure MES_ReportWip;
+drop procedure if exists MES_ReportWip;
 
 create procedure MES_ReportWip(
     in    WorkstationId        bigint,              -- 报工工位

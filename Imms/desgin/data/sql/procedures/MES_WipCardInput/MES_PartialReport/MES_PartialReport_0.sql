@@ -1,3 +1,5 @@
+drop procedure if exists MES_PartialReport_0;
+
 create procedure MES_PartialReport_0
 (
     out Success      int,

@@ -1,4 +1,4 @@
-drop procedure MES_GetWorkstationSession;
+drop procedure if exists MES_GetWorkstationSession;
 
 create procedure MES_GetWorkstationSession(
     in     WorkstationId        bigint,

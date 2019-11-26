@@ -1,4 +1,4 @@
-drop procedure MES_BindOutsourceCard;
+drop procedure if exists MES_BindOutsourceCard;
 
 create procedure MES_BindOutsourceCard
 (

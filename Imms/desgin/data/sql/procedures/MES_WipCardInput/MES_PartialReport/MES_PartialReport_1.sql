@@ -1,3 +1,5 @@
+drop procedure if exists MES_PartialReport_1;
+
 create procedure MES_PartialReport_1
 (    
     in WorkstationId    bigint,

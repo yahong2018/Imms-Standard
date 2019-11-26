@@ -1,4 +1,4 @@
-drop procedure MES_GetCardType;
+drop procedure if exists MES_GetCardType;
 
 create procedure  MES_GetCardType(
     in  CardNo     varchar(20),

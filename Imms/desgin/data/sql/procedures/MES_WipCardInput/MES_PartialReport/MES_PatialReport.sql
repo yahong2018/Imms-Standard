@@ -1,6 +1,6 @@
 drop procedure if exists MES_PartialReport;
 create procedure MES_PartialReport
-(
+( 
     in SessionId     bigint,
     in CurrentStep   int,
     in WorkstationId bigint,

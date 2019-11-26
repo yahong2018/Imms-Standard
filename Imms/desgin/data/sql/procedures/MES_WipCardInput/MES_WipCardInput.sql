@@ -1,4 +1,4 @@
-drop procedure MES_WipCardInput;
+drop procedure if exists MES_WipCardInput;
 
 create procedure MES_WipCardInput(
     in     WorkstationId       bigint,

@@ -1,4 +1,4 @@
-drop procedure MES_SqlExceptionHandler;
+drop procedure if exists MES_SqlExceptionHandler;
 
 create procedure MES_SqlExceptionHandler(
     in StrPara1         varchar(20),   

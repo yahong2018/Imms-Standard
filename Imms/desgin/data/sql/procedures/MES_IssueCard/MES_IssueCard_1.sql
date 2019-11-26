@@ -1,4 +1,4 @@
-drop procedure MES_IssueCard_1;
+drop procedure if exists MES_IssueCard_1;
 
 create procedure MES_IssueCard_1
 (    

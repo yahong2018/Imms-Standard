@@ -1,4 +1,4 @@
-drop procedure MES_BuildRespData;
+drop procedure if exists MES_BuildRespData;
 
 create procedure MES_BuildRespData(
     in     TemplateIndex    int,

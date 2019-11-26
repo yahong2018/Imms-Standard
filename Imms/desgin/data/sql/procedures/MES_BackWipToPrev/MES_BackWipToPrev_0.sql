@@ -1,4 +1,4 @@
-drop procedure MES_BackWipToPrev_0;
+drop procedure if exists MES_BackWipToPrev_0;
 
 create procedure MES_BackWipToPrev_0(
     out Success      int,
