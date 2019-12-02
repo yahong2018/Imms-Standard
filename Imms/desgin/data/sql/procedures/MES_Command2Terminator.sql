@@ -1,3 +1,5 @@
+drop procedure if exists MES_Command2Terminator;
+
 create procedure MES_Command2Terminator(
     GID             int,
     DID             int,
@@ -9,5 +11,5 @@ begin
     call GetNewDeviceCmdID(DeviceCmdID);
 
     insert into DeviceCmdList(DeviceCmdID,CmdType,GID,DID,CmdNumber,CmdContent,CmdMakeTime,RetryTimes)
-                       values(DeviceCmdID,0,GID,DID,28,Command,GETDATE(),3);
+                       values(DeviceCmdID,0,GID,DID,28,Command,Now(),3);
 end;

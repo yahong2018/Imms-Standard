@@ -16,15 +16,28 @@ namespace Imms.Mes.Services
 
         protected override void DoInternalThreadProc()
         {
-            List<WorkstationSession> sessionList = this.dbContext.Set<WorkstationSession>().Where(x => x.ExpireTime > DateTime.Now && x.CurrentStep < 255).ToList();           
+            DateTime currentTime = DateTime.Now;
+            this.dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            List<WorkstationSession> sessionList = this.dbContext.Set<WorkstationSession>().Where(x => x.CurrentStep < 255 && x.ExpireTime < currentTime).ToList();
+            if (sessionList.Count > 0)
+            {
+                this.dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
+            }
+
             foreach (WorkstationSession session in sessionList)
             {
                 TerminatorCommand command = new TerminatorCommand();
                 command.GID = session.GID;
                 command.DID = session.DID;
                 command.CmdContent = "9|1|1|210|128|129|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|100";
-
                 this._Command2Terminator.RegisterCommand(command);
+                session.CurrentStep = 255;
+                GlobalConstants.ModifyEntityStatus<WorkstationSession>(session, this.dbContext);
+            }
+
+            if (sessionList.Count > 0)
+            {
+                this.dbContext.SaveChanges();
             }
         }
 
@@ -33,7 +46,7 @@ namespace Imms.Mes.Services
             this.ThreadIntervals = 1000 * 10;//10秒钟检查1次
 
             this.dbContext = GlobalConstants.DbContextFactory.GetContext();
-            this.dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+
 
             return true;
         }

@@ -17,17 +17,17 @@ namespace Imms.Mes.Services
                                         
                     var gidParam = dbCommand.CreateParameter();
                     gidParam.Value = termiComand.GID;
-                    gidParam.ParameterName="GID";
+                    gidParam.ParameterName="@GID";
 
                     var didParam = dbCommand.CreateParameter();
                     didParam.Value = termiComand.DID;
-                    didParam.ParameterName = "DID";
+                    didParam.ParameterName = "@DID";
 
                     var cmdContentParam = dbCommand.CreateParameter();
                     cmdContentParam.Value = termiComand.CmdContent;
-                    cmdContentParam.ParameterName = "Command";
+                    cmdContentParam.ParameterName = "@Command";
                     
-                    this.dbContext.Database.ExecuteSqlCommand("call MES_Command2Terminator(GID,DID,Command)", gidParam, didParam, cmdContentParam);                    
+                    this.dbContext.Database.ExecuteSqlCommand("call MES_Command2Terminator(@GID,@DID,@Command)", gidParam, didParam, cmdContentParam);                    
 
                     commandList.RemoveAt(0);
                 }
