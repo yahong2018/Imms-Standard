@@ -127,7 +127,7 @@ namespace Imms.Data
                 trackableEntity.CreateById = currentUser.RecordId;
                 trackableEntity.CreateByCode = currentUser.UserCode;
                 trackableEntity.CreateByName = currentUser.UserName;
-                trackableEntity.CreateTime = DateTime.Now;                
+                trackableEntity.CreateTime = DateTime.Now;
             }
             else if (entry.State == EntityState.Modified)
             {
@@ -144,7 +144,7 @@ namespace Imms.Data
             modelBuilder.ApplyConfiguration(new SimpleCodeConfigure());
             modelBuilder.ApplyConfiguration(new CodeSeedConfigure());
 
-            modelBuilder.ApplyConfiguration(new WorkOrganizationUnitConfigure());   
+            modelBuilder.ApplyConfiguration(new WorkOrganizationUnitConfigure());
             // modelBuilder.ApplyConfiguration(new SystemParameterClassConfigure()) ;
             modelBuilder.ApplyConfiguration(new SystemParameterConfigure());
 
@@ -193,15 +193,21 @@ namespace Imms.Data
         public static void RegisterEntityTable<T>(string tableName)
         {
             Guid key = typeof(T).GUID;
-            if (entityTables.ContainsKey(key))
+            lock (typeof(ImmsDbContext))
             {
-                return;
+                if (entityTables.ContainsKey(key))
+                {
+                    return;
+                }
+                entityTables.Add(key, tableName);
             }
-            entityTables.Add(key, tableName);
         }
         public static string GetEntityTableName<T>()
         {
-            return entityTables[typeof(T).GUID];
+            lock (typeof(ImmsDbContext))
+            {
+                return entityTables[typeof(T).GUID];
+            }
         }
     }
 

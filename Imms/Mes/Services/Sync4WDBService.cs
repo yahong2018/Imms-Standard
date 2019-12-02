@@ -64,7 +64,7 @@ namespace Imms.Mes.Services
         private IHttpClientFactory _factory;
         private WDBLoginParameter _loginParameter = new WDBLoginParameter();
         private WDBLoginResult _loginResult = new WDBLoginResult();
-        private DbContext dbContext{get;set;}
+        private DbContext dbContext { get; set; }
         private List<SystemParameter> ParameterList;
 
         public string ServerHost { get; set; }
@@ -83,7 +83,7 @@ namespace Imms.Mes.Services
         public WDBSynchronizer(IHttpClientFactory factory)
         {
             this._factory = factory;
-        }        
+        }
 
         public BusinessException SyncData()
         {
@@ -96,10 +96,11 @@ namespace Imms.Mes.Services
 
                     this.Initarameters(); //获取参数
                     this.LoginToWDB();    //登录
-                    this.PushInstoreData(); //入库报工
-                    this.PushInstoreWWData(); //委外入库
-                    this.PushMovingData();   //移库
-                    this.PushQualityCheckData();  //品质
+                    List<Workshop> firstWorkshopList = this.dbContext.Set<Workshop>().Where(x => x.PrevOperationIndex == -1).ToList();
+                    foreach (Workshop workshop in firstWorkshopList)
+                    {
+                        this.SyncWorkshopData(workshop);
+                    }
 
                     this.GetBom(); //同步BOM的数据
                 }
@@ -122,6 +123,27 @@ namespace Imms.Mes.Services
                 // this.dbContext.Dispose();
             }
             return result;
+        }
+
+        private void SyncWorkshopData(Workshop workshop)
+        {
+            if (workshop.WorkshopType != 3)
+            {
+                this.PushInstoreData(workshop); //入库报工
+            }
+            if (workshop.WorkshopType == 4)
+            {
+                this.PushInstoreWWData(workshop); //委外入库
+            }
+
+            this.PushMovingData(workshop);   //移库
+            this.PushQualityCheckData(workshop);  //品质
+
+            List<Workshop> nextList = this.dbContext.Set<Workshop>().Where(x => x.PrevOperationIndex == workshop.OperationIndex).ToList();
+            foreach (Workshop next in nextList)
+            {
+                this.SyncWorkshopData(next);
+            }
         }
 
         private void Initarameters()
@@ -265,7 +287,7 @@ namespace Imms.Mes.Services
             }
         }
 
-        private void PushQualityCheckData()
+        private void PushQualityCheckData(Workshop workshop)
         {
             if (string.IsNullOrEmpty(this.QualityCheckSyncUrl))
             {
@@ -273,7 +295,7 @@ namespace Imms.Mes.Services
             }
 
             List<QualitySyncItem> itemList;
-            long lastRecordId = this.GetQualitySyncData(out itemList);
+            long lastRecordId = this.GetQualitySyncData(workshop, out itemList);
             if (itemList.Count == 0)
             {
                 return;
@@ -289,10 +311,10 @@ namespace Imms.Mes.Services
             this.ReportToErp(this.last_sync_qualitycheck_param, this.QualityCheckSyncUrl, data, lastRecordId);
         }
 
-        private long GetQualitySyncData(out List<QualitySyncItem> itemList)
+        private long GetQualitySyncData(Workshop workshop, out List<QualitySyncItem> itemList)
         {
             long last_sync_id = long.Parse(this.last_sync_qualitycheck_param.ParameterValue);
-            List<QualityCheck> dataList = this.dbContext.Set<QualityCheck>().Where(x => x.RecordId > last_sync_id).ToList();
+            List<QualityCheck> dataList = this.dbContext.Set<QualityCheck>().Where(x => x.RecordId > last_sync_id && x.WorkshopId == workshop.RecordId).ToList();
             itemList = dataList.Select(x => new QualitySyncItem
             {
                 procode = x.ProductionCode,
@@ -315,10 +337,10 @@ namespace Imms.Mes.Services
             return -1;
         }
 
-        private long GetMovingSyncData(out List<MoveSyncItem> itemList)
+        private long GetMovingSyncData(Workshop workshop, out List<MoveSyncItem> itemList)
         {
             long last_sync_id = long.Parse(this.last_sync_move_param.ParameterValue);
-            List<ProductionMoving> dataList = this.dbContext.Set<ProductionMoving>().Where(x => x.RecordId > last_sync_id && x.WorkshopCode != "EV_1").ToList();
+            List<ProductionMoving> dataList = this.dbContext.Set<ProductionMoving>().Where(x => x.RecordId > last_sync_id && x.WorkshopId == workshop.RecordId).ToList();
             itemList = dataList.GroupBy(x => new { x.WorkshopCode, x.ProductionCode, x.WorkshopCodeFrom })
             .Select(group => new MoveSyncItem
             {
@@ -340,7 +362,7 @@ namespace Imms.Mes.Services
             return -1;
         }
 
-        private void PushMovingData()
+        private void PushMovingData(Workshop workshop)
         {
             if (string.IsNullOrEmpty(this.MoveSyncUrl))
             {
@@ -348,7 +370,7 @@ namespace Imms.Mes.Services
             }
 
             List<MoveSyncItem> itemList;
-            long lastRecordId = this.GetMovingSyncData(out itemList);
+            long lastRecordId = this.GetMovingSyncData(workshop, out itemList);
             if (itemList.Count == 0)
             {
                 return;
@@ -364,12 +386,12 @@ namespace Imms.Mes.Services
         }
 
 
-        private long GetInstoreData(out List<InstoreSyncItem> itemList)
+        private long GetInstoreData(Workshop workshop, out List<InstoreSyncItem> itemList)
         {
             long last_sync_id = long.Parse(this.last_sync_progress_param.ParameterValue);
-            List<ProductionOrderProgress> dataList = this.dbContext.Set<ProductionOrderProgress>()                  
-                   .Where(x => x.RecordId > last_sync_id && x.WorkshopCode != "EV_2")
-                   .OrderBy(x=>x.CreateTime)
+            List<ProductionOrderProgress> dataList = this.dbContext.Set<ProductionOrderProgress>()
+                   .Where(x => x.RecordId > last_sync_id && x.WorkshopId == workshop.RecordId)
+                   .OrderBy(x => x.CreateTime)
                    // .Take(10)
                    .ToList();
             itemList = dataList.GroupBy(x => new { x.WorkshopCode, x.ProductionCode, x.WocgCode })
@@ -393,14 +415,14 @@ namespace Imms.Mes.Services
             return -1;
         }
 
-        private void PushInstoreData()
+        private void PushInstoreData(Workshop workshop)
         {
             if (string.IsNullOrEmpty(this.InstoreSyncUrl))
             {
                 return;
             }
             List<InstoreSyncItem> itemList;
-            long lastRecordId = GetInstoreData(out itemList);
+            long lastRecordId = GetInstoreData(workshop, out itemList);
             if (itemList.Count == 0)
             {
                 return;
@@ -416,10 +438,10 @@ namespace Imms.Mes.Services
         }
 
 
-        private long GetInstoreWWData(out List<InstoreSyncItemWW> itemList)
+        private long GetInstoreWWData(Workshop workshop, out List<InstoreSyncItemWW> itemList)
         {
             long last_sync_id = long.Parse(this.last_sync_progress_ww_param.ParameterValue);
-            List<ProductionOrderProgress> dataList = this.dbContext.Set<ProductionOrderProgress>().Where(x => x.RecordId > last_sync_id && x.WorkshopCode == "EV_2").ToList();
+            List<ProductionOrderProgress> dataList = this.dbContext.Set<ProductionOrderProgress>().Where(x => x.RecordId > last_sync_id && x.WorkshopId == workshop.RecordId).ToList();
             itemList = dataList.GroupBy(x => new { x.WorkshopCode, x.ProductionCode })
             .Select(group => new InstoreSyncItemWW
             {
@@ -440,14 +462,14 @@ namespace Imms.Mes.Services
             return -1;
         }
 
-        private void PushInstoreWWData()
+        private void PushInstoreWWData(Workshop workshop)
         {
             if (string.IsNullOrEmpty(this.InstoreSyncUrl))
             {
                 return;
             }
             List<InstoreSyncItemWW> itemList;
-            long lastRecordId = this.GetInstoreWWData(out itemList);
+            long lastRecordId = this.GetInstoreWWData(workshop, out itemList);
             if (itemList.Count == 0)
             {
                 return;

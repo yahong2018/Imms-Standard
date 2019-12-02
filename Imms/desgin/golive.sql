@@ -179,3 +179,47 @@
 --    set card_status = 10    
 -- where tower_no in ('7A','7E','9Q','9A','9C','6D','9E','9K','4C','5P')
 --     and card_status  = 1
+
+
+--------------------------------------------------------------------
+-- 2019/11/27
+
+--  1125-02830  --> 1125-02831
+--  1125-13ET0  --> 1125-08500
+
+-- update material
+--   set material_code = '1125-08500'
+-- where material_code = '1125-13EJ0'
+-- ;
+
+-- update material_stock
+--   set material_code = '1125-08500'
+-- where material_code = '1125-13EJ0'
+-- ;
+
+-- update product_summary
+--    set production_code = '1125-08500'
+-- where production_code = '1125-13EJ0'
+-- ;
+
+-- update production_order_progress
+--    set production_code = '1125-08500'
+-- where production_code = '1125-13EJ0'
+-- ;
+
+
+-- update production_moving
+--    set production_code = '1125-08500'
+-- where production_code = '1125-13EJ0'
+-- ;
+
+-- update rfid_card
+--    set production_code = '1125-08500'
+-- where production_code = '1125-13EJ0'
+-- ;
+
+
+-- update quality_check
+--    set production_code = '1125-08500'
+-- where production_code = '1125-13EJ0'
+-- ;

@@ -41,6 +41,8 @@ namespace Imms.Mes.Data
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.MaterialStockConfigure());
 
             modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.WorkstationLoginConfigure());
+
+            modelBuilder.ApplyConfiguration(new Imms.Mes.Data.Domain.WorkstationSessionConfigure()); 
         }
     }
 }

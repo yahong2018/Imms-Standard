@@ -122,10 +122,11 @@ namespace Imms.WebManager
             GlobalConstants.GetCurrentUserDelegate = Security.Data.SystemUserLogic.GetCurrentUser;
 
             services.AddSignalR();
-            // services.AddSingleton<RealtimeDataPushTask,RealtimeDataPushTask>();    
-
             services.AddHttpClient();
+
             services.AddSingleton<Sync4WDBService, Sync4WDBService>();
+            services.AddSingleton<Command2TerminatorService, Command2TerminatorService>();
+            services.AddSingleton<CloseSessionService, CloseSessionService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -179,12 +180,16 @@ namespace Imms.WebManager
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            // RealtimeDataPushTask task = app.ApplicationServices.GetService<RealtimeDataPushTask>();
-            //  task.Start();
+            this.StartService<Sync4WDBService>(app);
+            this.StartService<Command2TerminatorService>(app);
+            this.StartService<CloseSessionService>(app);
+        }
 
-            Sync4WDBService syncService = app.ApplicationServices.GetService<Sync4WDBService>();
-         //   syncService.Config();
-         //   syncService.Startup();
+        private void StartService<T>(IApplicationBuilder app) where T : BaseService
+        {
+            T service = app.ApplicationServices.GetService<T>();
+            service.Config();
+            service.Startup();
         }
     }
 
