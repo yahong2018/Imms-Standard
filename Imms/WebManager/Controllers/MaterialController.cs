@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Imms.Data;
+using Imms.Mes.Controllers;
 using Imms.Mes.Data;
 using Imms.Mes.Data.Domain;
 using Microsoft.AspNetCore.Http;
@@ -62,11 +63,10 @@ namespace Imms.WebManager.Controllers
 
 
     [Route("api/imms/material/materialStock")]
-    public class MaterialStockController : SimpleCRUDController<MaterialStock>
+    public class MaterialStockController : StoreFilterController
     {
         public MaterialStockController() => this.Logic = new SimpleCRUDLogic<MaterialStock>();
     }
-
 
     [Route("api/imms/material/bom")]
     public class BomController : SimpleCRUDController<Bom>

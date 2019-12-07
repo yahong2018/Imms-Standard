@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Imms.Core;
 using Imms.Data;
+using Imms.Mes.Controllers;
 using Imms.Mes.Data;
 using Imms.Mes.Data.Domain;
 using Microsoft.AspNetCore.Hosting;
@@ -16,7 +17,7 @@ using NPOI.SS.UserModel;
 namespace Imms.WebManager.Controllers
 {
     [Route("api/imms/mfc/rfidCard")]
-    public class RfidCardController : SimpleCRUDController<RfidCard>
+    public class RfidCardController : OrgFilterController<RfidCard>
     {
         private readonly IHostingEnvironment host = null;
         public RfidCardController(IHostingEnvironment host)
@@ -159,13 +160,13 @@ namespace Imms.WebManager.Controllers
     }
 
     [Route("api/imms/mfc/productionOrder")]
-    public class ProductionOrderController : SimpleCRUDController<ProductionOrder>
+    public class ProductionOrderController : OrgFilterController<ProductionOrder>
     {
         public ProductionOrderController() => this.Logic = new SimpleCRUDLogic<ProductionOrder>();
     }
 
     [Route("api/imms/mfc/productSummary")]
-    public class ProductSummaryController : SimpleCRUDController<ProductSummary>
+    public class ProductSummaryController : OrgFilterController<ProductSummary>
     {
         public ProductSummaryController()
         {
@@ -181,7 +182,7 @@ namespace Imms.WebManager.Controllers
     }
 
     [Route("api/imms/mfc/productionOrderProgress")]
-    public class ProductionOrderProgressController : SimpleCRUDController<ProductionOrderProgress>
+    public class ProductionOrderProgressController : OrgFilterController<ProductionOrderProgress>
     {
         public ProductionOrderProgressController() => this.Logic = new ProductOrderProgressLogic();
 
@@ -416,7 +417,7 @@ namespace Imms.WebManager.Controllers
     }
 
     [Route("api/imms/mfc/productionOrderMoving")]
-    public class ProductionMovingController : SimpleCRUDController<ProductionMoving>
+    public class ProductionMovingController : OrgFilterController<ProductionMoving>
     {
         public ProductionMovingController() => this.Logic = new ProductMovingLogic();
 
@@ -424,7 +425,7 @@ namespace Imms.WebManager.Controllers
     }
 
     [Route("api/imms/mfc/qualityCheck")]
-    public class QualityCheckController : SimpleCRUDController<QualityCheck>
+    public class QualityCheckController : OrgFilterController<QualityCheck>
     {
         public QualityCheckController() => this.Logic = new QualityCheckLogic();
     }

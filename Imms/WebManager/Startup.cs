@@ -125,8 +125,8 @@ namespace Imms.WebManager
             services.AddHttpClient();
 
             services.AddSingleton<Sync4WDBService, Sync4WDBService>();
-            services.AddSingleton<Command2TerminatorService, Command2TerminatorService>();
-            services.AddSingleton<CloseSessionService, CloseSessionService>();
+            // services.AddSingleton<Command2TerminatorService, Command2TerminatorService>();
+            // services.AddSingleton<CloseSessionService, CloseSessionService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -134,15 +134,8 @@ namespace Imms.Data
                 try
                 {
                     List<T> list = dataSource.ToList();
-                    int count = this.DefaultDataSourceFilter(this.DefaultDataSourceGetHandler(dbContext), filterList).Count();
-                    // if (filterList != null && filterList.Length > 0)
-                    // {
-                    //     count = this.FilterDataSource(this.GetDataSource(dbContext), filterList).Count();
-                    // }
-                    // else
-                    // {
-                    //     count = list.Count;
-                    // }
+                    int count = countSource.Count();
+                    // int count = this.DefaultDataSourceFilter(this.DefaultDataSourceGetHandler(dbContext), filterList).Count();
 
                     result.RootProperty = list;
                     result.total = count;
@@ -175,9 +168,10 @@ namespace Imms.Data
         private string BuildWhereString(FilterExpression[] filterList)
         {
             StringBuilder stringBuilder = new StringBuilder();
-            foreach (FilterExpression filter in filterList)
+            for (int i = 0; i < filterList.Length; i++)
             {
-                stringBuilder.Append(filter.ToWhereString());
+                FilterExpression filter = filterList[i];
+                stringBuilder.Append(filter.ToWhereString(i));
             }
             return stringBuilder.ToString();
         }
@@ -204,14 +198,14 @@ namespace Imms.Data
         public string R { get; set; }
         public string J { get; set; }
 
-        public string ToWhereString()
+        public string ToWhereString(int n)
         {
             if ("like" == this.O)
             {
                 return $" {this.J} ({this.L}.contains(@0))";
             }
 
-            return $" {this.J} ({this.L} {this.O} @0)";
+            return $" {this.J} ({this.L} {this.O} @{n.ToString()})";
         }
     }
 
