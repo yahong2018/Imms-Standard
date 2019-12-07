@@ -83,7 +83,7 @@ INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUE
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_02', 'INSERT', '新增');
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_02', 'UPDATE', '修改');
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_02', 'DELETE', '删除');
-INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_02', 'ExcelImport', '导入看板');
+-- INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_02', 'ExcelImport', '导入看板');
 
 -- INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_03', 'RUN', '运行');
 -- INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_03', 'INSERT', '新增');

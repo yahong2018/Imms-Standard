@@ -16,15 +16,22 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
         { name: "defectId", xtype: "hidden" },
         { name: "productionId", xtype: "hidden" },
         { name: "workshopId", xtype: "hidden" },
-
-        { name: "timeOfOriginWork", xtype: "textfield", fieldLabel: "工作日",  allowBlank: false },
         {
             xtype: "container",
             layout: "hbox",
             margin: '0 0 3 ',
-            items: [                
+            items: [
+                { name: "timeOfOriginWork", xtype: "datefield", format: 'Y-m-d', fieldLabel: "工作日", allowBlank: false },
+                { name: "qty", xtype: "textfield", fieldLabel: "缺陷数量", margin: '0 20 0 20', allowBlank: false },
+            ]
+        },
+        {
+            xtype: "container",
+            layout: "hbox",
+            margin: '0 0 3 ',
+            items: [
                 { name: "shiftId", xtype: "textfield", fieldLabel: "班次", margin: '0 20 5 0', allowBlank: false },
-                { xtype:"label",text:"0.白班  1.夜班"},
+                { xtype: "label", margin: '5 0 0 0', text: "0.白班  1.夜班" },
             ]
         },
         {
@@ -68,16 +75,7 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
                 { name: "workshopName", xtype: "textfield", flex: 0.8, margin: '0 20 5 5', allowBlank: false, readOnly: true },
             ]
         },
-        { name: "wocgCode", xtype: "textfield", width: 200, fieldLabel: "工作中心组", allowBlank: false },
-        {
-            xtype: "container",
-            layout: "hbox",
-            margin: '0 0 3 ',
-            items: [
-                { name: "timeOfOrigin", xtype: "textfield", fieldLabel: "产生时间", margin: '0 20 5 0', allowBlank: false },
-                { name: "qty", xtype: "textfield", fieldLabel: "缺陷数量", margin: '0 20 5 0', allowBlank: false },
-            ]
-        },       
+        { name: "wocgCode", xtype: "textfield", width: 200, margin: '0 20 5 0', fieldLabel: "工作中心组", allowBlank: false },
         {
             xtype: "container",
             layout: "hbox",

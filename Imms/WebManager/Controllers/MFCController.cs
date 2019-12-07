@@ -386,16 +386,17 @@ namespace Imms.WebManager.Controllers
 
         protected override void Verify(ProductionOrderProgress item, int operation)
         {
-            ProductionOrder order = CommonRepository.GetOneByFilter<ProductionOrder>(x => x.OrderNo == item.ProductionOrderNo);
-            if (order == null)
-            {
-                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_DATA_NOT_FOUND, $"计划单号为{item.ProductionOrderNo}的生产计划不存在！");
-            }
-            item.ProductionOrderId = order.RecordId;
-            item.ProductionId = order.ProductionId;
-            item.ProductionCode = order.ProductionCode;
-            item.ProductionName = order.ProductionName;
+            // ProductionOrder order = CommonRepository.GetOneByFilter<ProductionOrder>(x => x.OrderNo == item.ProductionOrderNo);
+            // if (order == null)
+            // {
+            //     throw new BusinessException(GlobalConstants.EXCEPTION_CODE_DATA_NOT_FOUND, $"计划单号为{item.ProductionOrderNo}的生产计划不存在！");
+            // }
+            // item.ProductionOrderId = order.RecordId;
+            // item.ProductionId = order.ProductionId;
+            // item.ProductionCode = order.ProductionCode;
+            // item.ProductionName = order.ProductionName;
 
+            item.ProductionOrderId = -1;
             Workshop workshop = CommonRepository.GetOneByFilter<Workshop>(x => x.OrgCode == item.WorkshopCode);
             if (workshop == null)
             {

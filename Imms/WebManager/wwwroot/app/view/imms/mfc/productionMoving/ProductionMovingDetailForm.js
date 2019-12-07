@@ -1,6 +1,7 @@
 Ext.define("app.view.imms.mfc.productionMoving.ProductionMovingDetailForm", {
     extend: "app.ux.TrackableFormPanel",
     xtype: "imms_mfc_productionMoving_ProductionMovingDetailForm",
+    requires: ["app.ux.field.DateTime"],
     padding: 5,
     width: 600,
     layout: "anchor",
@@ -9,8 +10,8 @@ Ext.define("app.view.imms.mfc.productionMoving.ProductionMovingDetailForm", {
         anchor: "100%",
     },
     operatorStore: Ext.create({ xtype: 'imms_org_OperatorStore', autoLoad: true, pageSize: 0 }),
-    workshopStore: Ext.create({ xtype: 'imms_org_WorkshopStore', autoLoad: true, pageSize: 0 }),
-    workstationStore: Ext.create({ xtype: 'imms_org_WorkstationStore', autoLoad: true, pageSize: 0 }),
+    workshopStore: Ext.create({ xtype: 'imms_org_WorkshopStore', autoLoad: true, pageSize: 0 }),    
+    materialStore: Ext.create({ xtype: 'app_store_imms_material_MaterialStore', autoLoad: true, pageSize: 0 }),
     items: [
         { name: "workshopIdFrom", xtype: "hidden" },
         { name: "productionId", xtype: "hidden" },
@@ -18,13 +19,26 @@ Ext.define("app.view.imms.mfc.productionMoving.ProductionMovingDetailForm", {
         { name: "operatorId", xtype: "hidden" },
         { name: "workstationId", xtype: "hidden" },
         { name: "workshopId", xtype: "hidden" },
+        { name:"workstationCode",xtype:"hidden"},
+        { name: "workstationName", xtype: "hidden" },
+        { name: "workstationId", xtype: "hidden" },
         { name: "prevProgressRecordId", xtype: "hidden" },
         {
             xtype: "container",
             layout: "hbox",
             margin: '0 0 3 ',
             items: [
-                { name: "productionCode", xtype: "textfield", fieldLabel: "交接产品", width: 200, allowBlank: false },
+                {
+                    name: "productionCode", xtype: "textfield", fieldLabel: "交接产品", width: 200, allowBlank: false, listeners: {
+                        change: function (self, newValue, oldValue, eOpts) {
+                            var form = this.up("imms_mfc_productionMoving_ProductionMovingDetailForm");
+                            var record = form.materialStore.findRecord("materialCode", newValue, 0, false, false, true);
+                            if (record != null) {
+                                form.down("[name='productionId']").setValue(record.get("recordId"));
+                                form.down("[name='productionName']").setValue(record.get("materialName"));
+                            }
+                        }
+                    }},
                 { name: "productionName", xtype: "textfield", margin: '0 20 0 5', flex: 0.8, readOnly: true },
             ]
         },
@@ -77,7 +91,7 @@ Ext.define("app.view.imms.mfc.productionMoving.ProductionMovingDetailForm", {
                     name: "workshopCodeFrom", xtype: "textfield", fieldLabel: "原车间", width: 200, allowBlank: false, listeners: {
                         change: function (self, newValue, oldValue, eOpts) {
                             var form = this.up("imms_mfc_productionMoving_ProductionMovingDetailForm");
-                            var record = form.workstationStore.findRecord("orgCode", newValue, 0, false, false, true);
+                            var record = form.workshopStore.findRecord("orgCode", newValue, 0, false, false, true);
                             if (record != null) {
                                 form.down("[name='workshopIdFrom']").setValue(record.get("recordId"));
                                 form.down("[name='workshopNameFrom']").setValue(record.get("orgName"));
@@ -102,7 +116,7 @@ Ext.define("app.view.imms.mfc.productionMoving.ProductionMovingDetailForm", {
             layout: "hbox",
             margin: '0 0 3 ',
             items: [
-                { name: "timeOfOrigin", xtype: "textfield", fieldLabel: "接收时间", margin: '0 20 5 0', allowBlank: false },
+                { name: "timeOfOrigin", xtype: "datetimefield", format:'Y-m-d H:i:s', fieldLabel: "接收时间", margin: '0 20 5 0', allowBlank: false },
                 { xtype: "label" }
             ]
         },

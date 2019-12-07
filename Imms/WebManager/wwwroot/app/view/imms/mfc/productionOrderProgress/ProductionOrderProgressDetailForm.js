@@ -1,6 +1,7 @@
 Ext.define("app.view.imms.mfc.productionOrderProgress.ProductionOrderProgressDetailForm", {
     extend: "app.ux.TrackableFormPanel",
     xtype: "imms_mfc_productionOrderProgress_ProductionOrderProgressDetailForm",
+    requires: ["app.ux.field.DateTime"],
     padding: 5,
     width: 750,
     layout: "anchor",
@@ -11,6 +12,7 @@ Ext.define("app.view.imms.mfc.productionOrderProgress.ProductionOrderProgressDet
     workshopStore: Ext.create({ xtype: 'imms_org_WorkshopStore', autoLoad: true, pageSize: 0 }),
     workstationStore: Ext.create({ xtype: 'imms_org_WorkstationStore', autoLoad: true, pageSize: 0 }),
     operatorStore: Ext.create({ xtype: 'imms_org_OperatorStore', autoLoad: true, pageSize: 0 }),
+    materialStore: Ext.create({ xtype: 'app_store_imms_material_MaterialStore', autoLoad: true, pageSize: 0 }),
     items: [
 
         { name: "workshopId", xtype: "hidden" },
@@ -70,7 +72,18 @@ Ext.define("app.view.imms.mfc.productionOrderProgress.ProductionOrderProgressDet
             layout: "hbox",
             margin: '0 0 3 ',
             items: [
-                { name: "productionCode", fieldLabel: "产品", xtype: "textfield", allowBlank: false, width: 200,},
+                {
+                    name: "productionCode", fieldLabel: "产品", xtype: "textfield", allowBlank: false, width: 200, listeners: {
+                        change: function (self, newValue, oldValue, eOpts) {
+                            var form = this.up("imms_mfc_productionOrderProgress_ProductionOrderProgressDetailForm");
+                            var record = form.materialStore.findRecord("materialCode", newValue, 0, false, false, true);
+                            if (record != null) {
+                                form.down("[name='productionId']").setValue(record.get("recordId"));
+                                form.down("[name='productionName']").setValue(record.get("materialName"));
+                            }
+                        }
+                    }
+                },
                 { name: "productionName",  margin: '0 0 0 20', allowBlank: false, xtype: "textfield", flex: 0.8, readOnly: true },
             ]
         },
@@ -104,21 +117,13 @@ Ext.define("app.view.imms.mfc.productionOrderProgress.ProductionOrderProgressDet
                 { name: "rfidControllerId", fieldLabel: "控制器", margin: '0 0 0 20', xtype: "textfield", flex: 0.5 },
             ]
         },
+        { name: "rfidCardNo", fieldLabel: "RFID卡号", xtype: "textfield", width: 250 },       
         {
             xtype: "container",
             layout: "hbox",
             margin: '0 0 3 ',
             items: [
-                { name: "rfidCardNo", fieldLabel: "RFID卡号", xtype: "textfield", width: 250 },
-                { name: "reportType", fieldLabel: "汇报类型", allowBlank: false, margin: '0 0 0 20', xtype: "textfield", width: 250 },
-            ]
-        },
-        {
-            xtype: "container",
-            layout: "hbox",
-            margin: '0 0 3 ',
-            items: [
-                { name: "timeOfOrigin", fieldLabel: "报工时间", xtype: "textfield", width: 250, allowBlank: false, format: 'Y-m-d H:i:s', },
+                { name: "timeOfOrigin", fieldLabel: "报工时间", xtype: "datetimefield",  width: 350, allowBlank: false, format: 'Y-m-d H:i:s', },
                 { name: "qty", fieldLabel: "报工数量", margin: '0 0 0 20', allowBlank: false, xtype: "textfield", width: 250 },
             ]
         },

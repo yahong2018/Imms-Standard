@@ -109,7 +109,7 @@ namespace Imms.Mes.Data.Domain
         public string DefectCode { get; set; }
         public string DefectName { get; set; }
 
-        public DateTime TimeOfOrigin { get; set; }
+        public DateTime? TimeOfOrigin { get; set; }
         public DateTime TimeOfOriginWork { get; set; }
         public int ShiftId { get; set; }
 
