@@ -9,7 +9,7 @@ begin
     if LightIndex = 3 then
         set LigthMessage = '|210|128|129|3|3|1000|2|2|0|1|2|0|0|0|0|0|0|0|0|0|0|3|100';
     else
-        set LigthMessage = '|210|128|129|3|2|0|2|3|1000|1|2|0|0|0|0|0|0|0|0|0|0|1|100';
+        set LigthMessage = '|210|128|129|3|2|0|2|3|1000|1|2|0|0|0|0|0|0|0|0|0|0|3|100';
     end if;
 
     call MES_AddRespMessage(LigthMessage,RespData);

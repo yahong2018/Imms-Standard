@@ -509,6 +509,7 @@ namespace Imms.Mes.Services
                     else
                     {
                         GlobalConstants.DefaultLogger.Error("同步失败!");
+                        GlobalConstants.DefaultLogger.Debug(syncResponese.Message);
                         return;
                     }
 

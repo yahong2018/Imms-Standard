@@ -35,6 +35,11 @@ top:begin
         end if;         
         set ReqDataType = CardType;
     elseif(DataType in(2,3)) then
+        if (SessionId <> -1) and (ReqData='12') then  -- 处理退出键
+           call MES_CloseSession(SessionId,RespData);
+           leave top ;
+        end if;
+
         set ReqDataType = 4;   -- 键盘输入
     end if;
     

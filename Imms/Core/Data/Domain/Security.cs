@@ -42,7 +42,7 @@ namespace Imms.Security.Data.Domain
         public int ShowOrder { get; set; }
         public string Parameters { get; set; }
         public string ParentId { get; set; }
-        public int ProgramStatus{get;set;}
+        public int ProgramStatus { get; set; }
 
         public virtual void Assign(BaseProgram other)
         {
@@ -59,8 +59,23 @@ namespace Imms.Security.Data.Domain
 
     public partial class SystemProgram : BaseProgram
     {
-        public virtual List<ProgramPrivilege> Privielges { get; set; } = new List<ProgramPrivilege>();
+        public bool Leaf
+        {
+            get
+            {
+                return this.Children.Count == 0;
+            }
+        }
 
+        public bool Expanded
+        {
+            get
+            {
+                return this.Children.Count > 0;
+            }
+        }
+
+        public virtual List<ProgramPrivilege> Privielges { get; set; } = new List<ProgramPrivilege>();
         public virtual List<SystemProgram> Children { get; set; } = new List<SystemProgram>();
         public virtual SystemProgram Parent { get; set; }
     }
@@ -163,7 +178,10 @@ namespace Imms.Security.Data.Domain
             builder.Property(e => e.ProgramName).IsRequired().HasColumnName("program_name").HasMaxLength(120).IsUnicode(false);
             builder.Property(e => e.ShowOrder).HasColumnName("show_order").HasColumnType("int(11)");
             builder.Property(e => e.Url).IsRequired().HasColumnName("url").HasMaxLength(255).IsUnicode(false);
-            builder.Property(e=>e.ProgramStatus).HasColumnName("program_status");
+            builder.Property(e => e.ProgramStatus).HasColumnName("program_status");
+
+            builder.Ignore(e => e.Leaf);
+            builder.Ignore(e => e.Expanded);
 
             builder.HasMany(e => e.Children).WithOne(e => e.Parent).HasForeignKey(e => e.ParentId).HasConstraintName("parent_id").HasPrincipalKey(x => x.RecordId);
         }

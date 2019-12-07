@@ -1,0 +1,138 @@
+与ERP联调
+
+12.02   960
+12.04   960
+12.06   1000
+
+22030-0Y090-00                          THR
+    1125-03390-90                       THR      1
+        1106-03390                      THR      1
+            1125-03390                  MC
+                1125-03390-01           CJG
+                    1125-03390-90       YZ
+            2301-03390                  THR      1
+        2132-03390                      THR      1
+
+系统登录
+    http://192.168.121.11/jsf/rfws/oauth/token
+    
+报工   压铸
+    http://192.168.121.11/jsf/rfws/erp/aisa/save/prodPw
+  
+    {
+        "beId":1,
+        "prodpwt":[
+            {
+                "procode":"1125-03390-90",
+                "unitcode":"pcs",
+                "qty":960,
+                "loccode":"YZ",
+                "wcgcode":"YZ01"
+            }
+        ]
+    }
+
+移库  从压铸到粗加工
+    http://192.168.121.11/jsf/rfws/erp/aisa/save/move
+
+   {
+       "beId":1,
+       "movet":[
+           {
+               "loccode":"YZ",
+               "aloccode":"CJG",
+               "procode":"1125-03390-90",
+               "unitcode":"pcs",
+               "qty":960
+           }
+       ]
+   }
+   
+
+报工  粗加工
+
+    http://192.168.121.11/jsf/rfws/erp/aisa/save/prodPw
+  
+    {
+        "beId":1,
+        "prodpwt":[
+            {
+                "procode":"1125-03390-01",
+                "unitcode":"pcs",
+                "qty":960,
+                "loccode":"CJG",
+                "wcgcode":"CJG01"
+            }
+        ]
+    }
+
+移库  从粗加工到MC    
+   http://192.168.121.11/jsf/rfws/erp/aisa/save/move
+
+   {
+       "beId":1,
+       "movet":[
+           {
+               "loccode":"CJG",
+               "aloccode":"MC-JG",
+               "procode":"1125-03390-01",
+               "unitcode":"pcs",
+               "qty":960
+           }
+       ]
+   }
+     
+
+报工  MC报工
+
+    http://192.168.121.11/jsf/rfws/erp/aisa/save/prodPw
+  
+    {
+        "beId":1,
+        "prodpwt":[
+            {
+                "procode":"1125-03390",
+                "unitcode":"pcs",
+                "qty":960,
+                "loccode":"MC-JG",
+                "wcgcode":"JG01"
+            }
+        ]
+    }
+
+移库  MC --> THR    
+
+   http://192.168.121.11/jsf/rfws/erp/aisa/save/move
+
+   {
+       "beId":1,
+       "movet":[
+           {
+               "loccode":"MC-JG",
+               "aloccode":"THR",
+               "procode":"1125-03390",
+               "unitcode":"pcs",
+               "qty":960
+           }
+       ]
+   }
+
+THR 报工
+    http://192.168.121.11/jsf/rfws/erp/aisa/save/prodPw
+
+    {
+        "beId":1,
+        "prodpwt":[
+            {
+                "procode":"2132-03390",
+                "unitcode":"pcs",
+                "qty":960,
+                "loccode":"THR",
+                "wcgcode":"THR01"
+            }
+        ]
+    }
+
+
+
+

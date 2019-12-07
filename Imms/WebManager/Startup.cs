@@ -168,10 +168,10 @@ namespace Imms.WebManager
 
             Imms.HttpContext.Configure(app.ApplicationServices.GetRequiredService<Microsoft.AspNetCore.Http.IHttpContextAccessor>());
 
-            app.UseSignalR(routes =>
-            {
-                routes.MapHub<KanbanRealtimeHub>("/kanbanHub/realtime");
-            });
+            // app.UseSignalR(routes =>
+            // {
+            //     routes.MapHub<KanbanRealtimeHub>("/kanbanHub/realtime");
+            // });
 
             app.UseMvc(routes =>
             {
@@ -181,8 +181,8 @@ namespace Imms.WebManager
             });
 
             this.StartService<Sync4WDBService>(app);
-            this.StartService<Command2TerminatorService>(app);
-            this.StartService<CloseSessionService>(app);
+            //this.StartService<Command2TerminatorService>(app);
+            //this.StartService<CloseSessionService>(app);
         }
 
         private void StartService<T>(IApplicationBuilder app) where T : BaseService
