@@ -3,6 +3,7 @@ using Imms.Data;
 using Imms.Mes.Controllers;
 using Imms.Mes.Data;
 using Imms.Mes.Data.Domain;
+using Imms.WebManager.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -97,6 +98,11 @@ namespace Imms.WebManager.Controllers
             return result;
         }
 
+        [Route("getBomTree")]
+        public List<BomTree> GetBomTree(string materialCode){
+            BomTreeBuilder treeBuilder = new BomTreeBuilder();
+            return treeBuilder.BuildBomTree(materialCode,false);
+        }
     }
 
     public class MaterialSyncItem

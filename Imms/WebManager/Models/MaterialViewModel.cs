@@ -15,7 +15,23 @@ namespace Imms.WebManager.Models
 
     public class BomTreeBuilder
     {
-        public List<BomTree> BuildBomTree(string materialCode, int level)
+        public void ClearLeaf(List<BomTree> treeList)
+        {
+            for (int i = 0; i < treeList.Count; i++)
+            {
+                BomTree tree = treeList[i];
+                if (tree.Leaf)
+                {
+                    treeList.Remove(tree);
+                    i--;
+                    continue;
+                }
+
+                ClearLeaf(tree.Children);
+            }
+        }
+
+        public List<BomTree> BuildBomTree(string materialCode, bool clearLeaf)
         {
             DbContext dbContext = GlobalConstants.DbContextFactory.GetContext();
             IQueryable<Bom> bomList = dbContext.Set<Bom>().Where(x => x.MaterialCode == materialCode);
@@ -29,6 +45,11 @@ namespace Imms.WebManager.Models
                 this.FillTreeBom(treeBom, dbContext);
             }
 
+            if (clearLeaf)
+            {
+                this.ClearLeaf(result);
+            }
+
             return result;
         }
 
@@ -37,11 +58,9 @@ namespace Imms.WebManager.Models
             string materialCode = treeBom.ComponentCode;
             List<Bom> children = dbContext.Set<Bom>().Where(x => x.MaterialCode == materialCode).ToList();
             int childrentCount = children.Count;
-            if (childrentCount > 0)
-            {
-                treeBom.Leaf = false;
-                treeBom.Expanded = true;
-            }
+            treeBom.Expanded = childrentCount > 0;
+            treeBom.Leaf = childrentCount == 0;
+
             treeBom.Children = new List<BomTree>();
             foreach (Bom childBom in children)
             {
