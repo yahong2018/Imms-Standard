@@ -26,5 +26,5 @@ namespace Imms.Mes.Data
                 item.BomNo = "";
             }
         }
-    }
+    }    
 }

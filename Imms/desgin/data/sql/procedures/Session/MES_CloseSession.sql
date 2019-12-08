@@ -1,3 +1,5 @@
+drop procedure if exists MES_CloseSession;
+
 create procedure MES_CloseSession(
     in     SessionId    bigint,
     out    RespData     varchar(200)

@@ -2,7 +2,7 @@ drop procedure if exists MES_ProcessSession;
 
 create procedure MES_ProcessSession(
     in   WorkstationId        bigint,  
-    in   DataType             int,          -- 1. 工卡    2.数量卡   3.委外加工卡    4.键盘输入    
+    in   DataType             int,          -- 1. 工卡    2.数量卡   3.委外加工卡    4.键盘输入(多键) 
     in   ReqData              varchar(20),  -- 卡号或者键盘输入的数字        
     in   ReqTime              datetime,       
     out  RespData             varchar(200)
@@ -32,10 +32,10 @@ top:begin
             call MES_Error(RespData);
 
             leave top;
-        end if;         
+        end if;
         set ReqDataType = CardType;
     elseif(DataType in(2,3)) then
-        if (SessionId <> -1) and (ReqData='12') then  -- 处理退出键
+        if (DataType = 2) and (ReqData='12') then  -- 处理退出键
            call MES_CloseSession(SessionId,RespData);
            leave top ;
         end if;

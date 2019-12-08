@@ -32,7 +32,7 @@ top:begin
     if (CurrentStep = 0) and (ReqDataType = 4) then    -- 菜单选择
         call MES_PartialReport_0(Success,RespHint,RespData);		
 	elseif (CurrentStep = 1) and (ReqDataType = 2) then --  刷看板
-        call MES_PartialReport_1(ReqDataType,CardId,DefaultIssueQty,Success,RespHint,RespData);	
+        call MES_PartialReport_1(WorkstationId,CardId,DefaultIssueQty,Success,RespHint,RespData);	
     elseif (CurrentStep = 2) and (ReqDataType = 4) then     -- 输入数量
         call MES_PartialReport_2(SessionId,CurrentStep,ReqDataType,ReqData,ReqTime,Success,RespData);		
     end if;

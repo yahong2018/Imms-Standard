@@ -9,9 +9,9 @@ create procedure MES_PartialReport_2(
         out Success      int,    
         out RespData     varchar(200)
 )
-begin
+top:begin
     declare RfidNo varchar(20);
-    declare CardType,CardStatus,WorkshopType,ReportQty int;
+    declare CardType,CardStatus,WorkshopType,ReportQty,QtyStock,QtyIssue int;
     declare CardId,WorkstationId,LastBusinessId,OperatorId bigint;	 
     declare EmployeeId varchar(20);
     declare EmployeeName varchar(50);
@@ -25,12 +25,19 @@ begin
         order by s.record_id desc
         limit 1;
 
-    select c.record_id,c.card_type,c.card_status into CardId,CardType,CardStatus
+    select c.record_id,c.card_type,c.card_status,c.stock_qty,c.issue_qty into CardId,CardType,CardStatus,QtyStock,QtyIssue
         from rfid_card c
     where c.rfid_no = RfidNo
       and c.card_status <> 255;
    
     set ReportQty = cast(ReqData as UNSIGNED);	   
+    if(QtyStock + ReportQty > QtyIssue) then
+        set RespData='2';    
+        set RespData = CONCAT(RespData,'|1|累计数量大于收容数,|0');			
+        set RespData = CONCAT(RespData,'|2|请输入正确的报工数量|0');
+
+        leave top;
+    end if;
      
     select ws.operator_id,ws.employee_id,ws.employee_name,ws.workstation_id 
         into OperatorId,EmployeeId,EmployeeName,WorkstationId
