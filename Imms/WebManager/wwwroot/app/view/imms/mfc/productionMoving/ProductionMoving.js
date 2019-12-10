@@ -14,8 +14,8 @@ Ext.define("app.view.imms.mfc.productionMoving.ProductionMoving", {
     columns: [
         // { dataIndex: "productionOrderNo", text: "计划单号" },
         { dataIndex: "recordId", text: "业务流水" },
-        { dataIndex: "productionCode", text: "产品编号" },
-        { dataIndex: "productionName", text: "产品名称",width:150 },
+        { dataIndex: "productionCode", text: "产品编号",width:130 },
+        { dataIndex: "productionName", text: "产品名称",width:200 },
 
         { dataIndex: "workshopCode", text: "接收车间编号" },
         { dataIndex: "workshopName", text: "接收车间名称" },

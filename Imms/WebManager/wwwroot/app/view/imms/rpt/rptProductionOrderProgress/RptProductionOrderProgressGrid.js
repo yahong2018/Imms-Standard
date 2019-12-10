@@ -3,8 +3,8 @@ Ext.define("app.view.imms.rpt.rptProductionOrderProgress.RptProductionOrderProgr
     xtype: "app_view_imms_rpt_rptProductionOrderProgress_RptProductionOrderProgressGrid",
     requires: ["app.model.imms.mfc.ProductSummaryModel", "app.store.imms.mfc.ProductSummaryStore"],
     columns: [
-        { text: "品号", dataIndex: "productionCode", width: 100, align: "center", menuDisabled: true },
-        { text: "品名", dataIndex: "productionName", width: 150, align: "center", menuDisabled: true },
+        { text: "品号", dataIndex: "productionCode", width: 130, align: "center", menuDisabled: true },
+        { text: "品名", dataIndex: "productionName", width: 200, align: "center", menuDisabled: true },
         { text: "车间", dataIndex: "workshopCode", width: 100, align: "center", menuDisabled: true },
         { text: "日期", dataIndex: "productDate", width: 90, align: "center", menuDisabled: true },
         {

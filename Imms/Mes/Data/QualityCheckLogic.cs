@@ -21,6 +21,15 @@ namespace Imms.Mes.Data
             public int Level { get; set; }
         }
 
+        protected override void BeforeInsert(QualityCheck item, DbContext dbContext)
+        {
+            int count = dbContext.Set<Workstation>().Where(x => x.WocgCode == item.WocgCode).Count();
+            if (count <= 0)
+            {
+                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_DATA_NOT_FOUND, "不存在工作中心组为" + item.WocgCode + "的数据！");
+            }
+        }
+
         protected override void AfterInsert(QualityCheck item, DbContext dbContext)
         {
             lock (this)

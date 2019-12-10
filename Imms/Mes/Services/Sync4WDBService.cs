@@ -308,8 +308,6 @@ namespace Imms.Mes.Services
                 this.ReportToErp(this.QualityCheckSyncUrl, data, item);
 
                 Thread.Sleep(100); // 休息100毫秒    
-
-                return;
             }
         }
 
@@ -345,8 +343,6 @@ namespace Imms.Mes.Services
                 this.ReportToErp(this.MoveSyncUrl, data, item);
 
                 Thread.Sleep(100); // 休息100毫秒       
-
-                return;
             }
         }
 
@@ -379,8 +375,6 @@ namespace Imms.Mes.Services
                 this.ReportToErp<long>(this.InstoreSyncUrl, data, progress);
 
                 Thread.Sleep(100); // 休息100毫秒  
-
-                return;
             }
         }
 
@@ -412,8 +406,6 @@ namespace Imms.Mes.Services
                 this.ReportToErp<long>(this.InstoreSyncUrl, data, progress);
 
                 Thread.Sleep(100); // 休息100毫秒      
-
-                return;
             }
         }
 

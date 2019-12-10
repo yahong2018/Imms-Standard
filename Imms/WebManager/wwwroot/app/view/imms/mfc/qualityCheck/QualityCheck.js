@@ -15,10 +15,10 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheck", {
     columns: [
         // { dataIndex: "productionOrderNo", text: "计划单号", width: 100 },
         { dataIndex: "recordId", text: "业务流水" },
-        { dataIndex: "productionCode", text: "产品代码", width: 100 },
+        { dataIndex: "productionCode", text: "产品代码", width: 130 },
         { dataIndex: "productionName", text: "产品名称", width: 200 },
         { dataIndex: "qty", text: "数量", width: 100 },
-        { dataIndex: "timeOfOrigin", text: "时间", width: 100 },
+        // { dataIndex: "timeOfOrigin", text: "时间", width: 100 },
         { dataIndex: "timeOfOriginWork", text: "工作日", width: 100 },
         { dataIndex: "shiftId", text: "班次", width: 100,renderer:function(value){
             if(value==0){
