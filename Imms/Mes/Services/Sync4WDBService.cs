@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
+using Imms.Data;
 using Imms.Data.Domain;
 using Imms.Mes.Data.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -74,11 +75,6 @@ namespace Imms.Mes.Services
         public string QualityCheckSyncUrl { get; set; }
         public string BomSyncUrl { get; set; }
         public int AccountId { get; set; } = 63;
-
-        public SystemParameter last_sync_progress_param { get; set; }   //内部入库数据的最后Id
-        public SystemParameter last_sync_progress_ww_param { get; set; } //委外入库数据的最后id
-        public SystemParameter last_sync_move_param { get; set; }  //移库数据的最后Id
-        public SystemParameter last_sync_qualitycheck_param { get; set; } //品质数据的最后Id
 
         public WDBSynchronizer(IHttpClientFactory factory)
         {
@@ -168,11 +164,6 @@ namespace Imms.Mes.Services
             {
                 this.AccountId = tempAccountid;
             }
-
-            this.last_sync_progress_param = this.ParameterList.Single(x => x.ParameterCode == "last_sync_id_progress");
-            this.last_sync_progress_ww_param = this.ParameterList.Single(x => x.ParameterCode == "last_sync_id_progress_ww");
-            this.last_sync_move_param = this.ParameterList.Single(x => x.ParameterCode == "last_sync_id_move");
-            this.last_sync_qualitycheck_param = this.ParameterList.Single(x => x.ParameterCode == "last_sync_id_qualitycheck");
         }
 
         private WDBLoginResult LoginToWDB()
@@ -294,72 +285,32 @@ namespace Imms.Mes.Services
                 return;
             }
 
-            List<QualitySyncItem> itemList;
-            long lastRecordId = this.GetQualitySyncData(workshop, out itemList);
-            if (itemList.Count == 0)
+            List<QualityCheck> reportLit = this.dbContext.Set<QualityCheck>().Where(x => x.WorkshopId == workshop.RecordId && x.OptFlag == 0).OrderBy(x => x.CreateTime).ToList();
+            foreach (QualityCheck item in reportLit)
             {
+                QualitySyncData data = new QualitySyncData()
+                {
+                    beId = this.AccountId,
+                    prodpwt = new QualitySyncItem[]{
+                        new QualitySyncItem(){
+                            procode = item.ProductionCode,
+                            unitcode = "pcs",
+                            qty = item.Qty,
+                            wcgcode = item.WocgCode,
+                            loccode = item.WorkshopCode+"_BAD",
+                            udfbldm = item.DefectCode,
+                            udfblbm = item.WorkshopCode
+                        }
+                    }
+                };
+
+                GlobalConstants.DefaultLogger.Debug("开始不良报工数据:\n" + data.ToJson());
+                this.ReportToErp(this.QualityCheckSyncUrl, data, item);
+
+                Thread.Sleep(100); // 休息100毫秒    
+
                 return;
             }
-
-            QualitySyncData data = new QualitySyncData()
-            {
-                beId = this.AccountId,
-                doctypeId = 4,
-                prodpwt = itemList.ToArray()
-            };
-            GlobalConstants.DefaultLogger.Debug("开始不良报工数据:\n" + data.ToJson());
-            this.ReportToErp(this.last_sync_qualitycheck_param, this.QualityCheckSyncUrl, data, lastRecordId);
-        }
-
-        private long GetQualitySyncData(Workshop workshop, out List<QualitySyncItem> itemList)
-        {
-            long last_sync_id = long.Parse(this.last_sync_qualitycheck_param.ParameterValue);
-            List<QualityCheck> dataList = this.dbContext.Set<QualityCheck>().Where(x => x.RecordId > last_sync_id && x.WorkshopId == workshop.RecordId).ToList();
-            itemList = dataList.Select(x => new QualitySyncItem
-            {
-                procode = x.ProductionCode,
-                unitcode = "pcs",
-                qty = x.Qty,
-                wcgcode = x.WocgCode,
-                udfbldm = x.DefectCode,
-                udfblbm = x.WorkshopCode + "_BAD",
-                loccode = x.WorkshopCode,
-            }).ToList();
-
-            // itemList = new QualitySyncItem[]{
-            //     new QualitySyncItem(){procode="5010-08120",unitcode="pcs",qty=23,loccode="THR",udfbldm="01",udfblbm="THR_BAD",wcgcode="THR01"}
-            // }.ToList();
-
-            if (dataList.Count > 0)
-            {
-                return dataList.Max(x => x.RecordId);
-            }
-            return -1;
-        }
-
-        private long GetMovingSyncData(Workshop workshop, out List<MoveSyncItem> itemList)
-        {
-            long last_sync_id = long.Parse(this.last_sync_move_param.ParameterValue);
-            List<ProductionMoving> dataList = this.dbContext.Set<ProductionMoving>().Where(x => x.RecordId > last_sync_id && x.WorkshopId == workshop.RecordId).ToList();
-            itemList = dataList.GroupBy(x => new { x.WorkshopCode, x.ProductionCode, x.WorkshopCodeFrom })
-            .Select(group => new MoveSyncItem
-            {
-                loccode = group.Key.WorkshopCodeFrom,
-                aloccode = group.Key.WorkshopCode,
-                procode = group.Key.ProductionCode,
-                qty = group.Sum(x => x.Qty),
-                unitcode = "pcs"
-            }).ToList();
-
-            // itemList = new MoveSyncItem[]{
-            //     new MoveSyncItem(){procode="1411-06880",unitcode="pcs",qty=23,loccode="B02",aloccode="THR"}
-            // }.ToList();
-
-            if (dataList.Count > 0)
-            {
-                return dataList.Max(x => x.RecordId);
-            }
-            return -1;
         }
 
         private void PushMovingData(Workshop workshop)
@@ -369,51 +320,36 @@ namespace Imms.Mes.Services
                 return;
             }
 
-            List<MoveSyncItem> itemList;
-            long lastRecordId = this.GetMovingSyncData(workshop, out itemList);
-            if (itemList.Count == 0)
+            List<ProductionMoving> reportLit = this.dbContext.Set<ProductionMoving>()
+                  .Where(x => x.WorkshopId == workshop.RecordId && x.OptFlag == 0)
+                  .OrderBy(x => x.CreateTime)
+                  .ToList()
+                  ;
+            foreach (ProductionMoving item in reportLit)
             {
+                MoveSyncData data = new MoveSyncData()
+                {
+                    beId = this.AccountId,
+                    movet = new MoveSyncItem[]{
+                        new MoveSyncItem(){
+                            procode = item.ProductionCode,
+                            unitcode = "pcs",
+                            qty = item.Qty,
+                            loccode = item.WorkshopCodeFrom,
+                            aloccode = item.WorkshopCode
+                        }
+                    }
+                };
+
+                GlobalConstants.DefaultLogger.Debug("开始内部转移数据:\n" + data.ToJson());
+                this.ReportToErp(this.MoveSyncUrl, data, item);
+
+                Thread.Sleep(100); // 休息100毫秒       
+
                 return;
             }
-            MoveSyncData data = new MoveSyncData()
-            {
-                beId = this.AccountId,
-                movet = itemList.ToArray(),
-            };
-
-            GlobalConstants.DefaultLogger.Debug("开始内部转移数据:\n" + data.ToJson());
-            this.ReportToErp(this.last_sync_move_param, this.MoveSyncUrl, data, lastRecordId);
         }
 
-
-        private long GetInstoreData(Workshop workshop, out List<InstoreSyncItem> itemList)
-        {
-            long last_sync_id = long.Parse(this.last_sync_progress_param.ParameterValue);
-            List<ProductionOrderProgress> dataList = this.dbContext.Set<ProductionOrderProgress>()
-                   .Where(x => x.RecordId > last_sync_id && x.WorkshopId == workshop.RecordId)
-                   .OrderBy(x => x.CreateTime)
-                   // .Take(10)
-                   .ToList();
-            itemList = dataList.GroupBy(x => new { x.WorkshopCode, x.ProductionCode, x.WocgCode })
-            .Select(group => new InstoreSyncItem
-            {
-                loccode = group.Key.WorkshopCode,
-                procode = group.Key.ProductionCode,
-                wcgcode = group.Key.WocgCode,
-                qty = group.Sum(x => x.Qty),
-                unitcode = "pcs"
-            }).ToList();
-
-            // itemList = new InstoreSyncItem[]{
-            //      new InstoreSyncItem(){procode="5010-08120",unitcode="pcs",qty=23,loccode="THR",wcgcode="THR01"}
-            // }.ToList();
-
-            if (dataList.Count > 0)
-            {
-                return dataList.Max(x => x.RecordId);
-            }
-            return -1;
-        }
 
         private void PushInstoreData(Workshop workshop)
         {
@@ -421,46 +357,33 @@ namespace Imms.Mes.Services
             {
                 return;
             }
-            List<InstoreSyncItem> itemList;
-            long lastRecordId = GetInstoreData(workshop, out itemList);
-            if (itemList.Count == 0)
+
+            List<ProductionOrderProgress> reportLit = this.dbContext.Set<ProductionOrderProgress>().Where(x => x.WorkshopId == workshop.RecordId && x.OptFlag == 0).OrderBy(x => x.CreateTime).ToList();
+            foreach (ProductionOrderProgress progress in reportLit)
             {
+                InstoreSyncData data = new InstoreSyncData()
+                {
+                    beId = this.AccountId,
+                    prodpwt = new InstoreSyncItem[]{
+                        new InstoreSyncItem(){
+                            procode = progress.ProductionCode,
+                            unitcode = "pcs",
+                            qty = progress.Qty,
+                            loccode = progress.WorkshopCode,
+                            wcgcode = progress.WocgCode
+                        }
+                    }
+                };
+
+                GlobalConstants.DefaultLogger.Info("开始同步内部报工数据：\n" + data.ToJson());
+                this.ReportToErp<long>(this.InstoreSyncUrl, data, progress);
+
+                Thread.Sleep(100); // 休息100毫秒  
+
                 return;
             }
-
-            InstoreSyncData data = new InstoreSyncData()
-            {
-                beId = this.AccountId,
-                prodpwt = itemList.ToArray()
-            };
-            GlobalConstants.DefaultLogger.Info("开始同步内部报工数据：\n" + data.ToJson());
-            this.ReportToErp(this.last_sync_progress_param, this.InstoreSyncUrl, data, lastRecordId);
         }
 
-
-        private long GetInstoreWWData(Workshop workshop, out List<InstoreSyncItemWW> itemList)
-        {
-            long last_sync_id = long.Parse(this.last_sync_progress_ww_param.ParameterValue);
-            List<ProductionOrderProgress> dataList = this.dbContext.Set<ProductionOrderProgress>().Where(x => x.RecordId > last_sync_id && x.WorkshopId == workshop.RecordId).ToList();
-            itemList = dataList.GroupBy(x => new { x.WorkshopCode, x.ProductionCode })
-            .Select(group => new InstoreSyncItemWW
-            {
-                loccode = group.Key.WorkshopCode,
-                procode = group.Key.ProductionCode,
-                qty = group.Sum(x => x.Qty),
-                unitcode = "pcs"
-            }).ToList();
-
-            // itemList = new InstoreSyncItemWW[]{
-            //     new InstoreSyncItemWW(){procode="5010-08120",unitcode="pcs",qty=23,loccode="HJG"}
-            // }.ToList();
-
-            if (dataList.Count > 0)
-            {
-                return dataList.Max(x => x.RecordId);
-            }
-            return -1;
-        }
 
         private void PushInstoreWWData(Workshop workshop)
         {
@@ -468,30 +391,34 @@ namespace Imms.Mes.Services
             {
                 return;
             }
-            List<InstoreSyncItemWW> itemList;
-            long lastRecordId = this.GetInstoreWWData(workshop, out itemList);
-            if (itemList.Count == 0)
+
+            List<ProductionOrderProgress> reportLit = this.dbContext.Set<ProductionOrderProgress>().Where(x => x.WorkshopId == workshop.RecordId && x.OptFlag == 0).OrderBy(x => x.CreateTime).ToList();
+            foreach (ProductionOrderProgress progress in reportLit)
             {
+                InstoreSyncDataWW data = new InstoreSyncDataWW()
+                {
+                    beId = this.AccountId,
+                    pdcorespwt = new InstoreSyncItemWW[]{
+                        new InstoreSyncItemWW(){
+                            procode = progress.ProductionCode,
+                            unitcode = "pcs",
+                            qty = progress.Qty,
+                            loccode = progress.WorkshopCode
+                        }
+                    }
+                };
+
+                GlobalConstants.DefaultLogger.Debug("开始同步委外加工数据:\n" + data.ToJson());
+                this.ReportToErp<long>(this.InstoreSyncUrl, data, progress);
+
+                Thread.Sleep(100); // 休息100毫秒      
+
                 return;
             }
-
-            InstoreSyncDataWW data = new InstoreSyncDataWW()
-            {
-                beId = this.AccountId,
-                pdcorespwt = itemList.ToArray()
-            };
-
-            GlobalConstants.DefaultLogger.Debug("开始同步委外加工数据:\n" + data.ToJson());
-            this.ReportToErp(this.last_sync_progress_ww_param, this.InstoreSyncUrl, data, lastRecordId);
         }
 
-        private void ReportToErp(SystemParameter syncParameter, string url, object data, long lastRecord)
+        private void ReportToErp<T>(string url, object data, TrackableEntity<T> item) where T : IComparable
         {
-            if (lastRecord <= 0)
-            {
-                return;
-            }
-
             try
             {
                 string reportUrl = this.ServerHost + "/" + url;
@@ -505,20 +432,15 @@ namespace Imms.Mes.Services
                     if (syncResponese.Status)
                     {
                         GlobalConstants.DefaultLogger.Info("同步成功");
+
+                        item.OptFlag = 255;
+                        GlobalConstants.ModifyEntityStatus(item, this.dbContext);
+                        this.dbContext.SaveChanges();
                     }
                     else
                     {
                         GlobalConstants.DefaultLogger.Error("同步失败!");
                         GlobalConstants.DefaultLogger.Debug(syncResponese.Message);
-                        return;
-                    }
-
-                    string strLastRecordId = lastRecord.ToString();
-                    if (strLastRecordId != syncParameter.ParameterValue)
-                    {
-                        syncParameter.ParameterValue = strLastRecordId;
-                        GlobalConstants.ModifyEntityStatus(syncParameter, this.dbContext);
-                        this.dbContext.SaveChanges();
                     }
                 }
             }
@@ -542,9 +464,6 @@ namespace Imms.Mes.Services
             client.DefaultRequestHeaders.Add("client_id", this._loginParameter.client_id);
             client.DefaultRequestHeaders.Add("cache-control", "no-cache");
         }
-
-        // string testSucessString = "{\"tranId\":266,\"tranCode\":\"PW19110277\",\"message\":\"\",\"status\":true}";
-        // string testFaillString = "{\"tranId\":0,\"tranCode\":\"\",\"message\":\"[{\\\"exception\\\":\\\"\\\",\\\"htmlMessage\\\":false,\\\"id\\\":10300,\\\"info\\\":\\\"table is empty(prodpwt)\\\",\\\"info_desc\\\":\\\"\\\\\\\"生产入库单 (生产详细)\\\\\\\"表格的数据为空，不能保存。\\\",\\\"jsonStr\\\":\\\"\\\",\\\"key\\\":\\\"ce01_core_10300\\\",\\\"locators\\\":[{\\\"colMess\\\":\\\"\\\",\\\"colName\\\":\\\"\\\",\\\"id\\\":0,\\\"locatorKey\\\":\\\"prodpwt\\\",\\\"row\\\":0,\\\"tableMess\\\":\\\"\\\",\\\"tableName\\\":\\\"prodpwt\\\",\\\"type\\\":\\\"Table\\\"}],\\\"pass\\\":false,\\\"trace\\\":\\\"[MacCheckerUtil.checkEmptyTable_197]-[TradeModuleChecker.checkTradingEmptyTable_1060]-[CheckerLib.runChecker_224]-[CawEntityCurdAction.updateEntity_107]-[CawEntityInterceptor.logCall_44]\\\",\\\"type\\\":\\\"Error\\\"}]\",\"status\":false}";
     }
 
     public class WDBSyncResponse
@@ -590,6 +509,7 @@ namespace Imms.Mes.Services
            base(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json")
         { }
     }
+
     public class InstoreSyncData
     {
         public int beId { get; set; }
@@ -642,6 +562,8 @@ namespace Imms.Mes.Services
         public int doctypeId { get; set; }
         public QualitySyncItem[] prodpwt { get; set; }
     }
+
+
     public class QualitySyncItem
     {
         public string procode { get; set; }

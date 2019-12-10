@@ -124,6 +124,34 @@ THR 报工
         "beId":1,
         "prodpwt":[
             {
+                "procode":"2301-03390",
+                "unitcode":"pcs",
+                "qty":960,
+                "loccode":"THR",
+                "wcgcode":"THR01"
+            }
+        ]
+    }
+
+
+
+    {
+        "beId":1,
+        "prodpwt":[
+            {
+                "procode":"2301-03390",
+                "unitcode":"pcs",
+                "qty":960,
+                "loccode":"THR",
+                "wcgcode":"THR01"
+            }
+        ]
+    }
+
+    {
+        "beId":1,
+        "prodpwt":[
+            {
                 "procode":"2132-03390",
                 "unitcode":"pcs",
                 "qty":960,
@@ -133,6 +161,44 @@ THR 报工
         ]
     }
 
+    {
+        "beId":1,
+        "prodpwt":[
+            {
+                "procode":"1106-03390",
+                "unitcode":"pcs",
+                "qty":960,
+                "loccode":"THR",
+                "wcgcode":"THR01"
+            }
+        ]
+    }
+
+    {
+        "beId":1,
+        "prodpwt":[
+            {
+                "procode":"1101-0Y090",
+                "unitcode":"pcs",
+                "qty":960,
+                "loccode":"THR",
+                "wcgcode":"THR01"
+            }
+        ]
+    }
+
+    {
+        "beId":1,
+        "prodpwt":[
+            {
+                "procode":"22030-0Y090-00",
+                "unitcode":"pcs",
+                "qty":960,
+                "loccode":"THR",
+                "wcgcode":"THR01"
+            }
+        ]
+    }
 
 
 

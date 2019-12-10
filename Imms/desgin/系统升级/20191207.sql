@@ -29,5 +29,7 @@ delete from role_privilege
 
 -- 操作人员按照部门进行数据权限管理
 
+-- 授权码
+ae103a68cd2ace75182268cc9c32ce84
 
-
+---
