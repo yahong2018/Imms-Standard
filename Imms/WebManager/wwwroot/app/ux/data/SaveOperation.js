@@ -24,7 +24,7 @@ Ext.define("app.ux.data.SaveOperation", {
                 url: theUrl,
                 success: function (form, action) {
                     store.load({
-                        callback: function (records, operation, success) {                           
+                        callback: function (records, operation, success) {
                             var theNewRecord = store.createModel({});
                             var idProperty = theNewRecord.getIdProperty();
                             var idField = me.down('[name="' + idProperty + '"]');
@@ -36,16 +36,17 @@ Ext.define("app.ux.data.SaveOperation", {
                                 dataMode: saveAndNew == true ? app.ux.data.DataMode.INSERT : app.ux.data.DataMode.POST,
                                 seq: saveAndNew == true ? app.ux.data.DataOperationSeq.BEFORE : app.ux.data.DataOperationSeq.AFTER,
                                 record: saveAndNew == true ? theNewRecord : oldRecord,
-                                grid:grid
+                                grid: grid
                             };
-
-                            if (formCmp.afterPost) {
-                                formCmp.afterPost(callConfig)
-                            }
-                            formCmp.loadRecord(callConfig.record);
-
-                            if (formCmp.onRecordLoad) {
-                                formCmp.onRecordLoad(callConfig);
+                            try {
+                                if (formCmp.afterPost) {
+                                    formCmp.afterPost(callConfig)
+                                }
+                                formCmp.loadRecord(callConfig.record);
+                                if (formCmp.onRecordLoad) {
+                                    formCmp.onRecordLoad(callConfig);
+                                }
+                            } catch{
                             }
 
                             if (saveAndNew != true && form.owner.afterSaveAction == 'keep') {
@@ -66,7 +67,7 @@ Ext.define("app.ux.data.SaveOperation", {
                     });
 
                 },
-                failure: function (form, action) {                 
+                failure: function (form, action) {
                     var message = action.response.responseText.trim().replace("\n", "<br>");
                     Ext.MessageBox.show({
                         title: '系统提示',

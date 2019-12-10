@@ -10,8 +10,8 @@ alter table production_moving modify column production_order_id  bigint null;
 
 -- 支持前台界面不输入卡号
 alter table production_order_progress modify column rfid_card_id  bigint not null default -1;
-alter table production_order_progress modify column rfid_card_no  varchar(20) not null default '';
 alter table production_order_progress modify column card_qty  int not null default 0;
+alter table production_order_progress modify column rfid_card_no varchar(20) null;
 
 alter table production_moving modify column workstation_code  varchar(20) null;
 alter table production_moving modify column workstation_name  varchar(50) null;

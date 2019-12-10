@@ -14,6 +14,17 @@ namespace Imms.Mes.Data
             {
                 throw new BusinessException(GlobalConstants.EXCEPTION_CODE_DATA_NOT_FOUND, "不存在工作中心组为" + item.WocgCode + "的数据！");
             }
+
+            item.TimeOfOriginWork = item.TimeOfOrigin.Date;
+            if (item.TimeOfOrigin.Hour < 8 || item.TimeOfOrigin.Hour > 20)
+            {
+                item.ShiftId = 1;
+
+                if (item.TimeOfOrigin.Hour < 8 || (item.TimeOfOrigin.Hour == 8 && item.TimeOfOrigin.Minute < 30))
+                {
+                    item.TimeOfOriginWork = item.TimeOfOrigin.AddDays(-1).Date;
+                }
+            }
         }
 
         protected override void AfterInsert(ProductionOrderProgress item, DbContext dbContext)
@@ -28,7 +39,9 @@ namespace Imms.Mes.Data
 
         private static void AjustProductSummary(ProductionOrderProgress item, DbContext dbContext)
         {
-            ProductSummary productSummary = dbContext.Set<ProductSummary>().Where(x => x.ProductionId == item.ProductionId).FirstOrDefault();
+            ProductSummary productSummary = dbContext.Set<ProductSummary>().Where(x =>
+                x.ProductionId == item.ProductionId && x.ProductDate == item.TimeOfOriginWork
+            ).FirstOrDefault();
             if (productSummary == null)
             {
                 productSummary = new ProductSummary();

@@ -42,11 +42,13 @@ namespace Imms.Mes.Data
 
         private static void AjustProductSummary(QualityCheck item, DbContext dbContext)
         {
-            ProductSummary productSummary = dbContext.Set<ProductSummary>().Where(x => x.ProductionId == item.ProductionId).FirstOrDefault();
+            ProductSummary productSummary = dbContext.Set<ProductSummary>()
+            .Where(x => x.ProductionId == item.ProductionId && x.ProductDate == item.TimeOfOriginWork)
+            .FirstOrDefault();
             if (productSummary == null)
             {
                 productSummary = new ProductSummary();
-                productSummary.ProductDate = item.TimeOfOriginWork;
+                productSummary.ProductDate = item.TimeOfOriginWork.Date;
                 productSummary.ProductionId = item.ProductionId;
                 productSummary.ProductionCode = item.ProductionCode;
                 productSummary.ProductionName = item.ProductionName;

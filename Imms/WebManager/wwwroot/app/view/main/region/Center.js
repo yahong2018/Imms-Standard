@@ -18,22 +18,22 @@ Ext.define('app.view.main.region.Center', {
 				{
 					region: "north",
 					height: 50,
-					xtype:"panel",
-					layout:"hbox",
-					items:[
+					xtype: "panel",
+					layout: "hbox",
+					items: [
 						{
 							xtype: "label",
 							text: "本日生产状态一览表",
-							flex:1,
+							flex: 1,
 							style: "text-align:center;font-size:24px;font-weight:bolder;line-height:50px;vertical-align: middle;"
-						},{
-							xtype:"button",
-							text:"刷新",
-							width:80,
-							margin:"5 5 5 5",
-							handler:function(){
+						}, {
+							xtype: "button",
+							text: "刷新",
+							width: 80,
+							margin: "5 5 5 5",
+							handler: function () {
 								var summaryGrid = this.up("maincenter").down("app_view_imms_rpt_rptProductionOrderProgress_RptProductionOrderProgressGrid");
-								summaryGrid.store.load();								
+								summaryGrid.store.load();
 							}
 						}
 					]
@@ -42,15 +42,19 @@ Ext.define('app.view.main.region.Center', {
 					region: "center",
 					xtype: "app_view_imms_rpt_rptProductionOrderProgress_RptProductionOrderProgressGrid",
 					height: "100%",
-					filter:function(){
+					filter: function () {
+						var today = new Date();
+						if (today.getHours() < 8 || (today.getHours() == 8 && today.getMinutes() < 30)) {
+							today.setDate(today.getDate() - 1);
+						}
 						return {
 							L: "productDate",
 							O: "=",
-							R: Ext.util.Format.date(new Date(), 'Y/m/d')
+							R: Ext.util.Format.date(today, 'Y/m/d')
 						};
 					},
-					hideDefeaultPagebar:true,
-					hideDefaultToolbar:true,
+					hideDefeaultPagebar: true,
+					hideDefaultToolbar: true,
 				}
 			]
 		}];
