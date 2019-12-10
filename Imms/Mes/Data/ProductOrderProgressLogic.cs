@@ -7,6 +7,15 @@ namespace Imms.Mes.Data
 {
     public class ProductOrderProgressLogic : SimpleCRUDLogic<ProductionOrderProgress>
     {
+        protected override void BeforeInsert(ProductionOrderProgress item, DbContext dbContext)
+        {
+            int count = dbContext.Set<Workstation>().Where(x => x.WocgCode == item.WocgCode).Count();
+            if (count <= 0)
+            {
+                throw new BusinessException(GlobalConstants.EXCEPTION_CODE_DATA_NOT_FOUND, "不存在工作中心组为" + item.WocgCode + "的数据！");
+            }
+        }
+
         protected override void AfterInsert(ProductionOrderProgress item, DbContext dbContext)
         {
             lock (this)
@@ -17,7 +26,7 @@ namespace Imms.Mes.Data
             dbContext.SaveChanges();
         }
 
-         private static void AjustProductSummary(ProductionOrderProgress item, DbContext dbContext)
+        private static void AjustProductSummary(ProductionOrderProgress item, DbContext dbContext)
         {
             ProductSummary productSummary = dbContext.Set<ProductSummary>().Where(x => x.ProductionId == item.ProductionId).FirstOrDefault();
             if (productSummary == null)
