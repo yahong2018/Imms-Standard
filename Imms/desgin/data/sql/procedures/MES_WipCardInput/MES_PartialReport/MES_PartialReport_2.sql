@@ -1,5 +1,5 @@
 drop procedure if exists MES_PartialReport_2;
-
+delimiter $$
 create procedure MES_PartialReport_2(        
         in  SessionId     bigint,    
         in  CurrentStep   int,		
@@ -29,8 +29,13 @@ top:begin
         from rfid_card c
     where c.rfid_no = RfidNo
       and c.card_status <> 255;
+
+    if ReqData = '' then
+       set ReportQty = QtyIssue - QtyStock;
+    else
+       set ReportQty = cast(ReqData as UNSIGNED);	   
+    end if;   
    
-    set ReportQty = cast(ReqData as UNSIGNED);	   
     if(QtyStock + ReportQty > QtyIssue) then
         set RespData='2';    
         set RespData = CONCAT(RespData,'|1|累计数量大于收容数,|0');			
@@ -55,4 +60,6 @@ top:begin
            employee_id = EmployeeId,
            employee_name = EmployeeName
      where record_id = LastBusinessId;
-end;
+end $$
+
+delimiter ;

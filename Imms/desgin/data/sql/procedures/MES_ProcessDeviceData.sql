@@ -1,4 +1,5 @@
 drop procedure if exists MES_ProcessDeviceData;
+delimiter $$
 
 create procedure MES_ProcessDeviceData( 
  in	GID            int,
@@ -25,6 +26,7 @@ top:begin
     end;
 
     select '' into RespData;
+    call MES_Debug(CONCAT("Get data--> GID:",GID,',DID:',DID,'DataType:',DataType,',DataGatherTime:',DataGatherTime,',StrPara1:',StrPara1));
     call MES_VerifyWorkstation(GID,DID,WorkstationId,TemplateIndex,RespData);	
     call MES_Debug(CONCAT('MES_VerifyWorkstation  GID:',GID,',DID:',DID,',WorkstationId:',WorkstationId,',TemplateIndex:',TemplateIndex));
 
@@ -36,5 +38,9 @@ top:begin
     end if;
     
     call MES_ProcessSession(WorkstationId,DataType,StrPara1,DataGatherTime,RespData); 
-    call MES_BuildRespData(TemplateIndex,RespData); 
-end;
+    if(DataType<>2) and (StrPara1<>'12') then
+        call MES_BuildRespData(TemplateIndex,RespData); 
+    end if;
+end$$
+
+delimiter ;
