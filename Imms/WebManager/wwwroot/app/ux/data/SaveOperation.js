@@ -46,7 +46,7 @@ Ext.define("app.ux.data.SaveOperation", {
                                 if (formCmp.onRecordLoad) {
                                     formCmp.onRecordLoad(callConfig);
                                 }
-                            } catch{
+                            } catch(e){
                             }
 
                             if (saveAndNew != true && form.owner.afterSaveAction == 'keep') {

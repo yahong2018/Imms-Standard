@@ -6993,70 +6993,110 @@
 /* /Users/space/buildAgent/work/8cc7421dd8da164c/staging/classic/theme-triton/sass/src/Component.scss:3 */
 @font-face {
     font-family: 'Open Sans';
-    src: url('fonts/OpenSans-Light.ttf');
+    /* src: url('fonts/OpenSans-Light.ttf'); */
+    src:url('fonts/OpenSans-Light/OpenSans-Light.eot');
+    src: url('fonts/OpenSans-Light/OpenSans-Light.eot?#iefix') format('embedded-opentype'),         
+         url('fonts/OpenSans-Light/OpenSans-Light.woff') format('woff'),
+         url('fonts/OpenSans-Light/OpenSans-Light.ttf') format('truetype');    
     font-weight: 300;
     font-style: normal;
 }
 /* /Users/space/buildAgent/work/8cc7421dd8da164c/staging/classic/theme-triton/sass/src/Component.scss:10 */
 @font-face {
     font-family: 'Open Sans';
-    src: url('fonts/OpenSans-LightItalic.ttf');
+    /* src: url('fonts/OpenSans-LightItalic.ttf'); */
+    src:url('fonts/OpenSans-LightItalic/OpenSans-LightItalic.eot');
+    src: url('fonts/OpenSans-LightItalic/OpenSans-LightItalic.eot?#iefix') format('embedded-opentype'),         
+         url('fonts/OpenSans-LightItalic/OpenSans-LightItalic.woff') format('woff'),
+         url('fonts/OpenSans-LightItalic/OpenSans-LightItalic.ttf') format('truetype');       
     font-weight: 300;
     font-style: italic;
 }
 /* /Users/space/buildAgent/work/8cc7421dd8da164c/staging/classic/theme-triton/sass/src/Component.scss:17 */
 @font-face {
     font-family: 'Open Sans';
-    src: url('fonts/OpenSans-Regular.ttf');
+    /* src: url('fonts/OpenSans-Regular.ttf'); */
+    src: url('fonts/OpenSans-Regular/OpenSans-Regular.eot');
+    src: url('fonts/OpenSans-Regular/OpenSans-Regular.eot?#iefix') format('embedded-opentype'),         
+         url('fonts/OpenSans-Regular/OpenSans-Regular.woff') format('woff'),
+         url('fonts/OpenSans-Regular/OpenSans-Regular.ttf') format('truetype');           
     font-weight: 400;
     font-style: normal;
 }
 /* /Users/space/buildAgent/work/8cc7421dd8da164c/staging/classic/theme-triton/sass/src/Component.scss:24 */
 @font-face {
     font-family: 'Open Sans';
-    src: url('fonts/OpenSans-Italic.ttf');
+    /* src: url('fonts/OpenSans-Italic.ttf'); */
+    src: url('fonts/OpenSans-Italic/OpenSans-Italic.eot');
+    src: url('fonts/OpenSans-Italic/OpenSans-Italic?#iefix') format('embedded-opentype'),         
+         url('fonts/OpenSans-Italic/OpenSans-Italic.woff') format('woff'),
+         url('fonts/OpenSans-Italic/OpenSans-Italic.ttf') format('truetype');      
     font-weight: 400;
     font-style: italic;
 }
 /* /Users/space/buildAgent/work/8cc7421dd8da164c/staging/classic/theme-triton/sass/src/Component.scss:31 */
 @font-face {
     font-family: 'Open Sans';
-    src: url('fonts/OpenSans-Semibold.ttf');
+    /* src: url('fonts/OpenSans-Semibold.ttf'); */
+    src: url('fonts/OpenSans-Semibold/OpenSans-Semibold.eot');
+    src: url('fonts/OpenSans-Semibold/OpenSans-Semibold?#iefix') format('embedded-opentype'),         
+         url('fonts/OpenSans-Semibold/OpenSans-Semibold.woff') format('woff'),
+         url('fonts/OpenSans-Semibold/OpenSans-Semibold.ttf') format('truetype');      
     font-weight: 600;
     font-style: normal;
 }
 /* /Users/space/buildAgent/work/8cc7421dd8da164c/staging/classic/theme-triton/sass/src/Component.scss:38 */
 @font-face {
     font-family: 'Open Sans';
-    src: url('fonts/OpenSans-SemiboldItalic.ttf');
+    /* src: url('fonts/OpenSans-SemiboldItalic.ttf'); */
+    src:url('fonts/OpenSans-SemiboldItalic/OpenSans-SemiboldItalic.eot');
+    src: url('fonts/OpenSans-SemiboldItalic/OpenSans-SemiboldItalic?#iefix') format('embedded-opentype'),         
+         url('fonts/OpenSans-SemiboldItalic/OpenSans-SemiboldItalic.woff') format('woff'),
+         url('fonts/OpenSans-SemiboldItalic/OpenSans-SemiboldItalic.ttf') format('truetype');        
     font-weight: 600;
     font-style: italic;
 }
 /* /Users/space/buildAgent/work/8cc7421dd8da164c/staging/classic/theme-triton/sass/src/Component.scss:45 */
 @font-face {
     font-family: 'Open Sans';
-    src: url('fonts/OpenSans-Bold.ttf');
+    /* src: url('fonts/OpenSans-Bold.ttf'); */
+    src:url('fonts/OpenSans-Bold/OpenSans-Bold.eot');
+    src: url('fonts/OpenSans-Bold/OpenSans-Bold?#iefix') format('embedded-opentype'),         
+         url('fonts/OpenSans-Bold/OpenSans-Bold.woff') format('woff'),
+         url('fonts/OpenSans-Bold/OpenSans-Bold.ttf') format('truetype');       
     font-weight: 700;
     font-style: normal;
 }
 /* /Users/space/buildAgent/work/8cc7421dd8da164c/staging/classic/theme-triton/sass/src/Component.scss:52 */
 @font-face {
     font-family: 'Open Sans';
-    src: url('fonts/OpenSans-BoldItalic.ttf');
+    /* src: url('fonts/OpenSans-BoldItalic.ttf'); */
+    src: url('fonts/OpenSans-BoldItalic/OpenSans-BoldItalic.eot');
+    src: url('fonts/OpenSans-BoldItalic/OpenSans-BoldItalic?#iefix') format('embedded-opentype'),         
+         url('fonts/OpenSans-BoldItalic/OpenSans-BoldItalic.woff') format('woff'),
+         url('fonts/OpenSans-BoldItalic/OpenSans-BoldItalic.ttf') format('truetype');       
     font-weight: 700;
     font-style: italic;
 }
 /* /Users/space/buildAgent/work/8cc7421dd8da164c/staging/classic/theme-triton/sass/src/Component.scss:59 */
 @font-face {
     font-family: 'Open Sans';
-    src: url('fonts/OpenSans-ExtraBold.ttf');
+    /* src: url('fonts/OpenSans-ExtraBold.ttf') ; */
+    src: url('fonts/OpenSans-ExtraBold/OpenSans-ExtraBold.eot');
+    src: url('fonts/OpenSans-ExtraBold/OpenSans-ExtraBold?#iefix') format('embedded-opentype'),         
+         url('fonts/OpenSans-ExtraBold/OpenSans-ExtraBold.woff') format('woff'),
+         url('fonts/OpenSans-ExtraBold/OpenSans-ExtraBold.ttf') format('truetype');      
     font-weight: 800;
     font-style: normal;
 }
 /* /Users/space/buildAgent/work/8cc7421dd8da164c/staging/classic/theme-triton/sass/src/Component.scss:66 */
 @font-face {
     font-family: 'Open Sans';
-    src: url('fonts/OpenSans-ExtraBoldItalic.ttf');
+    /* src: url('fonts/OpenSans-ExtraBoldItalic.ttf'); */
+    src: url('fonts/OpenSans-ExtraBoldItalic/OpenSans-ExtraBoldItalic.eot');
+    src: url('fonts/OpenSans-ExtraBoldItalic/OpenSans-ExtraBoldItalic?#iefix') format('embedded-opentype'),         
+         url('fonts/OpenSans-ExtraBoldItalic/OpenSans-ExtraBoldItalic.woff') format('woff'),
+         url('fonts/OpenSans-ExtraBoldItalic/OpenSans-ExtraBoldItalic.ttf') format('truetype');       
     font-weight: 800;
     font-style: italic;
 }
