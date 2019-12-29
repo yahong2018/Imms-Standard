@@ -33,6 +33,7 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheck", {
         { dataIndex: "workshopCode", text: "车间代码", width: 100 },
         { dataIndex: "workshopName", text: "车间名称", width: 150 },
         { dataIndex: "wocgCode", text: "工作中心组", width: 150 },
+        { dataIndex: "locCode", text: "存储区域", width: 150 },
     ],
     constructor: function (config) {
         var configBase = {

@@ -75,7 +75,15 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
                 { name: "workshopName", xtype: "textfield", flex: 0.8, margin: '0 20 5 5', allowBlank: false, readOnly: true },
             ]
         },
-        { name: "wocgCode", xtype: "textfield", width: 200, margin: '0 20 5 0', fieldLabel: "工作中心组", allowBlank: false },
+        {
+            xtype: "container",
+            layout: "hbox",
+            margin: '0 0 3 ',
+            items: [
+                { name: "wocgCode", xtype: "textfield", width: 200, margin: '0 20 5 0', fieldLabel: "工作中心组", allowBlank: false },
+                { name: "locCode", xtype: "textfield", width: 200, margin: '0 20 5 0', fieldLabel: "存储区域", allowBlank: false },
+            ]
+        },
         {
             xtype: "container",
             layout: "hbox",

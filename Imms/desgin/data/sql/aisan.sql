@@ -588,6 +588,7 @@ create table quality_check
     production_name                varchar(50)                 not null,
 
     wocg_code                      varchar(20)                 not null,   -- 工作中心组
+    loc_code                       varchar(20)                 not null,
 
     workshop_id                    bigint                      not null,  
     workshop_code                  varchar(20)                 not null,

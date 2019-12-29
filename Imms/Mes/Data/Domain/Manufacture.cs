@@ -115,6 +115,7 @@ namespace Imms.Mes.Data.Domain
 
         public int Qty { get; set; }
         public string WocgCode { get; set; }
+        public string LocCode{get;set;}
 
         public virtual ProductionOrder ProductionOrder { get; set; }
         public virtual Material Production { get; set; }
@@ -371,6 +372,7 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.DefectName).HasColumnName("defect_name");
             builder.Property(e => e.Qty).HasColumnName("qty");
             builder.Property(e => e.WocgCode).HasColumnName("wocg_code");
+            builder.Property(e=>e.LocCode).HasColumnName("loc_code");
 
             builder.HasOne(e => e.ProductionOrder).WithMany(e => e.QualityChecks).HasForeignKey(e => e.ProductionOrderId).HasConstraintName("production_order_id");
             builder.HasOne(e => e.Production).WithMany().HasForeignKey(e => e.ProductionId).HasConstraintName("production_id");
