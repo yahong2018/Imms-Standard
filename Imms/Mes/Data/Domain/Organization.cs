@@ -27,7 +27,9 @@ namespace Imms.Mes.Data.Domain
         public int RfidTerminatorId { get; set; }
         public int RfidTemplateIndex { get; set; }
         public string WocgCode { get; set; }
-        public int AutoReportCount {get;set;}
+        public int AutoReportCount { get; set; }
+
+        public string LocCode { get; set; }
 
         public virtual RfidController RfidController { get; set; }
     }
@@ -132,9 +134,10 @@ namespace Imms.Mes.Data.Domain
             builder.Property(e => e.RfidTerminatorId).HasColumnName("Rfid_terminator_id");
             builder.Property(e => e.WocgCode).HasColumnName("wocg_code");
 
-            builder.Property(e=>e.RfidTemplateIndex).HasColumnName("rfid_template_index");
-            builder.Property(e=>e.AutoReportCount).HasColumnName("auto_report_count");
-            
+            builder.Property(e => e.RfidTemplateIndex).HasColumnName("rfid_template_index");
+            builder.Property(e => e.AutoReportCount).HasColumnName("auto_report_count");
+            builder.Property(e => e.LocCode).HasColumnName("loc_code");
+
             builder.HasOne(e => e.RfidController).WithMany().HasForeignKey(e => e.RfidControllerId).HasConstraintName("rfid_controller_id");
         }
     }

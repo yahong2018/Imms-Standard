@@ -15,6 +15,7 @@ Ext.define("app.view.imms.org.workstation.Workstation", {
         { dataIndex: "rfidControllerId", text: "Rfid控制器编号", width: 150 },
         { dataIndex: "rfidTerminatorId", text: "Rfid工位机编号", width: 150 },
         { dataIndex: "autoReportCount", text: "自动工序数", width: 150 },
+        {dataIndex:"locCode",text:"存储区域代码",width:150},
         { dataIndex: "description", text: "备注", flex: 1 }
     ],
     constructor: function (config) {       

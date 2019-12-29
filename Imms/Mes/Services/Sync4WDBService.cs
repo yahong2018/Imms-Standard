@@ -67,6 +67,7 @@ namespace Imms.Mes.Services
         private WDBLoginResult _loginResult = new WDBLoginResult();
         private DbContext dbContext { get; set; }
         private List<SystemParameter> ParameterList;
+        private List<Workstation> _Workstations;
 
         public string ServerHost { get; set; }
         public string LoginUrl { get; set; }
@@ -93,6 +94,7 @@ namespace Imms.Mes.Services
                     this.Initarameters(); //获取参数
                     this.LoginToWDB();    //登录
                     List<Workshop> firstWorkshopList = this.dbContext.Set<Workshop>().Where(x => x.PrevOperationIndex == -1).ToList();
+                    this._Workstations = this.dbContext.Set<Workstation>().ToList();
                     foreach (Workshop workshop in firstWorkshopList)
                     {
                         this.SyncWorkshopData(workshop);
@@ -357,6 +359,8 @@ namespace Imms.Mes.Services
             List<ProductionOrderProgress> reportLit = this.dbContext.Set<ProductionOrderProgress>().Where(x => x.WorkshopId == workshop.RecordId && x.OptFlag == 0).OrderBy(x => x.CreateTime).ToList();
             foreach (ProductionOrderProgress progress in reportLit)
             {
+                string locCode = this._Workstations.Where(x=>x.RecordId == progress.WorkstationId).Select(x=>x.LocCode).Single();
+
                 InstoreSyncData data = new InstoreSyncData()
                 {
                     beId = this.AccountId,
@@ -365,7 +369,7 @@ namespace Imms.Mes.Services
                             procode = progress.ProductionCode,
                             unitcode = "pcs",
                             qty = progress.Qty,
-                            loccode = progress.WorkshopCode,
+                            loccode = locCode,  //progress.WorkshopCode,
                             wcgcode = progress.WocgCode
                         }
                     }
@@ -389,6 +393,8 @@ namespace Imms.Mes.Services
             List<ProductionOrderProgress> reportLit = this.dbContext.Set<ProductionOrderProgress>().Where(x => x.WorkshopId == workshop.RecordId && x.OptFlag == 0).OrderBy(x => x.CreateTime).ToList();
             foreach (ProductionOrderProgress progress in reportLit)
             {
+                string locCode = this._Workstations.Where(x=>x.RecordId == progress.WorkstationId).Select(x=>x.LocCode).Single();
+
                 InstoreSyncDataWW data = new InstoreSyncDataWW()
                 {
                     beId = this.AccountId,
@@ -397,7 +403,7 @@ namespace Imms.Mes.Services
                             procode = progress.ProductionCode,
                             unitcode = "pcs",
                             qty = progress.Qty,
-                            loccode = progress.WorkshopCode
+                            loccode = locCode //progress.WorkshopCode
                         }
                     }
                 };

@@ -6,5 +6,6 @@ Ext.define("app.model.imms.org.WorkstationModel", {
         { name: "wocgCode", type: "string" },
         { name: "rfidTemplateIndex", type: "int" },
         { name: "autoReportCount", type: "int" },
+        { name: "locCode", type: "string" }
     ]
 });

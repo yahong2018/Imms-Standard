@@ -77,6 +77,15 @@ Ext.define("app.view.imms.org.workstation.WorkstationDetailForm", {
             width: 180
         },      
         {
+            name: "locCode",
+           xtype: "textfield",
+           fieldLabel: "存储区域代码",
+           allowBlank: false,
+           maxLength: 3,
+           enforceMaxLength: true,
+           width: 180
+       },   
+        {
             name: "description",
             xtype: "textarea",
             fieldLabel: "备注",
