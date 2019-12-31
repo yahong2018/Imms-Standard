@@ -132,18 +132,6 @@ namespace Imms.WebManager
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseExceptionHandler(builder =>
-              {
-                  builder.Run(async context =>
-                  {
-                      context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                      context.Response.ContentType = "application/json";
-
-                      var ex = context.Features.Get<IExceptionHandlerFeature>();
-                      await context.Response.WriteAsync(ex?.Error?.Message ?? "出现系统错误");
-                  });
-              });
-
             if (env.IsDevelopment())
             {
                 //  注释以禁用开发异常处理功能

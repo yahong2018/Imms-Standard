@@ -24,7 +24,7 @@ namespace Imms.WebManager.Controllers
     {
         public WorkstationController()
         {
-            this.Logic = new SimpleCRUDLogic<Workstation>();
+            this.Logic = new WorkstationLogic();
         }
 
         [Route("getStationByWorkshop")]
@@ -43,6 +43,28 @@ namespace Imms.WebManager.Controllers
             };
 
             ExtJsResult result = Logic.GetAllWithExtResult(page, start, limit, new FilterExpression[] { expression });
+            return result;
+        }
+
+        [Route("getWorkshopWocgList")]
+        public ExtJsResult GetWorkshopWocgList(long workshopId)
+        {
+            WorkstationLogic workstationLogic = this.Logic as WorkstationLogic;
+            List<string> wocgList = workstationLogic.GetWorkshopWocgList(workshopId);
+            ExtJsResult result = new ExtJsResult();
+            result.RootProperty = wocgList.Select(x => new { wocgCode = x }).ToList();
+            result.total = wocgList.Count;
+            return result;
+        }
+
+        [Route("getWorkshopLocList")]
+        public ExtJsResult GetWorkshopLocList(long workshopId)
+        {
+            WorkstationLogic workstationLogic = this.Logic as WorkstationLogic;
+            List<string> locList = workstationLogic.GetWorkshopLocList(workshopId);
+            ExtJsResult result = new ExtJsResult();
+            result.RootProperty = locList.Select(x => new { locCode = x }).ToList();
+            result.total = locList.Count;
             return result;
         }
     }

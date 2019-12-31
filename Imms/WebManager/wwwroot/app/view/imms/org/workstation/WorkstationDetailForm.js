@@ -81,7 +81,6 @@ Ext.define("app.view.imms.org.workstation.WorkstationDetailForm", {
            xtype: "textfield",
            fieldLabel: "存储区域代码",
            allowBlank: false,
-           maxLength: 3,
            enforceMaxLength: true,
            width: 180
        },   

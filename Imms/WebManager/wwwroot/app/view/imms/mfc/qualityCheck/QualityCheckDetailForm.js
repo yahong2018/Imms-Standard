@@ -10,12 +10,13 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
     },
     defectStore: Ext.create({ xtype: "imms_mfc_DefectStore", autoLoad: true, pageSize: 0 }),
     operatorStore: Ext.create({ xtype: 'imms_org_OperatorStore', autoLoad: true, pageSize: 0 }),
-    workshopStore: Ext.create({ xtype: 'imms_org_WorkshopStore', autoLoad: true, pageSize: 0 }),
+
     productionStore: Ext.create({ xtype: 'app_store_imms_material_MaterialStore', autoLoad: true, pageSize: 0 }),
     items: [
         { name: "defectId", xtype: "hidden" },
         { name: "productionId", xtype: "hidden" },
-        { name: "workshopId", xtype: "hidden" },
+        { name: "workshopCode", xtype: "hidden" },
+        { name: "workshopName", xtype: "hidden" },
         {
             xtype: "container",
             layout: "hbox",
@@ -42,7 +43,6 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
                 {
                     name: "productionCode", xtype: "textfield", fieldLabel: "产品", allowBlank: false, listeners: {
                         change: function (self, newValue, oldValue, eOpts) {
-                            debugger;
                             var form = this.up("imms_mfc_qualityCheck_QualityCheckDetailForm");
                             var record = form.productionStore.findRecord("materialCode", newValue, 0, false, false, true);
                             if (record != null) {
@@ -60,19 +60,47 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
             layout: "hbox",
             items: [
                 {
-                    name: "workshopCode", xtype: "textfield", fieldLabel: "部门", allowBlank: false,
+                    name: "workshopId", xtype: "combobox", fieldLabel: "部门", allowBlank: false,
+                    valueField: "recordId", displayField: "orgName",
+                    store: Ext.create({ xtype: 'imms_org_WorkshopStore', autoLoad: true, pageSize: 0 }),
                     listeners: {
                         change: function (self, newValue, oldValue, eOpts) {
                             var form = this.up("imms_mfc_qualityCheck_QualityCheckDetailForm");
-                            var record = form.workshopStore.findRecord("orgCode", newValue, 0, false, false, true);
+                            var record = self.getSelectedRecord();
                             if (record != null) {
                                 form.down("[name='workshopId']").setValue(record.get("recordId"));
                                 form.down("[name='workshopName']").setValue(record.get("orgName"));
+
+                                var wocgCodeStore = form.down("[name='wocgCode']").getStore();
+                                wocgCodeStore.proxy.url = "api/imms/org/workstation/getWorkshopWocgList?workshopId=" + record.get("recordId");
+                                wocgCodeStore.load();
+
+                                var locCodestore = form.down("[name='locCode']").getStore();
+                                locCodestore.proxy.url = "api/imms/org/workstation/getWorkshopLocList?workshopId=" + record.get("recordId");
+                                locCodestore.load();
                             }
                         }
                     }
                 },
-                { name: "workshopName", xtype: "textfield", flex: 0.8, margin: '0 20 5 5', allowBlank: false, readOnly: true },
+                {
+                    name: "wocgCode", xtype: "combobox", margin: '0 20 0 20', fieldLabel: "工作中心组", allowBlank: false,
+                    valueField: "wocgCode", displayField: "wocgCode",
+                    store: Ext.create("Ext.data.JsonStore", {
+                        fields: [{ name: "wocgCode" }],
+                        autoLoad: false,
+                        pageSize: 0,
+                        params: function () {
+                            return { "workshopId": 3 };
+                        },
+                        proxy: {
+                            type: "ajax",
+                            url: "api/imms/org/workstation/getWorkshopWocgList",
+                            reader: {
+                                root: "rootProperty"
+                            }
+                        }
+                    })
+                },
             ]
         },
         {
@@ -80,8 +108,26 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
             layout: "hbox",
             margin: '0 0 3 ',
             items: [
-                { name: "wocgCode", xtype: "textfield", width: 200, margin: '0 20 5 0', fieldLabel: "工作中心组", allowBlank: false },
-                { name: "locCode", xtype: "textfield", width: 200, margin: '0 20 5 0', fieldLabel: "存储区域", allowBlank: false },
+
+                {
+                    name: "locCode", xtype: "combobox", margin: '8 20 5 0', fieldLabel: "存储区域", allowBlank: false,
+                    displayField: "locCode", valueField: "locCode",
+                    store: Ext.create("Ext.data.JsonStore", {
+                        fields: [{ name: "locCode" }],
+                        autoLoad: false,
+                        pageSize: 0,
+                        params: function () {
+                            return { "workshopId": 3 };
+                        },
+                        proxy: {
+                            type: "ajax",
+                            url: "api/imms/org/workstation/getWorkshopLocList",
+                            reader: {
+                                root: "rootProperty"
+                            }
+                        }
+                    })
+                },
             ]
         },
         {

@@ -19,11 +19,11 @@ namespace Imms.WebManager.Filters
             if (context.Result is ObjectResult)
             {
                 object value = (context.Result as ObjectResult).Value;
-                context.Result = new ObjectResult(new ExtJsApiCallResult()
+                context.Result = new ObjectResult((new ExtJsApiCallResult()
                 {
                     Success = true,
                     Data = value
-                });
+                }).ToJson());
             }
         }
 
