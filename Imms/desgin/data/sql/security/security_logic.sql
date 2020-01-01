@@ -67,7 +67,7 @@ INSERT INTO system_program (record_id,program_code, program_name, url, show_orde
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03', 'RUN', '运行');
 INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph,program_status) VALUES ('SYS03_01', 'SYS03_01', '产品管理', 'app.view.imms.material.material.Material', 1, '', 'SYS03', '0xf1d0',0);
 INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph,program_status) VALUES ('SYS03_02', 'SYS03_02', '发卡管理', 'app.view.imms.mfc.rfidCard.RfidCard', 2, '', 'SYS03', '0xf2c3',0);
--- INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph) VALUES ('SYS03_03', 'SYS03_03', '看板条码', 'app.view.imms.mfc.barcode.Barcode', 3, '', 'SYS03', '0xf02a',0);
+INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph,program_status) VALUES ('SYS03_03', 'SYS03_03', '品质代码', 'app.view.imms.mfc.defectCode.DefectCode', 3, '', 'SYS03', '0xf02a',0);
 INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph,program_status) VALUES ('SYS03_04', 'SYS03_04', '生产计划', 'app.view.imms.mfc.productionOrder.ProductionOrder', 4, '', 'SYS03', '0xf03a',0);
 INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph,program_status) VALUES ('SYS03_05', 'SYS03_05', '生产实绩', 'app.view.imms.mfc.productionOrderProgress.ProductionOrderProgress', 5, '', 'SYS03', '0xf0cb',0);
 INSERT INTO system_program (record_id,program_code, program_name, url, show_order, parameters, parent_id, glyph,program_status) VALUES ('SYS03_06', 'SYS03_06', '移库记录', 'app.view.imms.mfc.productionMoving.ProductionMoving', 6, '', 'SYS03', '0xf218',0);
@@ -85,10 +85,10 @@ INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUE
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_02', 'DELETE', '删除');
 -- INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_02', 'ExcelImport', '导入看板');
 
--- INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_03', 'RUN', '运行');
--- INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_03', 'INSERT', '新增');
--- INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_03', 'PRINT', '打印');
--- INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_03', 'DELETE', '删除');
+INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_03', 'RUN', '运行');
+INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_03', 'INSERT', '新增');
+INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_03', 'PRINT', '打印');
+INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_03', 'DELETE', '删除');
 
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_04', 'RUN', '运行');
 INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_04', 'INSERT', '新增');

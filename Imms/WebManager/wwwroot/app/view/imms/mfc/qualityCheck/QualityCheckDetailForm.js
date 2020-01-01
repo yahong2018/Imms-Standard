@@ -10,7 +10,6 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
     },
     defectStore: Ext.create({ xtype: "imms_mfc_DefectStore", autoLoad: true, pageSize: 0 }),
     operatorStore: Ext.create({ xtype: 'imms_org_OperatorStore', autoLoad: true, pageSize: 0 }),
-
     productionStore: Ext.create({ xtype: 'app_store_imms_material_MaterialStore', autoLoad: true, pageSize: 0 }),
     items: [
         { name: "defectId", xtype: "hidden" },
@@ -68,7 +67,7 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
                             var form = this.up("imms_mfc_qualityCheck_QualityCheckDetailForm");
                             var record = self.getSelectedRecord();
                             if (record != null) {
-                                form.down("[name='workshopId']").setValue(record.get("recordId"));
+                                form.down("[name='workshopCode']").setValue(record.get("orgCode"));
                                 form.down("[name='workshopName']").setValue(record.get("orgName"));
 
                                 var wocgCodeStore = form.down("[name='wocgCode']").getStore();
