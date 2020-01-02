@@ -13,8 +13,6 @@ Ext.define('app.view.admin.systemRole.SystemRoleController', {
             return;
         }
         var roleId = role.get('recordId');
-        debugger;
-
         var throughTree = function (node) {
             for (var i = 0; i < node.childNodes.length; i++) {
                 var child = node.getChildAt(i);

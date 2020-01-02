@@ -1,6 +1,7 @@
-Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
-    extend: "app.ux.TrackableFormPanel",
-    xtype: "imms_mfc_qualityCheck_QualityCheckDetailForm",
+Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckBatchDetailForm", {
+    extend: "Ext.form.Panel",
+    xtype: "imms_mfc_qualityCheck_QualityCheckBatchDetailForm",
+    uses: ["Ext.window.Window", "app.view.imms.mfc.qualityCheck.BomTreeSelectForm"],
     width: 650,
     padding: 5,
     layout: "anchor",
@@ -14,6 +15,7 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
     items: [
         { name: "defectId", xtype: "hidden" },
         { name: "productionId", xtype: "hidden" },
+        { name: "productionName", xtype: "hidden" },
         { name: "workshopCode", xtype: "hidden" },
         { name: "workshopName", xtype: "hidden" },
         {
@@ -37,26 +39,6 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
         {
             xtype: "container",
             layout: "hbox",
-            margin: '0 0 3 ',
-            items: [
-                {
-                    name: "productionCode", xtype: "textfield", fieldLabel: "产品", allowBlank: false, listeners: {
-                        change: function (self, newValue, oldValue, eOpts) {
-                            var form = this.up("imms_mfc_qualityCheck_QualityCheckDetailForm");
-                            var record = form.productionStore.findRecord("materialCode", newValue, 0, false, false, true);
-                            if (record != null) {
-                                form.down("[name='productionId']").setValue(record.get("recordId"));
-                                form.down("[name='productionName']").setValue(record.get("materialName"));
-                            }
-                        }
-                    }
-                },
-                { name: "productionName", xtype: "textfield", margin: '0 20 0 5', allowBlank: false, flex: 0.8, readOnly: true },
-            ]
-        },
-        {
-            xtype: "container",
-            layout: "hbox",
             items: [
                 {
                     name: "workshopId", xtype: "combobox", fieldLabel: "部门", allowBlank: false,
@@ -64,7 +46,7 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
                     store: Ext.create({ xtype: 'imms_org_WorkshopStore', autoLoad: true, pageSize: 0 }),
                     listeners: {
                         change: function (self, newValue, oldValue, eOpts) {
-                            var form = this.up("imms_mfc_qualityCheck_QualityCheckDetailForm");
+                            var form = this.up("imms_mfc_qualityCheck_QualityCheckBatchDetailForm");
                             var record = self.getSelectedRecord();
                             if (record != null) {
                                 form.down("[name='workshopCode']").setValue(record.get("orgCode"));
@@ -137,7 +119,7 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
                 {
                     name: "defectCode", xtype: "textfield", fieldLabel: "缺陷", margin: '0 20 5 0', allowBlank: false, listeners: {
                         change: function (self, newValue, oldValue, eOpts) {
-                            var form = this.up("imms_mfc_qualityCheck_QualityCheckDetailForm");
+                            var form = this.up("imms_mfc_qualityCheck_QualityCheckBatchDetailForm");
                             var record = form.defectStore.findRecord("defectCode", newValue, 0, false, false, true);
                             if (record != null) {
                                 form.down("[name='defectId']").setValue(record.get("recordId"));
@@ -149,16 +131,76 @@ Ext.define("app.view.imms.mfc.qualityCheck.QualityCheckDetailForm", {
                         }
                     }
                 },
-                { name: "defectName", xtype: "textfield", readOnly: true, margin: '0 20 5 0', allowBlank: false, flex: 0.8 },
+                { name: "defectName", xtype: "textfield", margin: '0 20 5 0', readOnly: true, allowBlank: false, flex: 0.8 },
             ]
-        }
-    ],
-    showHiddenItems: [
-        {
-            name: "recordId",
-            xtype: "textfield",
-            fieldLabel: "业务流水号",
-            readOnly: true,
-        }
+        }, {
+            xtype: "fieldcontainer",
+            layout: "hbox",
+            fieldLabel: "缺陷产品",
+            defaults: {
+                hideLabel: true
+            },
+            margin: '0 0 3 ',
+            items: [
+                { name: "productionCode", xtype: "textfield", fieldLabel: "产品", readOnly: true, allowBlank: false, flex: 1 },
+                {
+                    xtype: "button", glyph: 0xf002, tooltip: '查找', handler: function () {
+                        var detailForm = this.up("imms_mfc_qualityCheck_QualityCheckBatchDetailForm");
+                        var win = Ext.create({
+                            xtype: "window",
+                            modal: true,
+                            title: "部件选择",
+                            maximizable: true,
+                            minimizable: true,
+                            items: [{ xtype: "imms_mfc_qualityCheck_BomTreeSelectForm" }],
+                            buttons: [
+                                '->'
+                                , {
+                                    text: '确定',
+                                    handler: function () {
+                                        var tree = win.down("app_view_imms_mfc_qualityCheck_BomTreePanel");
+                                        var componentIdList = [];
+                                        var componentCodeList = [];
+                                        var componentNameList = [];
+                                        var throughTree = function (node) {
+                                            for (var i = 0; i < node.childNodes.length; i++) {
+                                                var child = node.getChildAt(i);
+                                                if (!child.get('checked')) {
+                                                    continue;
+                                                }
+                                                componentIdList.push(child.get("componentId"));
+                                                componentCodeList.push(child.get("componentCode"));
+                                                componentNameList.push(child.get("componentName"));
+                                                throughTree(child);
+                                            }
+                                        };
+                                        var node = tree.getRootNode();
+                                        throughTree(node);
+
+                                        detailForm.down("[name='productionId']").setValue(componentIdList.join(";"));
+                                        detailForm.down("[name='productionCode']").setValue(componentCodeList.join(";"));
+                                        detailForm.down("[name='productionName']").setValue(componentNameList.join(";"));
+
+                                        win.close();
+                                        win.destroy();
+                                        delete win;
+                                        win = null;
+                                    }
+                                }
+                                , {
+                                    text: '取消', handler: function () {
+                                        win.close();
+                                        win.destroy();
+                                        delete win;
+                                        win = null;
+                                    }
+                                }
+                            ],
+                        });
+                        win.show();
+                    }
+                }
+            ]
+        },
     ]
 });

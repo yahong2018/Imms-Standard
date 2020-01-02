@@ -40,6 +40,26 @@ namespace Imms.Data
             return ids.Length;
         }
 
+        public int BatchCreate(List<T> items)
+        {
+            CommonRepository.UseDbContextWithTransaction(dbContext =>
+            {
+                foreach (T item in items)
+                {
+                    this.Create(item, dbContext);
+                }
+            });
+            return items.Count;
+        }
+
+        public void BatchCreate(List<T> items, DbContext dbContext)
+        {
+            foreach (T item in items)
+            {
+                this.Create(item, dbContext);
+            }
+        }
+
         public void Create(T item, DbContext dbContext)
         {
             VerifierFactory.Verify(dbContext, item, GlobalConstants.DML_OPERATION_INSERT);

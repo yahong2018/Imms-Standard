@@ -8,6 +8,7 @@ using Imms.Data;
 using Imms.Mes.Controllers;
 using Imms.Mes.Data;
 using Imms.Mes.Data.Domain;
+using Imms.WebManager.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -384,7 +385,6 @@ namespace Imms.WebManager.Controllers
             return resultBuilder.ToString();
         }
 
-
         protected override void Verify(ProductionOrderProgress item, int operation)
         {
             // ProductionOrder order = CommonRepository.GetOneByFilter<ProductionOrder>(x => x.OrderNo == item.ProductionOrderNo);
@@ -428,6 +428,14 @@ namespace Imms.WebManager.Controllers
     public class QualityCheckController : OrgFilterController<QualityCheck>
     {
         public QualityCheckController() => this.Logic = new QualityCheckLogic();
+
+        [Route("batchAdd")]
+        public int BatchAdd(QualityCheckBatchAddForm batchAddForm)
+        {
+            List<QualityCheck> checkList = batchAddForm.ToQualityRecord();
+            (this.Logic as QualityCheckLogic).BatchCreate(checkList);
+            return checkList.Count;
+        }
     }
 
     [Route("api/imms/mfc/defect")]

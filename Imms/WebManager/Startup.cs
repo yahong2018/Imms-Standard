@@ -23,6 +23,10 @@ using Microsoft.IdentityModel.Tokens;
 using IdentityModel;
 using System.Text;
 using Imms.Mes.Services;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Imms.Security.Data.Domain;
+using System.IdentityModel.Tokens.Jwt;
+using Imms.Security.Data;
 
 namespace Imms.WebManager
 {
@@ -94,19 +98,9 @@ namespace Imms.WebManager
                     {
                         if (context.Token == null)
                         {
-                            try
-                            {
-                                byte[] buffer = context.HttpContext.Session.Get(GlobalConstants.AUTHROIZATION_SESSION_KEY);
-                                string token = System.Text.Encoding.UTF8.GetString(buffer);
-
-                                context.Token = token;
-                            }
-                            catch
-                            {
-                            }
+                            SetTokenFromSession(context);
                         }
                         return Task.CompletedTask;
-
                     }
                 };
             }).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
@@ -127,6 +121,36 @@ namespace Imms.WebManager
             services.AddSingleton<Sync4WDBService, Sync4WDBService>();
             // services.AddSingleton<Command2TerminatorService, Command2TerminatorService>();
             // services.AddSingleton<CloseSessionService, CloseSessionService>();
+                        
+            LoginWithBackgroundService();
+        }
+
+        private void LoginWithBackgroundService()
+        {
+            SystemUser user = new SystemUser();
+            user.UserCode = Guid.NewGuid().ToString();
+            user.Email = "admin@zhxh.com";
+            user.UserName = "BackgroundService";
+            SecurityTokenDescriptor tokenDescriptor = SystemUserLogic.CreateDescriptor(user);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            _BackgroundTokenString = tokenHandler.WriteToken(token);
+        }
+
+        private static string _BackgroundTokenString;
+
+        private static void SetTokenFromSession(MessageReceivedContext context)
+        {
+            try
+            {
+                byte[] buffer = context.HttpContext.Session.Get(GlobalConstants.AUTHROIZATION_SESSION_KEY);
+                string token = System.Text.Encoding.UTF8.GetString(buffer);
+
+                context.Token = token;
+            }
+            catch
+            {
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -153,14 +177,7 @@ namespace Imms.WebManager
 
             app.UseErrorHandling();
             app.UseAuthentication();
-
             Imms.HttpContext.Configure(app.ApplicationServices.GetRequiredService<Microsoft.AspNetCore.Http.IHttpContextAccessor>());
-
-            // app.UseSignalR(routes =>
-            // {
-            //     routes.MapHub<KanbanRealtimeHub>("/kanbanHub/realtime");
-            // });
-
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
@@ -170,7 +187,7 @@ namespace Imms.WebManager
 
             this.StartService<Sync4WDBService>(app);
             //this.StartService<Command2TerminatorService>(app);
-            //this.StartService<CloseSessionService>(app);
+            //this.StartService<CloseSessionService>(app);            
         }
 
         private void StartService<T>(IApplicationBuilder app) where T : BaseService

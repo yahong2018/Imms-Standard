@@ -74,7 +74,7 @@ namespace Imms.WebManager.Controllers
     {
         private BomLogic bomLogic { get; set; }
         public BomController()
-        {            
+        {
             this.bomLogic = new BomLogic();
             this.Logic = this.bomLogic;
         }
@@ -99,9 +99,16 @@ namespace Imms.WebManager.Controllers
         }
 
         [Route("getBomTree")]
-        public List<BomTree> GetBomTree(string materialCode){
+        public ExJsTreeReuslt GetBomTree(string materialCode)
+        {
             BomTreeBuilder treeBuilder = new BomTreeBuilder();
-            return treeBuilder.BuildBomTree(materialCode,false);
+            BomTree bomTree =  treeBuilder.BuildBomTree(materialCode, false);
+            
+            return new ExJsTreeReuslt()
+            {
+                children = bomTree,
+                text = "."
+            };
         }
     }
 

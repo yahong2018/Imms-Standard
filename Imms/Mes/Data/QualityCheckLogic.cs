@@ -19,7 +19,7 @@ namespace Imms.Mes.Data
             public string MaterialName { get; set; }
             public int Qty { get; set; }
             public int Level { get; set; }
-        }
+        }       
 
         protected override void BeforeInsert(QualityCheck item, DbContext dbContext)
         {

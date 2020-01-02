@@ -28,4 +28,17 @@ INSERT INTO role_privilege (role_id, program_privilege_id, program_id, privilege
   FROM program_privilege prv
   WHERE record_id NOT IN (
     SELECT program_privilege_id  FROM role_privilege
-  )
+  );
+
+  -- 品质记录增加批量新增的功能
+INSERT INTO program_privilege (program_id, privilege_code, privilege_name) VALUES ('SYS03_07', 'BATCH_INSERT', '批量新增');
+INSERT INTO role_privilege (role_id, program_privilege_id, program_id, privilege_code)
+  SELECT
+    1,
+    prv.record_id,
+    prv.program_id,
+    prv.privilege_code
+  FROM program_privilege prv
+  WHERE record_id NOT IN (
+    SELECT program_privilege_id  FROM role_privilege
+  );

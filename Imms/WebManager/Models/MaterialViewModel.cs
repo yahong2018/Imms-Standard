@@ -6,11 +6,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Imms.WebManager.Models
 {
-    public class BomTree : Bom
+    public class BomTree
     {
+        public long BomId { get; set; }
+        public long ComponentId { get; set; }
+        public string ComponentCode { get; set; }
+        public string ComponentName { get; set; }
+        public int MaterialQty { get; set; }
+        public int ComponentQty { get; set; }
+
+        public List<BomTree> Children { get; set; }
+
         public bool Expanded { get; set; }
         public bool Leaf { get; set; }
-        public List<BomTree> Children { get; set; }
+        public bool Checked { get; set; }
     }
 
     public class BomTreeBuilder
@@ -27,48 +36,80 @@ namespace Imms.WebManager.Models
                     continue;
                 }
 
-                ClearLeaf(tree.Children);
+                this.ClearLeaf(tree.Children);
             }
         }
 
-        public List<BomTree> BuildBomTree(string materialCode, bool clearLeaf)
+        public BomTree BuildBomTree(string materialCode, bool clearLeaf)
         {
             DbContext dbContext = GlobalConstants.DbContextFactory.GetContext();
             IQueryable<Bom> bomList = dbContext.Set<Bom>().Where(x => x.MaterialCode == materialCode);
-            List<BomTree> result = new List<BomTree>();
+
+            bool isFirst = true;
+            BomTree self = new BomTree();
+            self.Children = new List<BomTree>();
+
             foreach (Bom bom in bomList)
             {
+                if (isFirst)
+                {
+                    self.BomId = -1;
+                    self.MaterialQty = 1;
+                    self.ComponentQty = 1;
+                    self.ComponentId = bom.MaterialId;
+                    self.ComponentCode = bom.MaterialCode;
+                    self.ComponentName = bom.MaterialName;
+                    self.Leaf = false;
+                    self.Expanded = true;
+
+                    isFirst = false;
+                }
                 BomTree treeBom = new BomTree();
-                treeBom.Clone(bom);
-                result.Add(treeBom);
+                AssginBom(bom, treeBom);
+                self.Children.Add(treeBom);
 
                 this.FillTreeBom(treeBom, dbContext);
             }
 
             if (clearLeaf)
             {
-                this.ClearLeaf(result);
+                this.ClearLeaf(self.Children);
             }
-
-            return result;
+            if (self.Children.Count == 0)
+            {
+                return null;
+            }
+            return self;
         }
 
-        private void FillTreeBom(BomTree treeBom, DbContext dbContext)
+        private static void AssginBom(Bom bom, BomTree treeBom)
         {
-            string materialCode = treeBom.ComponentCode;
+            treeBom.BomId = bom.RecordId;
+            treeBom.ComponentId = bom.ComponentId;
+            treeBom.ComponentCode = bom.ComponentCode;
+            treeBom.ComponentName = bom.ComponentName;
+            treeBom.MaterialQty = bom.MaterialQty;
+            treeBom.ComponentQty = bom.ComponentQty;
+            if (treeBom.ComponentQty == 0)
+            {
+                treeBom.ComponentQty = 1;
+            }
+        }
+
+        private void FillTreeBom(BomTree parent, DbContext dbContext)
+        {
+            string materialCode = parent.ComponentCode;
             List<Bom> children = dbContext.Set<Bom>().Where(x => x.MaterialCode == materialCode).ToList();
             int childrentCount = children.Count;
-            treeBom.Expanded = childrentCount > 0;
-            treeBom.Leaf = childrentCount == 0;
-
-            treeBom.Children = new List<BomTree>();
+            parent.Expanded = childrentCount > 0;
+            parent.Leaf = childrentCount == 0;
+            parent.Children = new List<BomTree>();
             foreach (Bom childBom in children)
             {
-                BomTree child = new BomTree();
-                child.Clone(childBom);
-                treeBom.Children.Add(child);
-
-                this.FillTreeBom(child, dbContext);
+                BomTree childTree = new BomTree();
+                AssginBom(childBom, childTree);
+                parent.Children.Add(childTree);
+                this.FillTreeBom(childTree, dbContext);
             }
         }
     }
