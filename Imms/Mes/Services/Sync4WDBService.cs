@@ -93,7 +93,8 @@ namespace Imms.Mes.Services
 
                     this.Initarameters(); //获取参数
                     this.LoginToWDB();    //登录
-                    List<Workshop> firstWorkshopList = this.dbContext.Set<Workshop>().Where(x => x.PrevOperationIndex == -1).ToList();
+                    List<Workshop> firstWorkshopList = this.dbContext.Set<Workshop>().Where(x => x.WorkshopCode == "AF").ToList();
+                    // List<Workshop> firstWorkshopList =this.dbContext.Set<Workshop>().Where(x => x.PrevOperationIndex == -1).ToList();
                     this._Workstations = this.dbContext.Set<Workstation>().ToList();
                     foreach (Workshop workshop in firstWorkshopList)
                     {
@@ -183,7 +184,7 @@ namespace Imms.Mes.Services
                         throw new BusinessException(GlobalConstants.EXCEPTION_CODE_CUSTOM, "登录万达宝服务器无返回");
                     }
                     GlobalConstants.DefaultLogger.Info("登录成功,返回内容如下:" + respContent);
-                    this._loginResult = respContent.ToObject<WDBLoginResult>();
+                    this._loginResult = this.ParseResponse<WDBLoginResult>(respContent);
                 }
             }
             catch (Exception ex)
@@ -228,7 +229,7 @@ namespace Imms.Mes.Services
                         string respContent = result.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                         if (!string.IsNullOrEmpty(respContent))
                         {
-                            BomSyncData bomSyncData = respContent.ToObject<BomSyncData>();
+                            BomSyncData bomSyncData = this.ParseResponse<BomSyncData>(respContent);
 
                             foreach (BomSyncItem bomItem in bomSyncData.Values)
                             {
@@ -307,7 +308,13 @@ namespace Imms.Mes.Services
                 };
 
                 GlobalConstants.DefaultLogger.Debug("开始不良报工数据:\n" + data.ToJson());
-                this.ReportToErp(this.QualityCheckSyncUrl, data, item);
+                bool syncResult = this.ReportToErp<long>(this.QualityCheckSyncUrl, data, item);
+                if (syncResult)
+                {
+                    item.OptFlag = 255;
+                    GlobalConstants.ModifyEntityStatus<QualityCheck>(item, this.dbContext);
+                    this.dbContext.SaveChanges();
+                }
 
                 Thread.Sleep(100); // 休息100毫秒    
             }
@@ -342,7 +349,13 @@ namespace Imms.Mes.Services
                 };
 
                 GlobalConstants.DefaultLogger.Debug("开始内部转移数据:\n" + data.ToJson());
-                this.ReportToErp(this.MoveSyncUrl, data, item);
+                bool syncResult = this.ReportToErp<long>(this.MoveSyncUrl, data, item);
+                if (syncResult)
+                {
+                    item.OptFlag = 255;
+                    GlobalConstants.ModifyEntityStatus<ProductionMoving>(item, this.dbContext);
+                    this.dbContext.SaveChanges();
+                }
 
                 Thread.Sleep(100); // 休息100毫秒       
             }
@@ -357,27 +370,31 @@ namespace Imms.Mes.Services
             }
 
             List<ProductionOrderProgress> reportLit = this.dbContext.Set<ProductionOrderProgress>().Where(x => x.WorkshopId == workshop.RecordId && x.OptFlag == 0).OrderBy(x => x.CreateTime).ToList();
-            foreach (ProductionOrderProgress progress in reportLit)
+            foreach (ProductionOrderProgress item in reportLit)
             {
-                string locCode = this._Workstations.Where(x=>x.RecordId == progress.WorkstationId).Select(x=>x.LocCode).Single();
-
+                string locCode = this._Workstations.Where(x => x.RecordId == item.WorkstationId).Select(x => x.LocCode).Single();
                 InstoreSyncData data = new InstoreSyncData()
                 {
                     beId = this.AccountId,
                     prodpwt = new InstoreSyncItem[]{
                         new InstoreSyncItem(){
-                            procode = progress.ProductionCode,
+                            procode = item.ProductionCode,
                             unitcode = "pcs",
-                            qty = progress.Qty,
+                            qty = item.Qty,
                             loccode = locCode,  //progress.WorkshopCode,
-                            wcgcode = progress.WocgCode
+                            wcgcode = item.WocgCode
                         }
                     }
                 };
 
                 GlobalConstants.DefaultLogger.Info("开始同步内部报工数据：\n" + data.ToJson());
-                this.ReportToErp<long>(this.InstoreSyncUrl, data, progress);
-
+                bool syncResult = this.ReportToErp<long>(this.InstoreSyncUrl, data, item);
+                if (syncResult)
+                {
+                    item.OptFlag = 255;
+                    GlobalConstants.ModifyEntityStatus<ProductionOrderProgress>(item, this.dbContext);
+                    this.dbContext.SaveChanges();
+                }
                 Thread.Sleep(100); // 休息100毫秒  
             }
         }
@@ -391,31 +408,37 @@ namespace Imms.Mes.Services
             }
 
             List<ProductionOrderProgress> reportLit = this.dbContext.Set<ProductionOrderProgress>().Where(x => x.WorkshopId == workshop.RecordId && x.OptFlag == 0).OrderBy(x => x.CreateTime).ToList();
-            foreach (ProductionOrderProgress progress in reportLit)
+            foreach (ProductionOrderProgress item in reportLit)
             {
-                string locCode = this._Workstations.Where(x=>x.RecordId == progress.WorkstationId).Select(x=>x.LocCode).Single();
+                string locCode = this._Workstations.Where(x => x.RecordId == item.WorkstationId).Select(x => x.LocCode).Single();
 
                 InstoreSyncDataWW data = new InstoreSyncDataWW()
                 {
                     beId = this.AccountId,
                     pdcorespwt = new InstoreSyncItemWW[]{
                         new InstoreSyncItemWW(){
-                            procode = progress.ProductionCode,
+                            procode = item.ProductionCode,
                             unitcode = "pcs",
-                            qty = progress.Qty,
+                            qty = item.Qty,
                             loccode = locCode //progress.WorkshopCode
                         }
                     }
                 };
 
                 GlobalConstants.DefaultLogger.Debug("开始同步委外加工数据:\n" + data.ToJson());
-                this.ReportToErp<long>(this.InstoreSyncUrl, data, progress);
+                bool syncResult = this.ReportToErp<long>(this.InstoreSyncUrl, data, item);
+                if (syncResult)
+                {
+                    item.OptFlag = 255;
+                    GlobalConstants.ModifyEntityStatus<ProductionOrderProgress>(item, this.dbContext);
+                    this.dbContext.SaveChanges();
+                }
 
                 Thread.Sleep(100); // 休息100毫秒      
             }
         }
 
-        private void ReportToErp<T>(string url, object data, TrackableEntity<T> item) where T : IComparable
+        private bool ReportToErp<T>(string url, object data, TrackableEntity<T> item) where T : IComparable
         {
             try
             {
@@ -425,20 +448,16 @@ namespace Imms.Mes.Services
                     FillAuthorizationHeader(client);
                     string respContent = this.SendData(client, reportUrl, data);
                     GlobalConstants.DefaultLogger.Info("收到同步的结果：\n" + respContent);
-
-                    WDBSyncResponse syncResponese = respContent.ToObject<WDBSyncResponse>();
+                    WDBSyncResponse syncResponese = this.ParseResponse<WDBSyncResponse>(respContent);
                     if (syncResponese.Status)
                     {
                         GlobalConstants.DefaultLogger.Info("同步成功");
-
-                        item.OptFlag = 255;
-                        GlobalConstants.ModifyEntityStatus(item, this.dbContext);
-                        this.dbContext.SaveChanges();
+                        return true;
                     }
                     else
                     {
                         GlobalConstants.DefaultLogger.Error("同步失败!");
-                        GlobalConstants.DefaultLogger.Debug(syncResponese.Message);
+                        GlobalConstants.DefaultLogger.Error(syncResponese.Message);
                     }
                 }
             }
@@ -447,6 +466,31 @@ namespace Imms.Mes.Services
                 GlobalConstants.DefaultLogger.Error("同步失败：" + ex.Message);
                 GlobalConstants.DefaultLogger.Error(ex.StackTrace);
             }
+            return false;
+        }
+
+        private T ParseResponse<T>(string respContent) where T : class
+        {
+            StringBuilder stringBuilder = new StringBuilder(respContent);
+            if (respContent.StartsWith("\""))
+            {
+                stringBuilder.Remove(0, 1);
+            }
+            if (respContent.EndsWith("\""))
+            {
+                stringBuilder.Remove(stringBuilder.Length - 1, 1);
+            }
+            stringBuilder.Replace("\\\"tranId\\\"", "\"tranId\"");
+            stringBuilder.Replace("\\\"tranCode\\\":\\\"\\\"", "\"tranCode\":\"\"");
+            stringBuilder.Replace("\\\"message\\\":\\\"[", "\"message\":\"[");
+            stringBuilder.Replace("]\\\",\\\"status\\\"", "]\",\"status\"");
+
+            stringBuilder.Replace("\\\"tranCode\\\":\\\"", "\"tranCode\":\"");
+            stringBuilder.Replace("\\\",\\\"message\\\":\\\"", "\",\"message\":\"");
+            stringBuilder.Replace("\\\",\\\"status\\\"", "\",\"status\"");
+
+            T respObj = GlobalConstants.ToObject<T>(stringBuilder.ToString());
+            return respObj;
         }
 
         private string SendData(HttpClient client, string url, object data)

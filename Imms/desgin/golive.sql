@@ -107,21 +107,22 @@
 -- --     or workshop_id is null
 -- -- 
 
--- -- insert into rfid_card(
--- --      kanban_no,rfid_no,card_type,card_status,
--- -- 	 production_id,production_code,production_name,
--- -- 	 workshop_id,workshop_code,workshop_name,
--- -- 	 issue_qty,stock_qty,last_business_id,
--- -- 	 create_by_id,create_by_code,create_by_name,create_time,opt_flag)
--- -- select 	kanban_no,rfid_no,2,1,
--- -- 	    production_id,production_code,production_name,
--- -- 	    workshop_id,workshop_code,workshop_name,
--- -- 		issue_qty,0,-1,
--- -- 		1,'C00001','刘永红',Now(),0
--- -- from excel_import_rfid_card
--- -- ;
--- -- 
--- -- 					 
+-- insert into rfid_card(
+--      kanban_no,rfid_no,card_type,card_status,
+-- 	 production_id,production_code,production_name,
+-- 	 workshop_id,workshop_code,workshop_name,
+-- 	 issue_qty,stock_qty,last_business_id,
+-- 	 create_by_id,create_by_code,create_by_name,create_time,opt_flag)
+-- select 	kanban_no,rfid_no,2,1,
+-- 	    production_id,production_code,production_name,
+-- 	    workshop_id,workshop_code,workshop_name,
+-- 		issue_qty,0,-1,
+-- 		1,'C00001','刘永红',Now(),0
+-- from excel_import_rfid_card
+--  where rfid_no not in(
+--   select rfid_no from rfid_card
+-- )
+-- ;		 
 
 -- select * from rfid_card c0
 --    where c0.record_id in(

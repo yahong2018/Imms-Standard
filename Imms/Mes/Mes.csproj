@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
-    <ProjectReference Include="..\Security\Security.csproj" />
   </ItemGroup>
 
 </Project>

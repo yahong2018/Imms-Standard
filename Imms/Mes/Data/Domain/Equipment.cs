@@ -62,11 +62,11 @@ namespace Imms.Mes.Data.Domain
         public string IssueUserCode { get; set; }
         public string IssueUserName { get; set; }
 
-        public string WorkstationId { get; set; }
+        public long WorkstationId { get; set; }
         public string WorkstationCode { get; set; }
         public string WorkstationName { get; set; }
 
-        public string IssueQty { get; set; }
+        public int IssueQty { get; set; }
     }
 
     public class CardIssueConfigure : TrackableEntityConfigure<CardIssue>

@@ -23,7 +23,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj"/>
-    <ProjectReference Include="..\Security\Security.csproj"/>
     <ProjectReference Include="..\Mes\Mes.csproj"/>
   </ItemGroup>
   <ItemGroup>
