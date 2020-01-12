@@ -87,7 +87,7 @@ begin
                 s.update_time = Now(),
                 s.update_by_id = 1,
                 s.update_by_code = 'SYS',
-                s.update_by_name='数据采集平台'					 
+                s.update_by_name='数据采集平台'
         where record_id = StockRecordId;  -- 转入
             
         update material_stock s

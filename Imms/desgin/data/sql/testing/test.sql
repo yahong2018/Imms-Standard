@@ -38,6 +38,7 @@ truncate table workstation_session_step;
 truncate table quality_check;
 truncate table outsource_workstation_bind;
 truncate table outsource_card_bind;
+truncate table card_issue;
 
 truncate table defect;
 truncate table production_order;
@@ -773,3 +774,343 @@ select log_value from system_logs;
 select * from workstation_session;
 select * from workstation_session_step;
 
+
+---------------------------------------------------------------------------------------------------------------
+-- 绑卡
+truncate system_logs;
+truncate workstation_session;
+truncate workstation_session_step;
+
+set         
+		@GID=45, -- EV前加工
+		@DID=3,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
+		@StrPara1='0011004747', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+select log_value from system_logs;
+select * from workstation_session;
+select * from workstation_session_step;
+
+
+-- 报工
+
+truncate system_logs;
+truncate workstation_session;
+truncate workstation_session_step;
+
+set         
+		@GID=45, -- EV前加工
+		@DID=3,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
+		@StrPara1='0010970609', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+select log_value from system_logs;
+select * from workstation_session;
+select * from workstation_session_step;
+
+truncate system_logs;
+truncate workstation_session;
+truncate workstation_session_step;
+
+set         
+		@GID=45, -- EV前加工
+		@DID=3,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
+		@StrPara1='0010963202', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+select log_value from system_logs;
+select * from workstation_session;
+select * from workstation_session_step;
+
+
+set         
+		@GID=45, -- EV前加工
+		@DID=3,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
+		@StrPara1='0010970349', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+
+
+set         
+		@GID=45, -- EV前加工
+		@DID=3,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
+		@StrPara1='0011021970', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+
+
+set         
+		@GID=45, -- EV前加工
+		@DID=3,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
+		@StrPara1='0010978038', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+
+
+
+set         
+		@GID=45, -- EV前加工
+		@DID=3,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
+		@StrPara1='0011015658', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+
+
+set         
+		@GID=45, -- EV前加工
+		@DID=3,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
+		@StrPara1='0010998159', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+
+set         
+		@GID=45, -- EV前加工
+		@DID=3,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
+		@StrPara1='0011012385', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+
+
+
+set         
+		@GID=45, -- EV前加工
+		@DID=3,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
+		@StrPara1='0011007202', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+
+
+
+set         
+		@GID=45, -- EV前加工
+		@DID=3,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
+		@StrPara1='0011006752', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+
+
+
+set         
+		@GID=45, -- EV前加工
+		@DID=3,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
+		@StrPara1='0011008329', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+
+
+
+
+set         
+		@GID=45, -- EV前加工
+		@DID=3,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
+		@StrPara1='0010982920', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+
+
+set         
+		@GID=45, -- EV前加工
+		@DID=3,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
+		@StrPara1='0010963687', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+
+
+
+set         
+		@GID=45, -- EV前加工
+		@DID=3,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
+		@StrPara1='0011008209', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+
+
+
+set         
+		@GID=45, -- EV前加工
+		@DID=3,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
+		@StrPara1='0010976153', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+
+
+set         
+		@GID=45, -- EV前加工
+		@DID=3,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
+		@StrPara1='0010987348', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+
+
+set         
+		@GID=45, -- EV前加工
+		@DID=3,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
+		@StrPara1='0011008963', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+
+
+set         
+		@GID=45, -- EV前加工
+		@DID=3,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
+		@StrPara1='0010979793', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+
+-- --------------------------------------------------------------------------------------------
+-- EV外发
+truncate system_logs;
+truncate workstation_session;
+truncate workstation_session_step;
+
+set         
+		@GID=11, -- 中三三民
+		@DID=26,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
+		@StrPara1='0011004747', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+select log_value from system_logs;
+select * from workstation_session;
+select * from workstation_session_step;
+
+
+-- EV回厂
+truncate system_logs;
+truncate workstation_session;
+truncate workstation_session_step;
+
+set         
+		@GID=11, -- 中三三民
+		@DID=27,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
+		@StrPara1='0011004747', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+select log_value from system_logs;
+select * from workstation_session;
+select * from workstation_session_step;
+
+-- -----------------------------------------------------------------------------------------
+-- EV后加工
+truncate system_logs;
+truncate workstation_session;
+truncate workstation_session_step;
+
+set         
+		@GID=45, -- 后加工
+		@DID=5,	
+		@DataType=1, --  刷卡数据 				
+		@DataGatherTime=Now(),
+		@DataMakeTime=Now(),
+		@StrPara1='0011004747', 
+		@Resp=''
+		;		
+call MES_ProcessDeviceData(@GID,@DID,@DataType,@DataGatherTime,@DataMakeTime,@StrPara1,@Resp);
+select @Resp;
+select log_value from system_logs;
+select * from workstation_session;
+select * from workstation_session_step;

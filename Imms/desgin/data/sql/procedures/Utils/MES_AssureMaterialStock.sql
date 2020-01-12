@@ -10,12 +10,14 @@ create procedure MES_AssureMaterialStock(
     out StockRecordId    bigint
 )
 begin    
+    call MES_Debug(CONCAT('MES_AssureMaterialStock --> ProductionId:',ifnull(ProductionId,-1),',WorkshopId:',ifnull(WorkshopId,-1)));
+
     set StockRecordId = -1;
 
     select st.record_id into StockRecordId 
       from material_stock st
     where st.material_id = ProductionId  and st.store_id = WorkshopId;
-
+ 
     if ifnull(StockRecordId,-1) = -1 then
         start transaction;
             select st.record_id into StockRecordId 
@@ -36,4 +38,6 @@ begin
             end if;        
         commit;    -- 提交事务，释放锁
     end if;
+
+    call MES_Debug('MES_AssureMaterialStock 结束');
 end;

@@ -17,6 +17,7 @@ Ext.define("app.model.imms.mfc.RfidCardModel", {
         { name: "issueQty", type: "int" },
         { name: "stockQty", type: "int" },
 
-        { name:"towerNo",type:"string"}
+        { name: "towerNo", type: "string" },
+        { name: "outsourceQty", type: "int" }
     ]
 });

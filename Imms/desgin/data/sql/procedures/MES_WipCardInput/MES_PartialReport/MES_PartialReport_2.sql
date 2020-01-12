@@ -35,6 +35,8 @@ top:begin
     else
        set ReportQty = cast(ReqData as UNSIGNED);	   
     end if;   
+
+    call MES_Debug(CONCAT('MES_PartialReport_2 -->CardId:',CardId,',RfidNo:',RfidNo,',ReqData:',ReqData,',ReportQty:',ReportQty,',StockQty:',QtyStock,',CardIssue:',QtyIssue));
    
     if(QtyStock + ReportQty > QtyIssue) then
         set RespData='2';    

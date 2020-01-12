@@ -9,15 +9,15 @@ create procedure MES_ReportWip_1
     in    BindId               bigint,
     in    CardId               int,              
     in    RfidNo               varchar(20),      
-    in    ReqTime              datetime,         -- 报工时间
-    inout ReportQty            int,               -- 结果：报工数量
+    in    ReqTime              datetime,          -- 报工时间
+    in    ReportQty            int,               -- 结果：报工数量
     out   LastBusinessId       bigint
 )
 begin
     declare OutSourceCardId bigint;
     declare OutSoruceCardNo,OutSourceCardNo varchar(20);
 
-    -- 进行正常报工
+    -- 进行正常报工    
     call MES_ReportWip_0(WorkstationId,CardId,ReqTime,ReportQty,LastBusinessId);
 
     -- 更新外发工位的绑定状态
@@ -41,10 +41,4 @@ begin
         where workstation_bind_id = BindId 
           and qty_card_id = CardId;
     end if;
-    
-    -- 更新外发看板的完工数量
-    update rfid_card c
-      set c.stock_qty = c.stock_qty + ifnull(ReportQty,0),
-          c.card_status = 10   -- 外发看板已报工
-    where c.record_id = OutSourceCardId;
 end;

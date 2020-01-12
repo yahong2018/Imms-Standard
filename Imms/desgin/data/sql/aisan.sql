@@ -341,25 +341,15 @@ create table card_issue
     
     card_id                bigint                      not null,
     card_no                varchar(20)                 not null,
-    card_type              int                         not null,
-    old_card_status        int                         not null,
     
     issue_user_id          bigint                      not null,
     issue_user_code        varchar(20)                 not null,
     issue_user_name        varchar(50)                 not null,
     
-    issue_workstation_id   bigint                      not null,
-    issue_workstation_code varchar(20)                 not null,
-    issue_workstation_name varchar(50)                 not null,
-
-    production_id          bigint                      not null,
-    production_code        varchar(20)                 not null,
-    production_name        varchar(50)                 not null,
-
-    workshop_id            bigint                      not null,
-    workshop_code          varchar(20)                 not null,
-    workshop_name          varchar(50)                 not null,
-    
+    workstation_id         bigint                      not null,
+    workstation_code       varchar(20)                 not null,
+    workstation_name       varchar(50)                 not null,
+       
     issue_qty              int                         not null,
 
     create_by_id           bigint                      not null,

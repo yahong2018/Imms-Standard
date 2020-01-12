@@ -14,6 +14,8 @@ begin
     declare CardId,TheNewSessionId,ProductionId bigint;	 
     declare CreateTime,LastProcessTime,ExpireTime datetime;
     declare ProductionName varchar(50);
+
+    call MES_Debug('MES_IssueCard_2--->');
      
     select -1,'' into Success,RespData;
      
@@ -37,14 +39,15 @@ begin
         
     update rfid_card
        set issue_qty = IssueQty,
-         card_status = 1,
-           stock_qty = 0
+         card_status = 1,         
+           stock_qty = 0,
+           outsource_qty = 0
     where record_id = CardId;
 
     insert into card_issue(card_id,card_no,issue_user_id,issue_user_code,issue_user_name,workstation_id,workstation_code,workstation_name,issue_qty,create_by_id,create_by_code,create_by_name,create_time,opt_flag)
-         select CardId,ReqData,ws.operator_id,ws.employee_id,ws.employee_name,ws.workstation_id,wst.org_code,wst.org_name,IssueQty,1,'SYS','数据采集平台',Now(),0
+         select CardId,RfidNo,ws.operator_id,ws.employee_id,ws.employee_name,ws.workstation_id,wst.org_code,wst.org_name,IssueQty,1,'SYS','数据采集平台',Now(),0
            from workstation_session ws join work_organization_unit wst on ws.workstation_id = wst.record_id
-          where record_id = SessionId;           
+          where ws.record_id = SessionId;           
 
     set CreateTime = Now();
     set LastProcessTime = Now();
